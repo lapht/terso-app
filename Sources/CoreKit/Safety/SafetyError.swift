@@ -34,6 +34,27 @@ public enum SafetyError: Error, Sendable, Hashable {
     ///   - allowedRoots: The set of roots that would have been accepted.
     case pathNotAllowlisted(path: String, allowedRoots: [String])
 
+    // MARK: Invariant §2 — Symlink discipline
+
+    /// A symlink resolved to a target outside the allowlisted root or on a protected path.
+    ///
+    /// - Parameters:
+    ///   - originalPath: The path of the symlink.
+    ///   - resolvedPath: The resolved target of the symlink.
+    case symlinkEscape(originalPath: String, resolvedPath: String)
+
+    /// A symlink cannot be resolved because its target does not exist.
+    ///
+    /// - Parameters:
+    ///   - path: The path of the broken symlink.
+    ///   - destination: The unresolved destination target path.
+    case brokenSymlink(path: String, destination: String)
+
+    /// A symlink cannot be resolved because it forms a circular reference loop.
+    ///
+    /// - Parameter path: The path of the cyclic symlink.
+    case circularSymlink(path: String)
+
     // MARK: Invariant §3 — Protected paths
 
     /// The path matches a hard-denied protected location.
@@ -59,6 +80,12 @@ extension SafetyError: CustomStringConvertible {
         switch self {
         case let .pathNotAllowlisted(path, roots):
             return "Path '\(path)' is not under any allowlisted root: \(roots.joined(separator: ", "))"
+        case let .symlinkEscape(originalPath, resolvedPath):
+            return "Symlink '\(originalPath)' resolves outside allowlisted roots to '\(resolvedPath)'"
+        case let .brokenSymlink(path, destination):
+            return "Symlink '\(path)' is broken (destination '\(destination)' does not exist)"
+        case let .circularSymlink(path):
+            return "Symlink '\(path)' forms a circular reference loop"
         case let .protectedPath(path, reason):
             return "Path '\(path)' is hard-denied: \(reason)"
         case let .invalidPath(path):
