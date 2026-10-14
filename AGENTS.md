@@ -7,31 +7,40 @@ Leggi questo file per intero prima di toccare qualsiasi file. Il design document
 Terso: cleaner macOS open source, GPL-3.0, Swift 6 + SwiftUI, macOS 13+.
 Tutta la logica vive nel Swift Package `CoreKit`. L'app GUI è solo presentazione.
 
-## Le 8 invarianti di sicurezza (NON negoziabili — da docs/design.md §5)
-1. Deletion targets only paths under per-module allowlisted roots.
-2. Resolve every path; verify resolved target stays inside the allowlist; never
-   follow symlinks into unknown locations.
-3. Hard deny: SIP-protected volumes, `/System`, `/private/var/db`, Desktop,
-   Documents, Downloads roots, active app bundles.
-4. Trash-first: default op is `FileManager.trashItem`. Permanent delete solo
-   con opt-in esplicito per item, disattivato di default.
-5. Dry-run available for every clean action; Smart Scan first run is dry-run only.
-6. GUI confirmation with total size + item count before any execution.
-7. Missing Full Disk Access disables only affected modules, with clear UI.
-8. Every deletion logged locally (timestamp, rule id, size); logs exportable.
+## Mappa dell'architettura (da docs/design.md §3)
+```
+terso-app/
+  Sources/
+    CoreKit/
+      Engine/        # scanner, rule evaluation, size accounting
+      Safety/        # the guarded deletion pipeline (see §5)
+      Rules/         # rule DB loader + validation
+      Modules/       # one Swift file per cleanup module
+    TersoApp/        # SwiftUI views, minimal logic
+  Rules/             # rules/vYYYY.N.json — versioned rule database
+  Tests/             # fixtures: fake home dirs with known trees
+  docs/              # this file, CONTRIBUTING.md, CODE_OF_CONDUCT.md
+  AGENTS.md          # instructions for AI agents (see §8)
+```
+
+## Le 8 invarianti di sicurezza (NON negoziabili — verbatim da docs/design.md §5)
+1. **Allowlist-only roots.** Deletion may only target paths under allowlisted roots defined per module (e.g. `~/Library/Caches`). Everything else = refusal.
+2. **Symlink discipline.** Resolve every path; verify the resolved target is still inside the allowlist root; never follow symlinks into unknown locations.
+3. **Protected paths.** Hard deny: SIP-protected volumes, `/System`, `/private/var/db`, the user's Desktop/Documents/Downloads roots, and any active application bundle.
+4. **Trash-first.** Default destructive op is `FileManager.trashItem` (real Trash, recoverable). Permanent delete requires an explicit per-item opt-in checkbox, off by default.
+5. **Dry-run everywhere.** First run of "Smart Scan" never deletes; every clean action has a dry-run mode reporting byte counts.
+6. **Confirmation + recap.** GUI must show total size and item count before executing; admin escalation (sandboxed helper) is separate and logged.
+7. **Graceful TCC.** Missing Full Disk Access disables only the modules that need it, with clear onboarding — never silently scans less than displayed.
+8. **No silent failures.** Every deletion is logged (locally) with timestamp, rule id, and size; logs are exportable for bug reports.
 
 ## Regole di ingaggio
-- Nessuna API di cancellazione file fuori da `Sources/CoreKit/Safety/`. La CI
-  blocca le violazioni: non cercare workaround, segnala e basta.
-- Non allargare lo scope di un issue. Se serve altro lavoro, proponi un nuovo
-  issue invece di implementarlo.
-- Ogni modifica a `Safety/` o `Rules/` richiede review umana: segnalalo
-  esplicitamente nella PR description con il flag `[SAFETY]`.
+- **Divieto assoluto:** nessuna logica né API di cancellazione file fuori da `Sources/CoreKit/Safety/`. La CI blocca le violazioni: non cercare workaround, segnala e basta.
+- Non allargare lo scope di un issue. Se serve altro lavoro, proponi un nuovo issue invece di implementarlo.
+- Ogni modifica a `Safety/` o `Rules/` richiede review umana obbligatoria: segnalalo esplicitamente nella PR description con il flag `[SAFETY]`.
 - Codice conforme a SwiftLint; esegui i test prima di proporre la PR.
 - Commit in formato Conventional Commits (`feat:`, `fix:`, `test:`...).
 - Un issue = una PR. PR piccole e leggibili.
 
-## Test obbligatori
+## Test obbligatori per modifica
 - Rule engine: validazione schema e pattern con fixture in `Tests/`.
-- Ogni nuovo modulo: fixture tree con contenuto noto + test su risultato esatto
-  di scan e deletion set. Includi un caso symlink-attack quando rilevante.
+- Ogni nuovo modulo: fixture tree con contenuto noto + test su risultato esatto di scan e deletion set. Includi un caso symlink-attack quando rilevante.
