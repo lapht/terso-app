@@ -16,6 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import AppKit
 import CoreKit
 import SwiftUI
 
@@ -24,6 +25,14 @@ struct TersoApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    Task { @MainActor in
+                        let application = NSApplication.shared
+                        application.setActivationPolicy(.regular)
+                        application.activate(ignoringOtherApps: true)
+                        application.windows.first?.makeKeyAndOrderFront(nil)
+                    }
+                }
         }
     }
 }
