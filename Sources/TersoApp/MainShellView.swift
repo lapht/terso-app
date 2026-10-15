@@ -19,6 +19,7 @@
 import CoreKit
 import SwiftUI
 
+@MainActor
 struct MainShellView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var selection: SidebarDestination? = .smartScan

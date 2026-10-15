@@ -19,6 +19,7 @@
 import CoreKit
 import SwiftUI
 
+@MainActor
 struct SmartScanView: View {
     @StateObject private var viewModel: SmartScanViewModel
 

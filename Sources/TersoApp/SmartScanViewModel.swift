@@ -176,7 +176,7 @@ final class SmartScanViewModel: ObservableObject {
         UserLogsModule(),
         TrashBinsModule(),
         XcodeJunkModule(),
-        PackageCachesModule(),
+        PackageCachesModule()
     ]
 
     private static func makeScanContext(tccManager: TCCManager) -> ScanContext {
