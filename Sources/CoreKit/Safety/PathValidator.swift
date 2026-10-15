@@ -149,7 +149,7 @@ public struct PathValidator: Sendable {
         let personalProtected: [(URL, String)] = [
             (homeDirectory.appendingPathComponent("Desktop"), "user Desktop root"),
             (homeDirectory.appendingPathComponent("Documents"), "user Documents root"),
-            (homeDirectory.appendingPathComponent("Downloads"), "user Downloads root"),
+            (homeDirectory.appendingPathComponent("Downloads"), "user Downloads root")
         ]
         for (protectedURL, reason) in personalProtected {
             let protectedPath = protectedURL.standardizedFileURL.path
