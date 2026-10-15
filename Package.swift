@@ -45,7 +45,10 @@ let package = Package(
         .executableTarget(
             name: "TersoApp",
             dependencies: ["CoreKit"],
-            path: "Sources/TersoApp"
+            path: "Sources/TersoApp",
+            resources: [
+                .copy("Assets.xcassets")
+            ]
         ),
         .testTarget(
             name: "CoreKitTests",
