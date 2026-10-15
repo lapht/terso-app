@@ -44,7 +44,12 @@ private final class DeletionFixture {
         try? FileManager.default.removeItem(at: rootURL)
     }
 
-    func makeItem(at url: URL, content: String, action: CleanAction = .trash) throws -> CleanItem {
+    func makeItem(
+        at url: URL,
+        content: String,
+        action: CleanAction = .trash,
+        isDeletable: Bool = true
+    ) throws -> CleanItem {
         try content.write(to: url, atomically: true, encoding: .utf8)
         return CleanItem(
             url: url,
@@ -52,6 +57,7 @@ private final class DeletionFixture {
             sizeBytes: Int64(content.utf8.count),
             moduleId: "caches.user",
             ruleId: "caches.user.fixture",
+            isDeletable: isDeletable,
             recommendedAction: action
         )
     }
@@ -190,5 +196,36 @@ struct DeletionPipelineTests {
             )
         }
         #expect(FileManager.default.fileExists(atPath: itemURL.path))
+    }
+
+    @Test func nonDeletableItemIsRejectedBeforeDryRunOrDeletion() throws {
+        let fixture = try DeletionFixture()
+        let itemURL = fixture.cachesURL.appendingPathComponent("large-file.dat")
+        let item = try fixture.makeItem(
+            at: itemURL,
+            content: "read only",
+            action: .revealInFinder,
+            isDeletable: false
+        )
+        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL, auditLogger: fixture.auditLogger)
+
+        do {
+            _ = try pipeline.execute(
+                items: [item],
+                allowedRootsByModule: fixture.allowedRootsByModule,
+                dryRun: true
+            )
+            Issue.record("The pipeline must reject non-deletable items.")
+        } catch let error as DeletionPipelineError {
+            #expect(error == .nonDeletableItem(path: itemURL.path))
+        }
+
+        #expect(FileManager.default.fileExists(atPath: itemURL.path))
+        let records = try String(contentsOf: fixture.auditLogURL, encoding: .utf8)
+            .split(separator: "\n")
+        let record = try JSONDecoder().decode(AuditRecord.self, from: Data(try #require(records.first).utf8))
+        #expect(record.action == .dryRun)
+        #expect(record.result == .failure)
+        #expect(record.errorCode == "nonDeletableItem")
     }
 }

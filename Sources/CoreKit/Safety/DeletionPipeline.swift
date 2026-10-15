@@ -50,6 +50,9 @@ public enum DeletionPipelineError: Error, Sendable, Hashable {
     /// Permanent deletion is not supported by this pipeline.
     case unsupportedAction(path: String, action: CleanAction)
 
+    /// The scanner marked the item as read-only.
+    case nonDeletableItem(path: String)
+
     /// The scanner supplied an invalid byte count.
     case invalidSize(path: String, sizeBytes: Int64)
 
@@ -129,6 +132,10 @@ public final class DeletionPipeline {
 
         for item in items {
             do {
+                guard item.isDeletable else {
+                    throw DeletionPipelineError.nonDeletableItem(path: item.url.standardizedFileURL.path)
+                }
+
                 switch item.recommendedAction {
                 case .skip:
                     continue
@@ -139,6 +146,11 @@ public final class DeletionPipeline {
                     )
                 case .trash:
                     break
+                case .revealInFinder:
+                    throw DeletionPipelineError.unsupportedAction(
+                        path: item.url.standardizedFileURL.path,
+                        action: item.recommendedAction
+                    )
                 }
 
                 let roots = allowedRootsByModule[item.moduleId] ?? []
@@ -265,6 +277,8 @@ public final class DeletionPipeline {
             return "itemNotFound"
         case .unsupportedAction:
             return "unsupportedAction"
+        case .nonDeletableItem:
+            return "nonDeletableItem"
         case .invalidSize:
             return "invalidSize"
         case .sizeOverflow:

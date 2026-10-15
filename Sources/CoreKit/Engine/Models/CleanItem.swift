@@ -49,6 +49,9 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
     /// When `true`, the safety pipeline must refuse deletion.
     public let isProtected: Bool
 
+    /// Whether this item may be submitted to the deletion pipeline.
+    public let isDeletable: Bool
+
     /// The recommended action for this item.
     /// Defaults to `.trash` per Invariant §4 (trash-first).
     public let recommendedAction: CleanAction
@@ -61,6 +64,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         moduleId: String,
         ruleId: String,
         isProtected: Bool = false,
+        isDeletable: Bool = true,
         recommendedAction: CleanAction = .trash
     ) {
         self.id = id
@@ -70,6 +74,32 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         self.moduleId = moduleId
         self.ruleId = ruleId
         self.isProtected = isProtected
+        self.isDeletable = isDeletable
         self.recommendedAction = recommendedAction
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case url
+        case resolvedURL
+        case sizeBytes
+        case moduleId
+        case ruleId
+        case isProtected
+        case isDeletable
+        case recommendedAction
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        url = try container.decode(URL.self, forKey: .url)
+        resolvedURL = try container.decode(URL.self, forKey: .resolvedURL)
+        sizeBytes = try container.decode(Int64.self, forKey: .sizeBytes)
+        moduleId = try container.decode(String.self, forKey: .moduleId)
+        ruleId = try container.decode(String.self, forKey: .ruleId)
+        isProtected = try container.decode(Bool.self, forKey: .isProtected)
+        isDeletable = try container.decodeIfPresent(Bool.self, forKey: .isDeletable) ?? true
+        recommendedAction = try container.decode(CleanAction.self, forKey: .recommendedAction)
     }
 }
