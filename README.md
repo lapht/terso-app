@@ -41,14 +41,33 @@ answer: **GPL-3.0, free forever, zero telemetry, trash-first deletions.**
 
 Full details: [docs/design.md](docs/design.md)
 
-## Building
+## Run Terso on your Mac
 
-**Requires:** macOS 13+, Xcode 16+
+**Requires:** macOS 13+ and Xcode 16 or later (including the Swift 6 toolchain).
 
 ```bash
 git clone https://github.com/lapht/terso-app.git
 cd terso-app
-open Package.swift   # or xed .
+swift run TersoApp
+```
+
+SwiftPM builds and launches the macOS app. Keep the terminal open while using
+it; press `Ctrl-C` there to stop it.
+
+To run from Xcode instead, open the package and run the `TersoApp` scheme:
+
+```bash
+open Package.swift
+```
+
+Full Disk Access is not needed just to launch Terso. Modules that need it will
+tell you when permission is unavailable rather than showing an incomplete scan.
+
+To build without launching the app and run the test suite:
+
+```bash
+swift build
+swift test
 ```
 
 ## Contributing
