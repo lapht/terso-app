@@ -12,7 +12,18 @@ Grazie per l'interesse! Terso è GPL-3.0, gratuito per sempre, e resta tale.
 
 ## Setup sviluppo
 macOS 13+, Xcode 16+. `git clone`, apri `Package.swift`, build.
-Prima della PR: SwiftLint pulito + tutti i test verdi.
+Prima della PR: SwiftLint e SwiftFormat puliti + build e tutti i test verdi.
+
+## Protezione del branch `main`
+Le PR verso `main` devono passare entrambi i check obbligatori della CI prima
+del merge:
+- `Quality Gates (arm64)`
+- `Quality Gates (x86_64)`
+
+Configura la protezione di `main` in GitHub per richiedere questi status check
+e impedire il merge quando uno dei due fallisce. Entrambi i job verificano
+linting e formattazione, compilano ed eseguono i test con strict concurrency,
+ed eseguono il Safety Audit.
 
 ## Regole d'oro
 - Le invarianti di sicurezza in `docs/design.md` §5 non si toccano senza

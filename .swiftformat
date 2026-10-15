@@ -1,0 +1,4 @@
+--swiftversion 6.0
+--indent 4
+--maxwidth 120
+--disable andOperator,blankLinesAroundMark,blankLinesAtStartOfScope,blankLinesBetweenImports,conditionalAssignment,elseOnSameLine,hoistAwait,hoistPatternLet,hoistTry,indent,numberFormatting,preferKeyPath,redundantMemberwiseInit,redundantParens,redundantReturn,redundantSelf,redundantSwiftUIGroup,redundantType,sortImports,spaceAroundOperators,trailingCommas,trailingSpace,unusedArguments,wrap,wrapArguments,wrapIfStatementBodies,wrapMultilineStatementBraces,wrapPropertyBodies
