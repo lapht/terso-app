@@ -7,54 +7,49 @@ on:
     branches: [ main ]
 
 jobs:
-  safety-audit:
-    name: Safety Audit
-    runs-on: macos-14
+  quality-gates:
+    name: Quality Gates (${{ matrix.architecture }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            architecture: x86_64
+          - runner: macos-14-xlarge
+            architecture: arm64
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Set up Swift 6.1.2
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.1.2"
+
+      - name: Verify runner architecture
+        run: test "$(uname -m)" = "${{ matrix.architecture }}"
+
+      - name: Install SwiftLint and SwiftFormat
+        run: brew install swiftlint swiftformat
+
+      - name: Run SwiftLint
+        run: swiftlint lint --strict
+
+      - name: Check Swift formatting
+        run: swiftformat Sources Tests Package.swift --lint
+
+      - name: Show Swift version
+        run: swift --version
+
+      - name: Build with strict concurrency
+        run: swift build -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
+
+      - name: Run unit and integration tests
+        run: swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
 
       - name: Run Safety Audit
         run: bash .github/scripts/safety-audit.sh
 
       - name: Test Safety Audit
         run: bash .github/scripts/test-safety-audit.sh
-
-  lint:
-    name: SwiftLint
-    runs-on: macos-14
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Swift 6.1.2
-        uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: "6.1.2"
-
-      - name: Install SwiftLint
-        run: brew install swiftlint
-
-      - name: Run SwiftLint
-        run: swiftlint lint --strict
-
-  build-and-test:
-    name: Build & Test (macOS 14)
-    runs-on: macos-14
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Swift 6.1.2
-        uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: "6.1.2"
-
-      - name: Show Swift version
-        run: swift --version
-
-      - name: Build CoreKit & TersoApp
-        run: swift build -v
-
-      - name: Run Tests
-        run: swift test -v
