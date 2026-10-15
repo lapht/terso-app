@@ -69,11 +69,13 @@ public final class DeletionPipeline {
 
     private let pathValidator: PathValidator
     private let symlinkValidator: SymlinkValidator
+    private let auditLogger: AuditLogger
 
     /// Creates a pipeline configured for the current user's home directory.
-    public init(homeDirectory: URL) {
+    public init(homeDirectory: URL, auditLogger: AuditLogger = AuditLogger()) {
         self.pathValidator = PathValidator(homeDirectory: homeDirectory)
         self.symlinkValidator = SymlinkValidator(homeDirectory: homeDirectory, pathValidator: pathValidator)
+        self.auditLogger = auditLogger
     }
 
     /// Validates and, unless `dryRun` is true, moves items to the system Trash.
@@ -97,10 +99,12 @@ public final class DeletionPipeline {
     ) throws -> DeletionResult {
         let (candidates, estimatedBytes) = try prepareCandidates(
             items: items,
-            allowedRootsByModule: allowedRootsByModule
+            allowedRootsByModule: allowedRootsByModule,
+            action: dryRun ? .dryRun : .trash
         )
 
         if dryRun {
+            try recordDryRun(candidates)
             return DeletionResult(
                 items: candidates.map { DeletionItemResult(item: $0.item, resultingItemURL: nil) },
                 estimatedBytes: estimatedBytes,
@@ -108,28 +112,8 @@ public final class DeletionPipeline {
             )
         }
 
-        var results: [DeletionItemResult] = []
-        for candidate in candidates {
-            try validate(item: candidate.item, allowedRoots: candidate.roots)
-            guard FileManager.default.fileExists(atPath: candidate.item.url.path) else {
-                throw DeletionPipelineError.itemNotFound(path: candidate.item.url.standardizedFileURL.path)
-            }
-
-            var resultingItemURL: NSURL?
-            try FileManager.default.trashItem(
-                at: candidate.item.url,
-                resultingItemURL: &resultingItemURL
-            )
-            results.append(
-                DeletionItemResult(
-                    item: candidate.item,
-                    resultingItemURL: resultingItemURL as URL?
-                )
-            )
-        }
-
         return DeletionResult(
-            items: results,
+            items: try trash(candidates),
             estimatedBytes: estimatedBytes,
             isDryRun: false
         )
@@ -137,42 +121,53 @@ public final class DeletionPipeline {
 
     private func prepareCandidates(
         items: [CleanItem],
-        allowedRootsByModule: [String: [URL]]
+        allowedRootsByModule: [String: [URL]],
+        action: AuditAction
     ) throws -> (candidates: [Candidate], estimatedBytes: Int64) {
         var candidates: [Candidate] = []
         var estimatedBytes: Int64 = 0
 
         for item in items {
-            switch item.recommendedAction {
-            case .skip:
-                continue
-            case .permanentDelete:
-                throw DeletionPipelineError.unsupportedAction(
-                    path: item.url.standardizedFileURL.path,
-                    action: item.recommendedAction
-                )
-            case .trash:
-                break
-            }
+            do {
+                switch item.recommendedAction {
+                case .skip:
+                    continue
+                case .permanentDelete:
+                    throw DeletionPipelineError.unsupportedAction(
+                        path: item.url.standardizedFileURL.path,
+                        action: item.recommendedAction
+                    )
+                case .trash:
+                    break
+                }
 
-            let roots = allowedRootsByModule[item.moduleId] ?? []
-            try validate(item: item, allowedRoots: roots)
-            guard FileManager.default.fileExists(atPath: item.url.path) else {
-                throw DeletionPipelineError.itemNotFound(path: item.url.standardizedFileURL.path)
-            }
-            guard item.sizeBytes >= 0 else {
-                throw DeletionPipelineError.invalidSize(
-                    path: item.url.standardizedFileURL.path,
-                    sizeBytes: item.sizeBytes
-                )
-            }
+                let roots = allowedRootsByModule[item.moduleId] ?? []
+                try validate(item: item, allowedRoots: roots)
+                guard FileManager.default.fileExists(atPath: item.url.path) else {
+                    throw DeletionPipelineError.itemNotFound(path: item.url.standardizedFileURL.path)
+                }
+                guard item.sizeBytes >= 0 else {
+                    throw DeletionPipelineError.invalidSize(
+                        path: item.url.standardizedFileURL.path,
+                        sizeBytes: item.sizeBytes
+                    )
+                }
 
-            let (newTotal, overflow) = estimatedBytes.addingReportingOverflow(item.sizeBytes)
-            guard !overflow else {
-                throw DeletionPipelineError.sizeOverflow
+                let (newTotal, overflow) = estimatedBytes.addingReportingOverflow(item.sizeBytes)
+                guard !overflow else {
+                    throw DeletionPipelineError.sizeOverflow
+                }
+                estimatedBytes = newTotal
+                candidates.append(Candidate(item: item, roots: roots))
+            } catch {
+                try auditLogger.record(
+                    action: action,
+                    item: item,
+                    result: .failure,
+                    errorCode: Self.errorCode(for: error)
+                )
+                throw error
             }
-            estimatedBytes = newTotal
-            candidates.append(Candidate(item: item, roots: roots))
         }
 
         return (candidates, estimatedBytes)
@@ -192,5 +187,80 @@ public final class DeletionPipeline {
         guard resolvedURL.standardizedFileURL == item.resolvedURL.standardizedFileURL else {
             throw DeletionPipelineError.staleItem(path: path)
         }
+    }
+
+    private func recordDryRun(_ candidates: [Candidate]) throws {
+        for candidate in candidates {
+            try auditLogger.record(action: .dryRun, item: candidate.item, result: .success)
+        }
+    }
+
+    private func trash(_ candidates: [Candidate]) throws -> [DeletionItemResult] {
+        var results: [DeletionItemResult] = []
+        for candidate in candidates {
+            results.append(try trash(candidate))
+        }
+        return results
+    }
+
+    private func trash(_ candidate: Candidate) throws -> DeletionItemResult {
+        let item = candidate.item
+        let resultingItemURL: NSURL?
+        do {
+            try validate(item: item, allowedRoots: candidate.roots)
+            guard FileManager.default.fileExists(atPath: item.url.path) else {
+                throw DeletionPipelineError.itemNotFound(path: item.url.standardizedFileURL.path)
+            }
+
+            var trashedItemURL: NSURL?
+            try FileManager.default.trashItem(at: item.url, resultingItemURL: &trashedItemURL)
+            resultingItemURL = trashedItemURL
+        } catch {
+            try auditLogger.record(
+                action: .trash,
+                item: item,
+                result: .failure,
+                errorCode: Self.errorCode(for: error)
+            )
+            throw error
+        }
+
+        try auditLogger.record(action: .trash, item: item, result: .success)
+        return DeletionItemResult(item: item, resultingItemURL: resultingItemURL as URL?)
+    }
+
+    private static func errorCode(for error: Error) -> String {
+        if let error = error as? SafetyError {
+            switch error {
+            case .pathNotAllowlisted:
+                return "pathNotAllowlisted"
+            case .symlinkEscape:
+                return "symlinkEscape"
+            case .brokenSymlink:
+                return "brokenSymlink"
+            case .circularSymlink:
+                return "circularSymlink"
+            case .protectedPath:
+                return "protectedPath"
+            case .invalidPath:
+                return "invalidPath"
+            }
+        }
+        if let error = error as? DeletionPipelineError {
+            switch error {
+            case .staleItem:
+                return "staleItem"
+            case .itemNotFound:
+                return "itemNotFound"
+            case .unsupportedAction:
+                return "unsupportedAction"
+            case .invalidSize:
+                return "invalidSize"
+            case .sizeOverflow:
+                return "sizeOverflow"
+            }
+        }
+        let nsError = error as NSError
+        return "NSError.\(nsError.domain).\(nsError.code)"
     }
 }
