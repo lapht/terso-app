@@ -37,12 +37,18 @@ terso-app/
 ```swift
 protocol CleanModule {
     var id: String { get }            // e.g. "caches.user"
+    var title: String { get }
+    var requiresFDA: Bool
     func scan(context: ScanContext) async throws -> [CleanItem]
     // clean() is NOT part of modules: deletion only via Safety pipeline
 }
 ```
+
 Modules only *find* items. Deletion is centralized so the safety layer
 cannot be bypassed by a buggy or contributed module.
+Scans are requested through `TCCManager`; FDA-dependent modules return an
+explicit `requiresPermission` result instead of silently producing partial
+results when Full Disk Access is unavailable.
 
 ### Rule engine
 Cleanup locations are data, not code: a versioned JSON rule DB (categories,
@@ -80,8 +86,10 @@ These are hard requirements; a PR that weakens any of them is rejected.
    action has a dry-run mode reporting byte counts.
 6. **Confirmation + recap.** GUI must show total size and item count before
    executing; admin escalation (sandboxed helper) is separate and logged.
-7. **Graceful TCC.** Missing Full Disk Access disables only the modules that
-   need it, with clear onboarding — never silently scans less than displayed.
+7. **Graceful TCC.** `TCCManager` checks access to a TCC-protected path without
+   modifying it. Missing Full Disk Access disables only the modules that need
+   it, with a clear `requiresPermission` status and onboarding — never silently
+   scans less than displayed.
 8. **No silent failures.** Every deletion is logged (locally) with timestamp,
    rule id, and size; logs are exportable for bug reports.
 
