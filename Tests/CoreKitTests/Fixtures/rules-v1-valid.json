@@ -1,0 +1,27 @@
+{
+  "version": "2026.1",
+  "schemaVersion": 1,
+  "rules": [
+    {
+      "id": "caches.user.basic",
+      "module": "caches.user",
+      "category": "Caches",
+      "name": "User cache files",
+      "description": "Finds disposable user cache files.",
+      "allowlistRoots": [
+        "~/Library/Caches"
+      ],
+      "paths": [],
+      "patterns": [
+        "*.tmp",
+        "**/*.log",
+        "[0-9]*.cache"
+      ],
+      "exclusions": [
+        "**/Keep/**"
+      ],
+      "minAgeSeconds": 86400,
+      "isTrashSafe": true
+    }
+  ]
+}

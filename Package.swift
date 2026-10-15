@@ -50,7 +50,10 @@ let package = Package(
         .testTarget(
             name: "CoreKitTests",
             dependencies: ["CoreKit"],
-            path: "Tests/CoreKitTests"
+            path: "Tests/CoreKitTests",
+            resources: [
+                .process("Fixtures")
+            ]
         )
     ],
     swiftLanguageModes: [.v6]
