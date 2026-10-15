@@ -19,6 +19,7 @@
 import CoreKit
 import SwiftUI
 
+@MainActor
 struct MainShellView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var selection: SidebarDestination? = .smartScan
@@ -57,7 +58,9 @@ struct MainShellView: View {
 
     @ViewBuilder
     private var destinationView: some View {
-        if let selection {
+        if selection == .smartScan {
+            SmartScanView(tccManager: tccManager)
+        } else if let selection {
             VStack(alignment: .leading, spacing: 12) {
                 Label(selection.title, systemImage: selection.symbol)
                     .font(.largeTitle.weight(.semibold))
@@ -67,16 +70,6 @@ struct MainShellView: View {
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-
-                if selection == .smartScan {
-                    Label(
-                        "Scans are read-only. Review results before choosing any cleanup action.",
-                        systemImage: "info.circle"
-                    )
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 8)
-                }
             }
             .frame(maxWidth: 640, alignment: .leading)
         } else {
@@ -102,10 +95,14 @@ private struct PreviewTCCAccessChecker: TCCAccessChecking {
 struct MainShellView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            MainShellView(tccManager: TCCManager(accessChecker: PreviewTCCAccessChecker(status: .denied)))
-                .previewDisplayName("Full Disk Access unavailable")
-            MainShellView(tccManager: TCCManager(accessChecker: PreviewTCCAccessChecker(status: .granted)))
-                .previewDisplayName("Full Disk Access granted")
+            MainShellView(
+                tccManager: TCCManager(accessChecker: PreviewTCCAccessChecker(status: .denied))
+            )
+            .previewDisplayName("Full Disk Access unavailable")
+            MainShellView(
+                tccManager: TCCManager(accessChecker: PreviewTCCAccessChecker(status: .granted))
+            )
+            .previewDisplayName("Full Disk Access granted")
         }
     }
 }

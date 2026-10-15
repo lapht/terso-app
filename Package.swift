@@ -57,7 +57,7 @@ let package = Package(
         ),
         .testTarget(
             name: "TersoAppTests",
-            dependencies: ["TersoApp"],
+            dependencies: ["TersoApp", "CoreKit"],
             path: "Tests/TersoAppTests"
         )
     ],
