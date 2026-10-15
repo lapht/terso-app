@@ -14,6 +14,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Swift 6.1.2
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.1.2"
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
       - name: Run SwiftLint
         run: swiftlint lint --strict
 
@@ -23,6 +31,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Set up Swift 6.1.2
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.1.2"
 
       - name: Show Swift version
         run: swift --version
