@@ -49,18 +49,12 @@ Full details: [docs/design.md](docs/design.md)
 ```bash
 git clone https://github.com/lapht/terso-app.git
 cd terso-app
-swift run TersoApp
+open Terso.xcodeproj
 ```
 
-SwiftPM builds and launches the macOS app and brings its window to the
-foreground. Keep the terminal open while using it; press `Ctrl-C` there to stop
-it.
-
-To run from Xcode instead, open the package and run the `TersoApp` scheme:
-
-```bash
-open Package.swift
-```
+In Xcode, select the `TersoApp` scheme and press **⌘R** to build and launch
+Terso. `Package.swift` remains the source of truth for the local `CoreKit`
+package consumed by the app.
 
 Full Disk Access is not needed just to launch Terso. Modules that need it will
 tell you when permission is unavailable rather than showing an incomplete scan.
@@ -100,10 +94,10 @@ build:
 - [ ] Test with a non-English system locale.
 - [ ] Verify all cleanup candidates stay within their allowlisted roots.
 
-To build without launching the app and run the test suite:
+To build the app from the command line and run the package test suite:
 
 ```bash
-swift build
+xcodebuild -project Terso.xcodeproj -scheme TersoApp build
 swift test
 ```
 

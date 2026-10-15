@@ -29,6 +29,9 @@ jobs:
         with:
           swift-version: "6.1.2"
 
+      - name: Run unit and integration tests
+        run: swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
+
       - name: Build, sign, package, and checksum
         run: ./scripts/build-release.sh
 

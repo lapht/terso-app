@@ -42,8 +42,15 @@ jobs:
       - name: Show Swift version
         run: swift --version
 
-      - name: Build with strict concurrency
-        run: swift build -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
+      - name: Build app with Xcode
+        run: >-
+          xcodebuild
+          -project Terso.xcodeproj
+          -scheme TersoApp
+          -configuration Debug
+          -destination 'generic/platform=macOS'
+          CODE_SIGNING_ALLOWED=NO
+          build
 
       - name: Run unit and integration tests
         run: swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
