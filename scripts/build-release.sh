@@ -28,7 +28,7 @@ mkdir -p "$OUTPUT_DIR"
 echo "Building universal Terso.app with Xcode..."
 xcodebuild \
     -project "$REPO_ROOT/Terso.xcodeproj" \
-    -scheme TersoApp \
+    -scheme TersoApp-Xcode \
     -configuration Release \
     -destination 'generic/platform=macOS' \
     -derivedDataPath "$DERIVED_DATA" \

@@ -46,7 +46,7 @@ jobs:
         run: >-
           xcodebuild
           -project Terso.xcodeproj
-          -scheme TersoApp
+          -scheme TersoApp-Xcode
           -configuration Debug
           -destination 'generic/platform=macOS'
           CODE_SIGNING_ALLOWED=NO

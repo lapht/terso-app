@@ -52,7 +52,7 @@ cd terso-app
 open Terso.xcodeproj
 ```
 
-In Xcode, select the `TersoApp` scheme and press **⌘R** to build and launch
+In Xcode, select the `TersoApp-Xcode` scheme and press **⌘R** to build and launch
 Terso. `Package.swift` remains the source of truth for the local `CoreKit`
 package consumed by the app.
 
@@ -97,7 +97,7 @@ build:
 To build the app from the command line and run the package test suite:
 
 ```bash
-xcodebuild -project Terso.xcodeproj -scheme TersoApp build
+xcodebuild -project Terso.xcodeproj -scheme TersoApp-Xcode build
 swift test
 ```
 
