@@ -21,6 +21,12 @@ import Foundation
 import Testing
 
 struct UserCachesModuleTests {
+    private struct Fixture {
+        let home: URL
+        let caches: URL
+        let outside: URL
+    }
+
     @Test func excludesRunningApplicationsAndReportsClosedCacheSizes() async throws {
         let fixture = try makeFixture()
         defer { try? FileManager.default.removeItem(at: fixture.home) }
@@ -63,14 +69,14 @@ struct UserCachesModuleTests {
         #expect(result.isEmpty)
     }
 
-    private func makeFixture() throws -> (home: URL, caches: URL, outside: URL) {
+    private func makeFixture() throws -> Fixture {
         let home = FileManager.default.temporaryDirectory
             .appendingPathComponent("terso-user-caches-\(UUID().uuidString)", isDirectory: true)
         let caches = home.appendingPathComponent("Library/Caches", isDirectory: true)
         let outside = FileManager.default.temporaryDirectory
             .appendingPathComponent("terso-user-caches-outside-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: caches, withIntermediateDirectories: true)
-        return (home, caches, outside)
+        return Fixture(home: home, caches: caches, outside: outside)
     }
 
     private func createFile(at url: URL, contents: String) throws {
