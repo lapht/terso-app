@@ -60,7 +60,7 @@ public struct PathValidator: Sendable {
         ("/etc", "system etc directory"),
         ("/var", "system var directory"),
         ("/private/etc", "private system etc directory"),
-        ("/private/var", "private system var directory"),
+        ("/private/var", "private system var directory")
     ]
 
     /// Path suffixes that are always denied regardless of location (§3).
@@ -69,7 +69,7 @@ public struct PathValidator: Sendable {
         (".framework", "framework bundle"),
         (".kext", "kernel extension"),
         (".plugin", "plugin bundle"),
-        (".appex", "app extension bundle"),
+        (".appex", "app extension bundle")
     ]
 
     // MARK: - State
@@ -140,10 +140,9 @@ public struct PathValidator: Sendable {
         let lowerPath = standardizedPath.lowercased()
 
         // System-level prefixes
-        for (prefix, reason) in Self.systemProtectedPrefixes {
-            if isContained(path: lowerPath, underPrefix: prefix.lowercased()) {
-                throw SafetyError.protectedPath(path: standardizedPath, reason: reason)
-            }
+        for (prefix, reason) in Self.systemProtectedPrefixes
+            where isContained(path: lowerPath, underPrefix: prefix.lowercased()) {
+            throw SafetyError.protectedPath(path: standardizedPath, reason: reason)
         }
 
         // Personal protected roots: ~/Desktop, ~/Documents, ~/Downloads
@@ -169,8 +168,7 @@ public struct PathValidator: Sendable {
             .components(separatedBy: "/")
             .last(where: { !$0.isEmpty }) ?? ""
         for (suffix, reason) in Self.protectedSuffixes
-            where lastComponent.lowercased().hasSuffix(suffix.lowercased())
-        {
+            where lastComponent.lowercased().hasSuffix(suffix.lowercased()) {
             throw SafetyError.protectedPath(path: standardizedPath, reason: reason)
         }
     }
@@ -187,10 +185,9 @@ public struct PathValidator: Sendable {
 
         let standardizedRoots = allowedRoots.map { $0.standardizedFileURL.path }
 
-        for root in standardizedRoots {
-            if isContained(path: lowerPath, underPrefix: root.lowercased()) {
-                return // ✅ Found a valid root
-            }
+        for root in standardizedRoots
+            where isContained(path: lowerPath, underPrefix: root.lowercased()) {
+            return // ✅ Found a valid root
         }
 
         throw SafetyError.pathNotAllowlisted(

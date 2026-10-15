@@ -112,10 +112,10 @@ public struct SymlinkValidator: Sendable {
             return .valid(resolvedURL: resolvedURL, isSymlink: isSymlink)
         } catch let error as SafetyError {
             switch error {
-            case let .brokenSymlink(p, dest):
-                return .rejected(.brokenSymlink(path: p, destination: dest))
-            case let .circularSymlink(p):
-                return .rejected(.circularSymlink(path: p))
+            case let .brokenSymlink(symlinkPath, destination):
+                return .rejected(.brokenSymlink(path: symlinkPath, destination: destination))
+            case let .circularSymlink(symlinkPath):
+                return .rejected(.circularSymlink(path: symlinkPath))
             case let .symlinkEscape(orig, res):
                 return .rejected(.externalSymlinkTarget(originalPath: orig, resolvedPath: res))
             case .pathNotAllowlisted, .protectedPath, .invalidPath:
