@@ -60,6 +60,8 @@ struct MainShellView: View {
     private var destinationView: some View {
         if selection == .smartScan {
             SmartScanView(tccManager: tccManager)
+        } else if selection == .largeFiles {
+            LargeFilesView()
         } else if let selection {
             VStack(alignment: .leading, spacing: 12) {
                 Label(selection.title, systemImage: selection.symbol)

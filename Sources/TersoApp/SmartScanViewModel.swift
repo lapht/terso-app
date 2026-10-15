@@ -54,6 +54,7 @@ final class SmartScanViewModel: ObservableObject {
     private let modules: [any CleanModule]
     private let context: ScanContext
     private var scanTask: Task<Void, Never>?
+    private var selectionViewModels: [String: ModuleSelectionViewModel] = [:]
 
     var reclaimableBytes: Int64 {
         result?.items.reduce(into: Int64.zero) { total, item in
@@ -61,6 +62,10 @@ final class SmartScanViewModel: ObservableObject {
                 total += item.sizeBytes
             }
         } ?? 0
+    }
+
+    var homeDirectory: URL {
+        context.homeDirectory
     }
 
     var moduleSummaries: [SmartScanModuleSummary] {
@@ -91,6 +96,19 @@ final class SmartScanViewModel: ObservableObject {
         }
     }
 
+    func items(for moduleID: String) -> [CleanItem] {
+        result?.items.filter { $0.moduleId == moduleID } ?? []
+    }
+
+    func selectionViewModel(for moduleID: String) -> ModuleSelectionViewModel {
+        if let viewModel = selectionViewModels[moduleID] {
+            return viewModel
+        }
+        let viewModel = ModuleSelectionViewModel(items: items(for: moduleID))
+        selectionViewModels[moduleID] = viewModel
+        return viewModel
+    }
+
     init(
         tccManager: TCCManager = TCCManager(),
         aggregator: SmartScanAggregator? = nil,
@@ -110,6 +128,7 @@ final class SmartScanViewModel: ObservableObject {
         progress = nil
         activeModuleTitles = []
         result = nil
+        selectionViewModels.removeAll()
         state = .scanning
 
         let aggregator = self.aggregator
