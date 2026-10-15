@@ -25,6 +25,8 @@ private final class DeletionFixture {
     let homeURL: URL
     let cachesURL: URL
     let outsideURL: URL
+    let auditLogURL: URL
+    let auditLogger: AuditLogger
 
     init() throws {
         rootURL = URL(fileURLWithPath: "/tmp", isDirectory: true)
@@ -34,6 +36,8 @@ private final class DeletionFixture {
         outsideURL = homeURL.appendingPathComponent("Library/Logs", isDirectory: true)
         try FileManager.default.createDirectory(at: cachesURL, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: outsideURL, withIntermediateDirectories: true)
+        auditLogURL = rootURL.appendingPathComponent("audit.log")
+        auditLogger = AuditLogger(fileURL: auditLogURL)
     }
 
     deinit {
@@ -63,7 +67,7 @@ struct DeletionPipelineTests {
         let itemURL = fixture.cachesURL.appendingPathComponent("cache.dat")
         let item = try fixture.makeItem(at: itemURL, content: "cached contents")
         let originalContents = try String(contentsOf: itemURL, encoding: .utf8)
-        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL)
+        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL, auditLogger: fixture.auditLogger)
 
         let result = try pipeline.execute(
             items: [item],
@@ -77,13 +81,19 @@ struct DeletionPipelineTests {
         #expect(result.estimatedBytes == Int64(originalContents.utf8.count))
         #expect(FileManager.default.fileExists(atPath: itemURL.path))
         #expect(try String(contentsOf: itemURL, encoding: .utf8) == originalContents)
+        let records = try String(contentsOf: fixture.auditLogURL, encoding: .utf8)
+            .split(separator: "\n")
+        #expect(records.count == 1)
+        let record = try JSONDecoder().decode(AuditRecord.self, from: Data(records[0].utf8))
+        #expect(record.action == .dryRun)
+        #expect(record.result == .success)
     }
 
     @Test func executionMovesItemToTrashAndReturnsResultingURL() throws {
         let fixture = try DeletionFixture()
         let itemURL = fixture.cachesURL.appendingPathComponent("cache.dat")
         let item = try fixture.makeItem(at: itemURL, content: "trash me")
-        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL)
+        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL, auditLogger: fixture.auditLogger)
         var resultingItemURL: URL?
 
         defer {
@@ -108,6 +118,11 @@ struct DeletionPipelineTests {
         #expect(result.estimatedBytes == Int64("trash me".utf8.count))
         #expect(!FileManager.default.fileExists(atPath: itemURL.path))
         #expect(FileManager.default.fileExists(atPath: returnedItemURL.path))
+        let records = try String(contentsOf: fixture.auditLogURL, encoding: .utf8)
+            .split(separator: "\n")
+        let record = try JSONDecoder().decode(AuditRecord.self, from: Data(try #require(records.first).utf8))
+        #expect(record.action == .trash)
+        #expect(record.result == .success)
     }
 
     @Test func unauthorizedItemIsRejectedBeforeAnyItemIsMoved() throws {
@@ -116,7 +131,7 @@ struct DeletionPipelineTests {
         let unauthorizedURL = fixture.outsideURL.appendingPathComponent("not-allowed.dat")
         let authorizedItem = try fixture.makeItem(at: authorizedURL, content: "safe")
         let unauthorizedItem = try fixture.makeItem(at: unauthorizedURL, content: "blocked")
-        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL)
+        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL, auditLogger: fixture.auditLogger)
 
         #expect(throws: SafetyError.self) {
             try pipeline.execute(
@@ -127,6 +142,12 @@ struct DeletionPipelineTests {
         }
         #expect(FileManager.default.fileExists(atPath: authorizedURL.path))
         #expect(FileManager.default.fileExists(atPath: unauthorizedURL.path))
+        let records = try String(contentsOf: fixture.auditLogURL, encoding: .utf8)
+            .split(separator: "\n")
+        let record = try JSONDecoder().decode(AuditRecord.self, from: Data(try #require(records.first).utf8))
+        #expect(record.action == .trash)
+        #expect(record.result == .failure)
+        #expect(record.errorCode == "pathNotAllowlisted")
     }
 
     @Test func symlinkEscapeIsRejectedWithoutMovingTheLink() throws {
@@ -142,7 +163,7 @@ struct DeletionPipelineTests {
             moduleId: "caches.user",
             ruleId: "caches.user.fixture"
         )
-        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL)
+        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL, auditLogger: fixture.auditLogger)
 
         #expect(throws: SafetyError.self) {
             try pipeline.execute(
@@ -159,7 +180,7 @@ struct DeletionPipelineTests {
         let fixture = try DeletionFixture()
         let itemURL = fixture.cachesURL.appendingPathComponent("keep.dat")
         let item = try fixture.makeItem(at: itemURL, content: "keep", action: .permanentDelete)
-        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL)
+        let pipeline = DeletionPipeline(homeDirectory: fixture.homeURL, auditLogger: fixture.auditLogger)
 
         #expect(throws: DeletionPipelineError.self) {
             try pipeline.execute(
