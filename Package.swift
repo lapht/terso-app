@@ -33,7 +33,7 @@ let package = Package(
         .executable(
             name: "TersoApp",
             targets: ["TersoApp"]
-        )
+        ),
     ],
     dependencies: [],
     targets: [
@@ -57,9 +57,9 @@ let package = Package(
         ),
         .testTarget(
             name: "TersoAppTests",
-            dependencies: ["TersoApp"],
+            dependencies: ["TersoApp", "CoreKit"],
             path: "Tests/TersoAppTests"
-        )
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
