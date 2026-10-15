@@ -20,7 +20,6 @@ import AppKit
 import CoreKit
 import SwiftUI
 
-@MainActor
 private final class TersoAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApplication.shared.setActivationPolicy(.regular)
