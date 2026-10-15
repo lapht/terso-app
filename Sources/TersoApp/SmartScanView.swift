@@ -24,9 +24,14 @@ struct SmartScanView: View {
     @StateObject private var viewModel: SmartScanViewModel
     @State private var selectedModuleID: String?
     @State private var cleanupError: String?
+    private let onViewAuditLog: () -> Void
 
-    init(tccManager: TCCManager = TCCManager()) {
+    init(
+        tccManager: TCCManager = TCCManager(),
+        onViewAuditLog: @escaping () -> Void = {}
+    ) {
         _viewModel = StateObject(wrappedValue: SmartScanViewModel(tccManager: tccManager))
+        self.onViewAuditLog = onViewAuditLog
     }
 
     var body: some View {
@@ -136,22 +141,36 @@ struct SmartScanView: View {
 
     @ViewBuilder
     private var scanContent: some View {
-        switch viewModel.state {
-        case .idle:
-            Text("Your files stay untouched until you review scan results and choose what to do.")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-        case .scanning:
-            EmptyView()
-        case .finished:
-            finishedResults
-        case .cancelled:
-            Label("Scan cancelled. No files were changed.", systemImage: "pause.circle")
-                .foregroundStyle(.secondary)
-        case .failed(let message):
-            Label("Scan failed: \(message)", systemImage: "exclamationmark.triangle")
-                .foregroundStyle(.red)
-                .fixedSize(horizontal: false, vertical: true)
+        if let cleanupResult = viewModel.cleanupResult {
+            CleanResultView(
+                result: cleanupResult,
+                warnings: viewModel.cleanupWarnings,
+                onScanAgain: {
+                    selectedModuleID = nil
+                    viewModel.startScan()
+                },
+                onViewAuditLog: {
+                    onViewAuditLog()
+                }
+            )
+        } else {
+            switch viewModel.state {
+            case .idle:
+                Text("Your files stay untouched until you review scan results and choose what to do.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            case .scanning:
+                EmptyView()
+            case .finished:
+                finishedResults
+            case .cancelled:
+                Label("Scan cancelled. No files were changed.", systemImage: "pause.circle")
+                    .foregroundStyle(.secondary)
+            case .failed(let message):
+                Label("Scan failed: \(message)", systemImage: "exclamationmark.triangle")
+                    .foregroundStyle(.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
@@ -167,7 +186,6 @@ struct SmartScanView: View {
                         do {
                             try viewModel.moveToTrash(items: items)
                             selectedModuleID = nil
-                            viewModel.startScan()
                         } catch {
                             cleanupError = error.localizedDescription
                         }

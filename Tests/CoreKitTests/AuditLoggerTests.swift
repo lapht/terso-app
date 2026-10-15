@@ -140,6 +140,46 @@ struct AuditLoggerTests {
         #expect(try String(contentsOf: fixture.logURL, encoding: .utf8).contains("\"action\":\"dryRun\""))
     }
 
+    @Test func readsRecentRecordsNewestFirstAndHonorsLimit() throws {
+        let fixture = try AuditLoggerFixture()
+        let item = fixture.makeItem()
+        let logger = AuditLogger(fileURL: fixture.logURL)
+        let firstTimestamp = Date(timeIntervalSince1970: 1_735_689_600)
+        let secondTimestamp = firstTimestamp.addingTimeInterval(60)
+        try logger.record(action: .dryRun, item: item, result: .success, timestamp: firstTimestamp)
+        try logger.record(action: .trash, item: item, result: .success, timestamp: secondTimestamp)
+
+        let records = try logger.readRecords(limit: 1)
+
+        #expect(records.count == 1)
+        #expect(records[0].timestamp == "2025-01-01T00:01:00.000Z")
+        #expect(records[0].action == .trash)
+    }
+
+    @Test func missingLogProducesNoRecordsAndInvalidLimitIsRejected() throws {
+        let fixture = try AuditLoggerFixture()
+        let logger = AuditLogger(fileURL: fixture.logURL)
+
+        #expect(try logger.readRecords().isEmpty)
+        #expect(throws: AuditLoggerError.invalidRecordLimit) {
+            try logger.readRecords(limit: 0)
+        }
+    }
+
+    @Test func malformedAuditLogIsReportedWhenReadingRecords() throws {
+        let fixture = try AuditLoggerFixture()
+        try FileManager.default.createDirectory(
+            at: fixture.logURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try Data("not-json\n".utf8).write(to: fixture.logURL)
+        let logger = AuditLogger(fileURL: fixture.logURL)
+
+        #expect(throws: AuditLoggerError.invalidLog(path: fixture.logURL.path)) {
+            try logger.readRecords()
+        }
+    }
+
     @Test func exportToLogItselfIsRejected() throws {
         let fixture = try AuditLoggerFixture()
         let logger = AuditLogger(fileURL: fixture.logURL)

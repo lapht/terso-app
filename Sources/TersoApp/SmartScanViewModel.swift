@@ -50,6 +50,8 @@ final class SmartScanViewModel: ObservableObject {
     @Published private(set) var progress: SmartScanProgress?
     @Published private(set) var activeModuleTitles: [String] = []
     @Published private(set) var result: SmartScanResult?
+    @Published private(set) var cleanupResult: CleanResult?
+    @Published private(set) var cleanupWarnings: [String] = []
 
     private let aggregator: SmartScanAggregator
     private let deletionPipeline: DeletionPipeline
@@ -112,11 +114,19 @@ final class SmartScanViewModel: ObservableObject {
     }
 
     func moveToTrash(items: [CleanItem]) throws {
-        _ = try deletionPipeline.execute(
+        let startedAt = ProcessInfo.processInfo.systemUptime
+        let deletionResult = try deletionPipeline.execute(
             items: items,
             allowedRootsByModule: allowedRootsByModule,
             dryRun: false
         )
+        cleanupResult = CleanResult(
+            itemsTrashed: deletionResult.items.map(\.item),
+            bytesFreed: deletionResult.estimatedBytes,
+            executionDuration: ProcessInfo.processInfo.systemUptime - startedAt
+        )
+        cleanupWarnings = (result?.errors.map { "\($0.moduleTitle): \($0.message)" } ?? [])
+            + (result?.permissionRequirements.map { "\($0.moduleTitle): \($0.message)" } ?? [])
     }
 
     init(
@@ -140,6 +150,8 @@ final class SmartScanViewModel: ObservableObject {
         progress = nil
         activeModuleTitles = []
         result = nil
+        cleanupResult = nil
+        cleanupWarnings = []
         selectionViewModels.removeAll()
         state = .scanning
 

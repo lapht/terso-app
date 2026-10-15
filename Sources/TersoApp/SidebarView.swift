@@ -47,7 +47,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         case .largeFiles:
             "Large Files"
         case .auditLogs:
-            "Audit Logs"
+            "Audit Log"
         }
     }
 
