@@ -50,7 +50,10 @@ struct CleanActionTests {
 
 struct CleanItemTests {
     static let fixtureURL = URL(fileURLWithPath: "/Users/test/Library/Caches/com.example")
-    static let fixtureID = UUID(uuidString: "12345678-1234-1234-1234-123456789ABC")!
+    static let fixtureID = UUID(uuid: (
+        0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x12, 0x34,
+        0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC
+    ))
 
     static func makeItem(
         isProtected: Bool = false,
@@ -74,13 +77,13 @@ struct CleanItemTests {
     }
 
     @Test func hashableEquality() {
-        let a = Self.makeItem()
-        let b = Self.makeItem()
-        #expect(a == b)
-        #expect(a.hashValue == b.hashValue)
+        let firstItem = Self.makeItem()
+        let matchingItem = Self.makeItem()
+        #expect(firstItem == matchingItem)
+        #expect(firstItem.hashValue == matchingItem.hashValue)
 
-        let c = Self.makeItem(isProtected: true)
-        #expect(a != c)
+        let protectedItem = Self.makeItem(isProtected: true)
+        #expect(firstItem != protectedItem)
     }
 
     @Test func jsonRoundTrip() throws {
@@ -184,11 +187,11 @@ struct CleanErrorTests {
     }
 
     @Test func hashableEquality() {
-        let a = CleanError.permissionDenied(path: "/x")
-        let b = CleanError.permissionDenied(path: "/x")
-        let c = CleanError.permissionDenied(path: "/y")
-        #expect(a == b)
-        #expect(a != c)
+        let firstError = CleanError.permissionDenied(path: "/x")
+        let matchingError = CleanError.permissionDenied(path: "/x")
+        let differentError = CleanError.permissionDenied(path: "/y")
+        #expect(firstError == matchingError)
+        #expect(firstError != differentError)
     }
 }
 

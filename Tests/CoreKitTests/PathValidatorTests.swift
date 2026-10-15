@@ -50,7 +50,7 @@ struct PathValidatorProtectedSystemTests {
         ("/etc/hosts", "/etc prefix"),
         ("/var/log/system.log", "/var prefix"),
         ("/private/etc/passwd", "/private/etc prefix"),
-        ("/private/var/root", "/private/var prefix"),
+        ("/private/var/root", "/private/var prefix")
     ]
 
     @Test(arguments: forbiddenPaths)
