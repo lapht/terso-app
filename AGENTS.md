@@ -7,6 +7,30 @@ Leggi questo file per intero prima di toccare qualsiasi file. Il design document
 Terso: cleaner macOS open source, GPL-3.0, Swift 6 + SwiftUI, macOS 13+.
 Tutta la logica vive nel Swift Package `CoreKit`. L'app GUI è solo presentazione.
 
+## Avvio di una nuova chat o issue
+All'inizio di ogni nuova chat che deve modificare il codice, e prima di iniziare
+l'implementazione di una issue, prepara il repository da `main` aggiornato:
+
+1. Controlla branch corrente e `git status`. Se ci sono modifiche non salvate,
+   non cambiare branch né sovrascriverle: fermati e chiedi all'utente come
+   procedere.
+2. Esegui `git fetch origin --prune`, poi `git switch main` e
+   `git pull --ff-only origin main`. Se `main` non esiste, il pull fallisce o
+   l'aggiornamento richiede una risoluzione manuale, fermati e segnala il
+   problema; non usare reset o force-push per aggirarlo.
+3. Esamina `git branch -vv` e rimuovi i branch locali il cui upstream risulta
+   `[gone]`, dopo esserti assicurato che non contengano lavoro locale unico.
+   Usa `git branch -d`; non forzare la cancellazione con `-D`. Se un branch
+   contiene commit non integrati, conservalo e chiedi all'utente prima di
+   eliminarlo.
+4. Crea un nuovo branch dedicato alla chat/issue a partire dal `main`
+   aggiornato, ad esempio con `git switch -c <nome-issue> main`. Scegli un nome
+   non già in uso e non riutilizzare o sovrascrivere un branch esistente.
+
+Non iniziare l'implementazione finché il branch di lavoro non è stato creato
+da `main` aggiornato. Non eliminare o scartare modifiche dell'utente durante
+questa preparazione.
+
 ## Mappa dell'architettura (da docs/design.md §3)
 ```
 terso-app/
