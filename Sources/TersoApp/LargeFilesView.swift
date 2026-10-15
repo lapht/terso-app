@@ -33,7 +33,8 @@ struct LargeFilesView: View {
                     title: "Large Files",
                     items: items,
                     homeDirectory: homeDirectory,
-                    allowsSelection: false
+                    allowsSelection: false,
+                    onMoveToTrash: { _ in }
                 )
             } else if let failureMessage {
                 Label("Scan failed: \(failureMessage)", systemImage: "exclamationmark.triangle")

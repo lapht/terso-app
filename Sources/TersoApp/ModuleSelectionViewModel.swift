@@ -84,7 +84,6 @@ final class ModuleSelectionViewModel: ObservableObject {
     private static func isSelectable(_ item: CleanItem) -> Bool {
         item.isDeletable
             && !item.isProtected
-            && item.recommendedAction != .skip
-            && item.recommendedAction != .revealInFinder
+            && item.recommendedAction == .trash
     }
 }
