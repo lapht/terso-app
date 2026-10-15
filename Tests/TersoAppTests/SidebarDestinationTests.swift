@@ -29,7 +29,7 @@ struct SidebarDestinationTests {
             "Xcode Junk",
             "Package Caches",
             "Large Files",
-            "Audit Logs"
+            "Audit Log"
         ])
     }
 

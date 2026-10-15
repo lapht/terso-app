@@ -66,11 +66,27 @@ public struct AuditRecord: Codable, Sendable, Equatable {
 }
 
 /// Errors raised while writing or exporting the audit log.
-public enum AuditLoggerError: Error, Sendable, Hashable {
+public enum AuditLoggerError: Error, LocalizedError, Sendable, Hashable {
     case invalidResult
     case invalidLog(path: String)
+    case invalidRecordLimit
     case exportDestinationIsLog(path: String)
     case ioFailure(path: String, errorCode: Int)
+
+    public var errorDescription: String? {
+        switch self {
+        case .invalidResult:
+            "The audit result and error code do not match."
+        case let .invalidLog(path):
+            "The audit log at \(path) is invalid or unreadable."
+        case .invalidRecordLimit:
+            "The audit record limit must be greater than zero."
+        case let .exportDestinationIsLog(path):
+            "Cannot export the audit report over the source log at \(path)."
+        case let .ioFailure(path, errorCode):
+            "Unable to access audit data at \(path) (error \(errorCode))."
+        }
+    }
 }
 
 /// Appends cleanup events to a local JSON Lines log and exports readable reports.
@@ -143,6 +159,36 @@ public final class AuditLogger: @unchecked Sendable {
         }
     }
 
+    /// Reads the most recent audit events, newest first.
+    ///
+    /// - Parameter limit: Maximum number of events to return. Must be greater than zero.
+    /// - Returns: The newest events in reverse chronological log order.
+    /// - Throws: `AuditLoggerError` if the limit is invalid or the log cannot be read.
+    public func readRecords(limit: Int = 500) throws -> [AuditRecord] {
+        guard limit > 0 else {
+            throw AuditLoggerError.invalidRecordLimit
+        }
+
+        lock.lock()
+        defer { lock.unlock() }
+        let logData = try readLogData()
+        guard !logData.isEmpty else {
+            return []
+        }
+        guard let contents = String(data: logData, encoding: .utf8) else {
+            throw AuditLoggerError.invalidLog(path: logURL.path)
+        }
+
+        let records = try contents.split(whereSeparator: \.isNewline).map { line in
+            do {
+                return try decoder.decode(AuditRecord.self, from: Data(line.utf8))
+            } catch {
+                throw AuditLoggerError.invalidLog(path: logURL.path)
+            }
+        }
+        return Array(records.suffix(limit).reversed())
+    }
+
     /// Exports the current JSON Lines log as a readable plain-text report.
     ///
     /// If no events have been recorded yet, the report contains its header only.
@@ -155,22 +201,24 @@ public final class AuditLogger: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
         do {
-            let logData: Data
-            do {
-                logData = try Data(contentsOf: logURL)
-            } catch {
-                if (error as NSError).code == NSFileReadNoSuchFileError {
-                    logData = Data()
-                } else {
-                    throw Self.ioFailure(for: error, path: logURL.path)
-                }
-            }
+            let logData = try readLogData()
             let report = try makeReport(from: logData)
             try Data(report.utf8).write(to: destinationURL, options: .atomic)
         } catch let error as AuditLoggerError {
             throw error
         } catch {
             throw Self.ioFailure(for: error, path: destinationURL.path)
+        }
+    }
+
+    private func readLogData() throws -> Data {
+        do {
+            return try Data(contentsOf: logURL)
+        } catch {
+            if (error as NSError).code == NSFileReadNoSuchFileError {
+                return Data()
+            }
+            throw Self.ioFailure(for: error, path: logURL.path)
         }
     }
 
