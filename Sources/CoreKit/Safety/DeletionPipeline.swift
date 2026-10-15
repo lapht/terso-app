@@ -231,36 +231,44 @@ public final class DeletionPipeline {
 
     private static func errorCode(for error: Error) -> String {
         if let error = error as? SafetyError {
-            switch error {
-            case .pathNotAllowlisted:
-                return "pathNotAllowlisted"
-            case .symlinkEscape:
-                return "symlinkEscape"
-            case .brokenSymlink:
-                return "brokenSymlink"
-            case .circularSymlink:
-                return "circularSymlink"
-            case .protectedPath:
-                return "protectedPath"
-            case .invalidPath:
-                return "invalidPath"
-            }
+            return errorCode(for: error)
         }
         if let error = error as? DeletionPipelineError {
-            switch error {
-            case .staleItem:
-                return "staleItem"
-            case .itemNotFound:
-                return "itemNotFound"
-            case .unsupportedAction:
-                return "unsupportedAction"
-            case .invalidSize:
-                return "invalidSize"
-            case .sizeOverflow:
-                return "sizeOverflow"
-            }
+            return errorCode(for: error)
         }
         let nsError = error as NSError
         return "NSError.\(nsError.domain).\(nsError.code)"
+    }
+
+    private static func errorCode(for error: SafetyError) -> String {
+        switch error {
+        case .pathNotAllowlisted:
+            return "pathNotAllowlisted"
+        case .symlinkEscape:
+            return "symlinkEscape"
+        case .brokenSymlink:
+            return "brokenSymlink"
+        case .circularSymlink:
+            return "circularSymlink"
+        case .protectedPath:
+            return "protectedPath"
+        case .invalidPath:
+            return "invalidPath"
+        }
+    }
+
+    private static func errorCode(for error: DeletionPipelineError) -> String {
+        switch error {
+        case .staleItem:
+            return "staleItem"
+        case .itemNotFound:
+            return "itemNotFound"
+        case .unsupportedAction:
+            return "unsupportedAction"
+        case .invalidSize:
+            return "invalidSize"
+        case .sizeOverflow:
+            return "sizeOverflow"
+        }
     }
 }

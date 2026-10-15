@@ -42,7 +42,7 @@ public struct AuditRecord: Codable, Sendable, Equatable {
     public let result: AuditResult
     public let errorCode: String?
 
-    fileprivate init(
+    init(
         timestamp: Date,
         action: AuditAction,
         item: CleanItem,
@@ -180,8 +180,10 @@ public final class AuditLogger: @unchecked Sendable {
             return report
         }
 
-        let lines = String(decoding: data, as: UTF8.self)
-            .split(whereSeparator: \.isNewline)
+        guard let contents = String(data: data, encoding: .utf8) else {
+            throw AuditLoggerError.invalidLog(path: logURL.path)
+        }
+        let lines = contents.split(whereSeparator: \.isNewline)
         for line in lines {
             let record: AuditRecord
             do {
