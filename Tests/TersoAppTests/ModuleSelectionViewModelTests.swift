@@ -24,30 +24,32 @@ import Testing
 
 struct ModuleSelectionViewModelTests {
     @MainActor
-    @Test func startsWithRecommendedItemsSelectedAndTogglesIndividualItems() {
+    @Test func onlyTrashRecommendedItemsCanBeSelected() {
         let recommended = Self.item(name: "recommended", size: 10)
-        let notRecommended = Self.item(name: "not-recommended", size: 20, action: .permanentDelete)
+        let permanentDelete = Self.item(name: "permanent-delete", size: 20, action: .permanentDelete)
         let skipped = Self.item(name: "skipped", size: 30, action: .skip)
-        let viewModel = ModuleSelectionViewModel(items: [recommended, notRecommended, skipped])
+        let readOnly = Self.item(name: "read-only", size: 40, action: .revealInFinder)
+        let viewModel = ModuleSelectionViewModel(items: [recommended, permanentDelete, skipped, readOnly])
 
         #expect(viewModel.isSelected(recommended))
-        #expect(!viewModel.isSelected(notRecommended))
+        #expect(!viewModel.isSelected(permanentDelete))
         #expect(!viewModel.isSelected(skipped))
+        #expect(!viewModel.isSelected(readOnly))
         #expect(viewModel.selectedBytes == 10)
 
         viewModel.toggleSelection(for: recommended)
-        viewModel.toggleSelection(for: notRecommended)
+        viewModel.toggleSelection(for: permanentDelete)
 
         #expect(!viewModel.isSelected(recommended))
-        #expect(viewModel.isSelected(notRecommended))
+        #expect(!viewModel.isSelected(permanentDelete))
         #expect(!viewModel.isSelected(skipped))
-        #expect(viewModel.selectedBytes == 20)
+        #expect(viewModel.selectedBytes == 0)
     }
 
     @MainActor
     @Test func selectAllAndDeselectAllRecalculateSelectedBytes() {
         let first = Self.item(name: "first", size: 10)
-        let second = Self.item(name: "second", size: 25, action: .permanentDelete)
+        let second = Self.item(name: "second", size: 25)
         let readOnly = Self.item(name: "read-only", size: 100, isDeletable: false, action: .revealInFinder)
         let viewModel = ModuleSelectionViewModel(items: [first, second, readOnly])
 

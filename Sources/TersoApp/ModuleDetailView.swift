@@ -22,11 +22,13 @@ import SwiftUI
 @MainActor
 struct ModuleDetailView: View {
     @StateObject private var viewModel: ModuleSelectionViewModel
+    @StateObject private var confirmationViewModel: CleanupConfirmationViewModel
 
     private let title: String
     private let items: [CleanItem]
     private let homeDirectory: URL
     private let allowsSelection: Bool
+    private let onMoveToTrash: ([CleanItem]) -> Void
     private let onBack: (() -> Void)?
 
     init(
@@ -35,18 +37,23 @@ struct ModuleDetailView: View {
         homeDirectory: URL,
         allowsSelection: Bool = true,
         selectionViewModel: ModuleSelectionViewModel? = nil,
+        onMoveToTrash: @escaping ([CleanItem]) -> Void,
         onBack: (() -> Void)? = nil
     ) {
         self.title = title
         self.items = items
         self.homeDirectory = homeDirectory
         self.allowsSelection = allowsSelection
+        self.onMoveToTrash = onMoveToTrash
         self.onBack = onBack
         _viewModel = StateObject(
             wrappedValue: selectionViewModel ?? ModuleSelectionViewModel(
                 items: items,
                 allowsSelection: allowsSelection
             )
+        )
+        _confirmationViewModel = StateObject(
+            wrappedValue: CleanupConfirmationViewModel(onConfirm: onMoveToTrash)
         )
     }
 
@@ -65,6 +72,15 @@ struct ModuleDetailView: View {
             .frame(maxWidth: 720, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
+        }
+        .sheet(isPresented: confirmationSheetBinding) {
+            ConfirmationSheetView(
+                itemCount: confirmationViewModel.pendingItems.count,
+                totalBytes: confirmationViewModel.pendingBytes,
+                onCancel: confirmationViewModel.cancel,
+                onConfirm: confirmationViewModel.confirm
+            )
+            .interactiveDismissDisabled()
         }
     }
 
@@ -100,6 +116,17 @@ struct ModuleDetailView: View {
                         .accessibilityIdentifier("module-deselect-all")
                 }
                 .buttonStyle(.bordered)
+
+                Button(
+                    "Move \(viewModel.selectedItems.count) to Trash",
+                    systemImage: "trash",
+                    action: {
+                        confirmationViewModel.requestConfirmation(for: viewModel.selectedItems)
+                    }
+                )
+                .buttonStyle(.borderedProminent)
+                .disabled(viewModel.selectedItems.isEmpty)
+                .accessibilityIdentifier("module-move-to-trash")
             }
         }
     }
@@ -118,5 +145,16 @@ struct ModuleDetailView: View {
                 )
             }
         }
+    }
+
+    private var confirmationSheetBinding: Binding<Bool> {
+        Binding(
+            get: { confirmationViewModel.isPresented },
+            set: { isPresented in
+                if !isPresented {
+                    confirmationViewModel.cancel()
+                }
+            }
+        )
     }
 }

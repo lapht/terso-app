@@ -23,6 +23,7 @@ import SwiftUI
 struct SmartScanView: View {
     @StateObject private var viewModel: SmartScanViewModel
     @State private var selectedModuleID: String?
+    @State private var cleanupError: String?
 
     init(tccManager: TCCManager = TCCManager()) {
         _viewModel = StateObject(wrappedValue: SmartScanViewModel(tccManager: tccManager))
@@ -38,6 +39,25 @@ struct SmartScanView: View {
             .frame(maxWidth: 720, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
+        }
+        .alert(
+            "Unable to Move Items to Trash",
+            isPresented: Binding(
+                get: { cleanupError != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        cleanupError = nil
+                    }
+                }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                cleanupError = nil
+            }
+        } message: {
+            if let cleanupError {
+                Text(cleanupError)
+            }
         }
     }
 
@@ -143,6 +163,15 @@ struct SmartScanView: View {
                     items: viewModel.items(for: summary.id),
                     homeDirectory: viewModel.homeDirectory,
                     selectionViewModel: viewModel.selectionViewModel(for: summary.id),
+                    onMoveToTrash: { items in
+                        do {
+                            try viewModel.moveToTrash(items: items)
+                            selectedModuleID = nil
+                            viewModel.startScan()
+                        } catch {
+                            cleanupError = error.localizedDescription
+                        }
+                    },
                     onBack: { selectedModuleID = nil }
                 )
                 .id(summary.id)

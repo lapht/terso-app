@@ -18,6 +18,7 @@
 
 import Combine
 import CoreKit
+import Darwin
 import Foundation
 
 enum SmartScanViewState: Equatable {
@@ -51,6 +52,7 @@ final class SmartScanViewModel: ObservableObject {
     @Published private(set) var result: SmartScanResult?
 
     private let aggregator: SmartScanAggregator
+    private let deletionPipeline: DeletionPipeline
     private let modules: [any CleanModule]
     private let context: ScanContext
     private var scanTask: Task<Void, Never>?
@@ -109,6 +111,14 @@ final class SmartScanViewModel: ObservableObject {
         return viewModel
     }
 
+    func moveToTrash(items: [CleanItem]) throws {
+        _ = try deletionPipeline.execute(
+            items: items,
+            allowedRootsByModule: allowedRootsByModule,
+            dryRun: false
+        )
+    }
+
     init(
         tccManager: TCCManager = TCCManager(),
         aggregator: SmartScanAggregator? = nil,
@@ -117,7 +127,9 @@ final class SmartScanViewModel: ObservableObject {
     ) {
         self.aggregator = aggregator ?? SmartScanAggregator(tccManager: tccManager)
         self.modules = modules ?? Self.defaultModules
-        self.context = context ?? Self.makeScanContext(tccManager: tccManager)
+        let resolvedContext = context ?? Self.makeScanContext(tccManager: tccManager)
+        self.context = resolvedContext
+        deletionPipeline = DeletionPipeline(homeDirectory: resolvedContext.homeDirectory)
     }
 
     func startScan() {
@@ -188,6 +200,48 @@ final class SmartScanViewModel: ObservableObject {
         case nil:
             break
         }
+    }
+
+    private var allowedRootsByModule: [String: [URL]] {
+        let home = context.homeDirectory
+        let library = home.appendingPathComponent("Library", isDirectory: true)
+        let developer = library.appendingPathComponent("Developer", isDirectory: true)
+        var roots: [String: [URL]] = [
+            "caches.user": [
+                library.appendingPathComponent("Caches", isDirectory: true)
+            ],
+            "logs.user": [
+                library.appendingPathComponent("Logs", isDirectory: true)
+            ],
+            "trash.user": [
+                home.appendingPathComponent(".Trash", isDirectory: true)
+            ],
+            "xcode.junk": [
+                developer.appendingPathComponent("Xcode/DerivedData", isDirectory: true),
+                developer.appendingPathComponent("Xcode/Archives", isDirectory: true),
+                developer.appendingPathComponent("CoreSimulator/Caches", isDirectory: true)
+            ],
+            "caches.packages": [
+                home.appendingPathComponent(".npm", isDirectory: true),
+                library.appendingPathComponent("Caches", isDirectory: true),
+                home.appendingPathComponent(".cache", isDirectory: true)
+            ]
+        ]
+
+        let userID = String(getuid())
+        for volume in context.mountedVolumes where Self.isExternalVolumeMount(volume.mountPath) {
+            let volumeTrash = volume.mountPath
+                .appendingPathComponent(".Trashes", isDirectory: true)
+                .appendingPathComponent(userID, isDirectory: true)
+            roots["trash.user", default: []].append(volumeTrash)
+        }
+        return roots
+    }
+
+    private static func isExternalVolumeMount(_ mountPath: URL) -> Bool {
+        let standardizedPath = mountPath.standardizedFileURL
+        return standardizedPath.deletingLastPathComponent().lastPathComponent == "Volumes"
+            && standardizedPath.lastPathComponent != "Volumes"
     }
 
     private static let defaultModules: [any CleanModule] = [
