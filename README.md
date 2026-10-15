@@ -52,9 +52,9 @@ cd terso-app
 open Terso.xcodeproj
 ```
 
-In Xcode, select the `TersoApp-Xcode` scheme and press **⌘R** to build and launch
-Terso. `Package.swift` remains the source of truth for the local `CoreKit`
-package consumed by the app.
+In Xcode, select the `TersoApp` scheme and press **⌘R** to build and launch
+Terso. The app target owns the SwiftUI sources; `Package.swift` contains the
+`CoreKit` library and Swift Package tests only.
 
 Full Disk Access is not needed just to launch Terso. Modules that need it will
 tell you when permission is unavailable rather than showing an incomplete scan.
@@ -97,7 +97,7 @@ build:
 To build the app from the command line and run the package test suite:
 
 ```bash
-xcodebuild -project Terso.xcodeproj -scheme TersoApp-Xcode build
+xcodebuild -project Terso.xcodeproj -scheme TersoApp build
 swift test
 ```
 

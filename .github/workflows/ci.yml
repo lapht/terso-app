@@ -46,11 +46,23 @@ jobs:
         run: >-
           xcodebuild
           -project Terso.xcodeproj
-          -scheme TersoApp-Xcode
+          -scheme TersoApp
           -configuration Debug
           -destination 'generic/platform=macOS'
           CODE_SIGNING_ALLOWED=NO
           build
+
+      - name: Run app unit tests with Xcode
+        run: >-
+          xcodebuild
+          -project Terso.xcodeproj
+          -scheme TersoApp
+          -configuration Debug
+          -destination 'platform=macOS'
+          CODE_SIGNING_ALLOWED=NO
+          ARCHS=${{ matrix.architecture }}
+          ONLY_ACTIVE_ARCH=YES
+          test
 
       - name: Run unit and integration tests
         run: swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors

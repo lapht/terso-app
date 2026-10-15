@@ -32,6 +32,18 @@ jobs:
       - name: Run unit and integration tests
         run: swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
 
+      - name: Run app unit tests with Xcode
+        run: >-
+          xcodebuild
+          -project Terso.xcodeproj
+          -scheme TersoApp
+          -configuration Debug
+          -destination 'platform=macOS'
+          CODE_SIGNING_ALLOWED=NO
+          ARCHS=arm64
+          ONLY_ACTIVE_ARCH=YES
+          test
+
       - name: Build, sign, package, and checksum
         run: ./scripts/build-release.sh
 

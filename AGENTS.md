@@ -5,13 +5,14 @@ Leggi questo file per intero prima di toccare qualsiasi file. Il design document
 
 ## Progetto
 Terso: cleaner macOS open source, GPL-3.0, Swift 6 + SwiftUI, macOS 13+.
-Tutta la logica vive nel Swift Package `CoreKit`. L'app GUI è solo presentazione.
+L'app vive nel progetto Xcode; `Package.swift` contiene solo CoreKit e i test.
 
 ## Aprire, eseguire e testare
-- Apri `Terso.xcodeproj` in Xcode e seleziona lo schema `TersoApp-Xcode`.
-- Avvia l'app con **⌘R**. La logica di `CoreKit` continua a provenire da
-  `Package.swift`, che è la source of truth del package locale.
+- Apri `Terso.xcodeproj` in Xcode e seleziona lo schema `TersoApp`.
+- Avvia l'app e le SwiftUI Preview con Xcode. `CoreKit` è fornito dal package
+  locale definito in `Package.swift`.
 - Esegui i test del package dalla root con `swift test`.
+- Esegui i test UI/ViewModel con `xcodebuild test -project Terso.xcodeproj -scheme TersoApp`.
 
 ## Avvio di una nuova chat o issue
 All'inizio di ogni nuova chat che deve modificare il codice, e prima di iniziare
