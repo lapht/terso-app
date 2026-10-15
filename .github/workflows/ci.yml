@@ -7,6 +7,19 @@ on:
     branches: [ main ]
 
 jobs:
+  safety-audit:
+    name: Safety Audit
+    runs-on: macos-14
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run Safety Audit
+        run: bash .github/scripts/safety-audit.sh
+
+      - name: Test Safety Audit
+        run: bash .github/scripts/test-safety-audit.sh
+
   lint:
     name: SwiftLint
     runs-on: macos-14
