@@ -44,6 +44,11 @@ struct CleanActionTests {
         )
         #expect(item.recommendedAction == .trash)
     }
+
+    @Test func revealInFinderRoundTrips() throws {
+        let data = try JSONEncoder().encode(CleanAction.revealInFinder)
+        #expect(try JSONDecoder().decode(CleanAction.self, from: data) == .revealInFinder)
+    }
 }
 
 // MARK: - CleanItem
@@ -67,6 +72,7 @@ struct CleanItemTests {
             moduleId: "caches.user",
             ruleId: "caches.user.comExample",
             isProtected: isProtected,
+            isDeletable: true,
             recommendedAction: recommendedAction
         )
     }
@@ -103,6 +109,7 @@ struct CleanItemTests {
         #expect(decoded.moduleId == original.moduleId)
         #expect(decoded.ruleId == original.ruleId)
         #expect(decoded.isProtected == original.isProtected)
+        #expect(decoded.isDeletable == original.isDeletable)
         #expect(decoded.recommendedAction == original.recommendedAction)
     }
 
@@ -116,9 +123,21 @@ struct CleanItemTests {
         )
         let expectedKeys: Set<String> = [
             "id", "url", "resolvedURL", "sizeBytes",
-            "moduleId", "ruleId", "isProtected", "recommendedAction"
+            "moduleId", "ruleId", "isProtected", "isDeletable", "recommendedAction"
         ]
         #expect(Set(json.keys) == expectedKeys)
+    }
+
+    @Test func decodingLegacyItemDefaultsToDeletable() throws {
+        let encoder = JSONEncoder()
+        let encoded = try encoder.encode(Self.makeItem())
+        var json = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        json.removeValue(forKey: "isDeletable")
+        let legacyData = try JSONSerialization.data(withJSONObject: json)
+
+        let decoded = try JSONDecoder().decode(CleanItem.self, from: legacyData)
+
+        #expect(decoded.isDeletable)
     }
 
     @Test func defaultIsProtectedIsFalse() {
@@ -130,6 +149,7 @@ struct CleanItemTests {
             ruleId: "test.rule"
         )
         #expect(item.isProtected == false)
+        #expect(item.isDeletable)
     }
 
     @Test func sendableConformance() async {

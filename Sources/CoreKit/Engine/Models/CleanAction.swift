@@ -18,7 +18,7 @@
 
 import Foundation
 
-/// The recommended deletion action for a scanned item.
+/// The recommended action for a scanned item.
 ///
 /// Aligns with Safety Invariant §4 (Trash-first): the default action is
 /// always `.trash`; permanent deletion requires explicit user opt-in.
@@ -31,4 +31,7 @@ public enum CleanAction: String, Sendable, Hashable, Codable, CaseIterable {
 
     /// Skip this item — no action will be taken.
     case skip
+
+    /// Reveal this read-only item in Finder.
+    case revealInFinder
 }
