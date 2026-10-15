@@ -98,15 +98,37 @@ struct SidebarView: View {
     @Binding var selection: SidebarDestination?
 
     var body: some View {
-        List(selection: $selection) {
-            ForEach(SidebarDestination.allCases) { destination in
-                Label(destination.title, systemImage: destination.symbol)
-                    .tag(destination)
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 4) {
+                    Spacer(minLength: 0)
+                    ForEach(SidebarDestination.allCases) { destination in
+                        Button {
+                            selection = destination
+                        } label: {
+                            Label(destination.title, systemImage: destination.symbol)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(
+                            selection == destination ? Color.accentColor.opacity(0.16) : .clear,
+                            in: RoundedRectangle(cornerRadius: 6)
+                        )
+                        .foregroundStyle(selection == destination ? Color.accentColor : Color.primary)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 8)
+                .frame(minHeight: geometry.size.height)
             }
+            .accessibilityIdentifier("navigation-sidebar")
         }
-        .listStyle(.sidebar)
+        .frame(minWidth: 190, idealWidth: 220, maxWidth: 280)
+        .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
         .navigationTitle("Terso")
-        .accessibilityIdentifier("navigation-sidebar")
     }
 }
 

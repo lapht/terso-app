@@ -51,8 +51,9 @@ cd terso-app
 swift run TersoApp
 ```
 
-SwiftPM builds and launches the macOS app. Keep the terminal open while using
-it; press `Ctrl-C` there to stop it.
+SwiftPM builds and launches the macOS app and brings its window to the
+foreground. Keep the terminal open while using it; press `Ctrl-C` there to stop
+it.
 
 To run from Xcode instead, open the package and run the `TersoApp` scheme:
 
