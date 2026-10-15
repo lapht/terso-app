@@ -22,6 +22,7 @@ import SwiftUI
 @MainActor
 struct SmartScanView: View {
     @StateObject private var viewModel: SmartScanViewModel
+    @State private var selectedModuleID: String?
 
     init(tccManager: TCCManager = TCCManager()) {
         _viewModel = StateObject(wrappedValue: SmartScanViewModel(tccManager: tccManager))
@@ -72,6 +73,7 @@ struct SmartScanView: View {
             .accessibilityIdentifier("smart-scan-cancel")
         } else {
             Button(viewModel.state == .idle ? "Scan" : "Scan Again", systemImage: "sparkles") {
+                selectedModuleID = nil
                 viewModel.startScan()
             }
             .buttonStyle(.borderedProminent)
@@ -134,21 +136,41 @@ struct SmartScanView: View {
     }
 
     private var finishedResults: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Potentially reclaimable")
-                    .font(.headline)
-                Text(SizeCalculator.formattedByteCount(viewModel.reclaimableBytes))
-                    .font(.title2.weight(.semibold))
-                    .accessibilityIdentifier("smart-scan-reclaimable-size")
-                Text("\(viewModel.result?.items.filter(\.isDeletable).count ?? 0) items found")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-            }
+        Group {
+            if let summary = viewModel.moduleSummaries.first(where: { $0.id == selectedModuleID }) {
+                ModuleDetailView(
+                    title: summary.title,
+                    items: viewModel.items(for: summary.id),
+                    homeDirectory: viewModel.homeDirectory,
+                    selectionViewModel: viewModel.selectionViewModel(for: summary.id),
+                    onBack: { selectedModuleID = nil }
+                )
+                .id(summary.id)
+            } else {
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Potentially reclaimable")
+                            .font(.headline)
+                        Text(SizeCalculator.formattedByteCount(viewModel.reclaimableBytes))
+                            .font(.title2.weight(.semibold))
+                            .accessibilityIdentifier("smart-scan-reclaimable-size")
+                        Text("\(viewModel.result?.items.filter(\.isDeletable).count ?? 0) items found")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
-                ForEach(viewModel.moduleSummaries) { summary in
-                    moduleCard(summary)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
+                        ForEach(viewModel.moduleSummaries) { summary in
+                            Button {
+                                selectedModuleID = summary.id
+                            } label: {
+                                moduleCard(summary)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(summary.status != .completed)
+                            .accessibilityIdentifier("module-card-\(summary.id)")
+                        }
+                    }
                 }
             }
         }
