@@ -16,19 +16,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import CoreKit
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack(spacing: 12) {
-            Text("Terso")
-                .font(.title)
-                .bold()
-            Text("Version \(CoreKit.version)")
-                .foregroundStyle(.secondary)
-        }
-        .padding()
-        .frame(minWidth: 400, minHeight: 300)
+        MainShellView()
     }
 }

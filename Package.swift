@@ -54,6 +54,11 @@ let package = Package(
             resources: [
                 .process("Fixtures")
             ]
+        ),
+        .testTarget(
+            name: "TersoAppTests",
+            dependencies: ["TersoApp"],
+            path: "Tests/TersoAppTests"
         )
     ],
     swiftLanguageModes: [.v6]
