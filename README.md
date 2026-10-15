@@ -12,6 +12,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-0FB5AE" alt="GPL-3.0"/></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013%2B-0B1B2B" alt="macOS 13+"/>
+  <a href="https://github.com/lapht/terso-app/actions/workflows/ci.yml"><img src="https://github.com/lapht/terso-app/actions/workflows/ci.yml/badge.svg" alt="Build"/></a>
   <img src="https://img.shields.io/badge/telemetry-none-success" alt="No telemetry"/>
 </p>
 
@@ -63,6 +64,41 @@ open Package.swift
 
 Full Disk Access is not needed just to launch Terso. Modules that need it will
 tell you when permission is unavailable rather than showing an incomplete scan.
+
+## Install a release build
+
+Download `Terso-v0.1-macOS.zip` from the
+[GitHub Releases](https://github.com/lapht/terso-app/releases) page and open the
+ZIP to extract `Terso.app`. The release is an ad-hoc-signed universal build for
+Apple silicon and Intel Macs. It is not notarized. On first launch, use
+Control-click > **Open**, then confirm **Open** in the macOS dialog. Only install
+apps from a release you trust.
+
+To build the same app bundle and archive from source on macOS 13 or later with
+Swift 6.1.2 installed:
+
+```bash
+./scripts/build-release.sh
+```
+
+The script creates `dist/Terso-v0.1-macOS.zip` and its SHA-256 sidecar file.
+Verify the downloaded archive with:
+
+```bash
+shasum -a 256 -c Terso-v0.1-macOS.zip.sha256
+```
+
+## Release verification checklist
+
+Complete these checks on a clean macOS test environment before publishing a
+release. They require manual verification and are not implied by the automated
+build:
+
+- [ ] Launch on a clean VM without Full Disk Access, then grant Full Disk Access
+  and verify permission-dependent modules.
+- [ ] Test on a case-sensitive APFS volume.
+- [ ] Test with a non-English system locale.
+- [ ] Verify all cleanup candidates stay within their allowlisted roots.
 
 To build without launching the app and run the test suite:
 
