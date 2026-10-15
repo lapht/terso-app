@@ -20,21 +20,19 @@ import AppKit
 import CoreKit
 import SwiftUI
 
-private final class TersoAppDelegate: NSObject, NSApplicationDelegate {
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApplication.shared.setActivationPolicy(.regular)
-        NSApplication.shared.activate(ignoringOtherApps: true)
-        NSApplication.shared.windows.first?.makeKeyAndOrderFront(nil)
-    }
-}
-
 @main
 struct TersoApp: App {
-    @NSApplicationDelegateAdaptor(TersoAppDelegate.self) private var appDelegate
-
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    Task { @MainActor in
+                        let application = NSApplication.shared
+                        application.setActivationPolicy(.regular)
+                        application.activate(ignoringOtherApps: true)
+                        application.windows.first?.makeKeyAndOrderFront(nil)
+                    }
+                }
         }
     }
 }
