@@ -39,7 +39,9 @@ struct ToolScanView: View {
             phase: viewModel.phase,
             currentModule: viewModel.tool.title,
             isScanEnabled: viewModel.isScanAvailable,
-            unavailableNote: "Detection for \(viewModel.tool.title) is not available in this build yet.",
+            unavailableNote: String(
+                localized: "Detection for \(viewModel.tool.title) is not available in this build yet."
+            ),
             onScan: viewModel.startScan,
             onCancel: viewModel.cancelScan
         ) {
@@ -62,15 +64,17 @@ struct ToolScanView: View {
     private var partialNotice: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.small) {
             StatusMessage(
-                text: "Partial results: some areas were not scanned, so this list may be incomplete.",
+                text: String(
+                    localized: "Partial results: some areas were not scanned, so this list may be incomplete."
+                ),
                 systemImage: "exclamationmark.circle",
                 tone: .warning
             )
             ForEach(viewModel.notScanned, id: \.name) { area in
                 StatusMessage(
                     text: area.needsFullDiskAccess
-                        ? "\(area.name) — needs Full Disk Access"
-                        : "\(area.name) — could not be read",
+                        ? String(localized: "\(area.name) — needs Full Disk Access")
+                        : String(localized: "\(area.name) — could not be read"),
                     systemImage: area.needsFullDiskAccess ? "lock" : "questionmark.circle"
                 )
             }

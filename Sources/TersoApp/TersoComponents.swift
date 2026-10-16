@@ -206,7 +206,7 @@ struct ReclaimableSummaryView: View {
                         .font(DesignTokens.Typography.heroFigure)
                         .foregroundStyle(DesignTokens.Palette.brandText)
                         .accessibilityIdentifier(sizeIdentifier ?? "reclaimable-size")
-                    Text("\(itemCount) \(itemCount == 1 ? "item" : "items")")
+                    Text("\(itemCount) items")
                         .font(DesignTokens.Typography.metadata)
                         .foregroundStyle(.secondary)
                 }

@@ -91,8 +91,8 @@ struct MainShellView: View {
         } else {
             EmptyStateView(
                 systemImage: "sidebar.left",
-                title: "Select a module",
-                message: "Choose Smart Scan or a module in the sidebar to get started."
+                title: String(localized: "Select a module"),
+                message: String(localized: "Choose Smart Scan or a module in the sidebar to get started.")
             )
             .frame(maxWidth: DesignTokens.Layout.contentMaxWidth)
         }

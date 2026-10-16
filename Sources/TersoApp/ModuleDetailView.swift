@@ -42,7 +42,7 @@ struct ModuleDetailView: View {
         selectionViewModel: ModuleSelectionViewModel? = nil,
         onMoveToTrash: @escaping ([CleanItem]) -> Void,
         onBack: (() -> Void)? = nil,
-        backTitle: String = "Back to Smart Scan"
+        backTitle: String = String(localized: "Back to Smart Scan")
     ) {
         self.title = title
         self.systemImage = systemImage
@@ -104,7 +104,10 @@ struct ModuleDetailView: View {
                     selectionBar
                 }
             } else {
-                StatusMessage(text: "Read-only — items can only be revealed in Finder.", systemImage: "eye")
+                StatusMessage(
+                    text: String(localized: "Read-only — items can only be revealed in Finder."),
+                    systemImage: "eye"
+                )
             }
         }
     }

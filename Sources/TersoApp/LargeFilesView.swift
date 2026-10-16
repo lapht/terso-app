@@ -31,17 +31,21 @@ struct LargeFilesView: View {
 
     var body: some View {
         ScanStateView(
-            title: "Large Files",
+            title: SidebarDestination.largeFiles.title,
             systemImage: "doc.text.magnifyingglass",
-            description: "Find large files in your home folder. This scanner is read-only: "
-                + "you can reveal files in Finder, but Terso does not remove them from here.",
+            description: String(
+                localized: """
+                    Find large files in your home folder. This scanner is read-only: \
+                    you can reveal files in Finder, but Terso does not remove them from here.
+                    """
+            ),
             phase: viewModel.phase,
             currentModule: viewModel.moduleTitle,
             onScan: viewModel.startScan,
             onCancel: viewModel.cancelScan
         ) {
             ModuleDetailView(
-                title: "Large Files",
+                title: SidebarDestination.largeFiles.title,
                 systemImage: SidebarDestination.largeFiles.symbol,
                 items: viewModel.items,
                 homeDirectory: viewModel.homeDirectory,

@@ -69,22 +69,24 @@ struct TCCBannerView: View {
     private var title: String {
         switch status {
         case .granted:
-            "Full Disk Access is enabled"
+            String(localized: "Full Disk Access is enabled")
         case .denied:
-            "Full Disk Access is off"
+            String(localized: "Full Disk Access is off")
         case .unknown:
-            "Full Disk Access status is unavailable"
+            String(localized: "Full Disk Access status is unavailable")
         }
     }
 
     private var message: String {
         switch status {
         case .granted:
-            "Terso can scan modules that require this permission."
+            String(localized: "Terso can scan modules that require this permission.")
         case .denied:
-            "Some modules need this permission to scan completely. You can enable it in System Settings."
+            String(
+                localized: "Some modules need this permission to scan completely. You can enable it in System Settings."
+            )
         case .unknown:
-            "Terso could not verify this permission. You can check it in System Settings."
+            String(localized: "Terso could not verify this permission. You can check it in System Settings.")
         }
     }
 
@@ -92,13 +94,15 @@ struct TCCBannerView: View {
         guard let settingsURL = URL(
             string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
         ) else {
-            settingsError = "The System Settings address is invalid."
+            settingsError = String(localized: "The System Settings address is invalid.")
             isShowingSettingsError = true
             return
         }
 
         guard NSWorkspace.shared.open(settingsURL) else {
-            settingsError = "Open System Settings and enable Terso under Privacy & Security > Full Disk Access."
+            settingsError = String(
+                localized: "Open System Settings and enable Terso under Privacy & Security > Full Disk Access."
+            )
             isShowingSettingsError = true
             return
         }
