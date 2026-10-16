@@ -19,17 +19,14 @@
 import CoreKit
 import Foundation
 
-/// The on-demand tools that live outside Smart Scan (design.md §11.1).
+/// The on-demand tools that live outside Smart Scan (design.md §11.1); Duplicates has its own page.
 enum ScanTool: Equatable {
     case leftovers
-    case duplicates
 
     var title: String {
         switch self {
         case .leftovers:
             "Leftovers"
-        case .duplicates:
-            "Duplicates"
         }
     }
 }

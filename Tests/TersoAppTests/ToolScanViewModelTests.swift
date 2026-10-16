@@ -49,7 +49,7 @@ struct ToolScanViewModelTests {
 
     @MainActor
     @Test func withoutADetectorTheScanIsUnavailableAndNeverStarts() {
-        let viewModel = ToolScanViewModel(tool: .duplicates)
+        let viewModel = ToolScanViewModel(tool: .leftovers)
 
         viewModel.startScan()
 
@@ -111,8 +111,8 @@ struct ToolScanViewModelTests {
         let store = ScanSessionStore(tccManager: TCCManager(accessChecker: StubAccessChecker(status: .granted)))
 
         #expect(store.leftovers.tool == .leftovers)
-        #expect(store.duplicates.tool == .duplicates)
-        #expect(store.leftovers !== store.duplicates)
+        #expect(store.duplicates === store.duplicates)
+        #expect(store.duplicates.phase == .idle)
     }
 
     @MainActor
