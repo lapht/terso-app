@@ -100,12 +100,16 @@ struct FullDiskAccessProbeTests {
 
 private struct FixedChecker: TCCAccessChecking {
     let status: TCCStatus
-    func fullDiskAccessStatus() -> TCCStatus { status }
+    func fullDiskAccessStatus() -> TCCStatus {
+        status
+    }
 }
 
 private final class LogBox: @unchecked Sendable {
     private let lock = NSLock()
     private var stored: [String] = []
     var messages: [String] { lock.withLock { stored } }
-    func append(_ message: String) { lock.withLock { stored.append(message) } }
+    func append(_ message: String) {
+        lock.withLock { stored.append(message) }
+    }
 }
