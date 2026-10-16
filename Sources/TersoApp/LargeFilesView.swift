@@ -33,8 +33,8 @@ struct LargeFilesView: View {
         ScanStateView(
             title: "Large Files",
             systemImage: "doc.text.magnifyingglass",
-            description: "Find large files in your home folder. Scanning only reads files "
-                + "and never changes or deletes them.",
+            description: "Find large files in your home folder. This scanner is read-only: "
+                + "you can reveal files in Finder, but Terso does not remove them from here.",
             phase: viewModel.phase,
             currentModule: viewModel.moduleTitle,
             onScan: viewModel.startScan,
@@ -42,6 +42,7 @@ struct LargeFilesView: View {
         ) {
             ModuleDetailView(
                 title: "Large Files",
+                systemImage: SidebarDestination.largeFiles.symbol,
                 items: viewModel.items,
                 homeDirectory: viewModel.homeDirectory,
                 allowsSelection: false,

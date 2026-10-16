@@ -42,19 +42,18 @@ struct ScanStateView<Content: View>: View {
     let onCancel: () -> Void
     @ViewBuilder let content: () -> Content
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         if phase == .finished {
             content()
         } else {
-            VStack(alignment: .leading, spacing: 20) {
-                Label(title, systemImage: systemImage)
-                    .font(.largeTitle.weight(.semibold))
-                Text(description)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.large) {
+                PageHeader(title: title, systemImage: systemImage, description: description)
                 controls
             }
-            .frame(maxWidth: 720, alignment: .leading)
+            .frame(maxWidth: DesignTokens.Layout.contentMaxWidth, alignment: .leading)
+            .animation(DesignTokens.Motion.standard(reduceMotion: reduceMotion), value: phase)
         }
     }
 
@@ -64,7 +63,9 @@ struct ScanStateView<Content: View>: View {
         case .idle:
             scanButton("Scan")
         case .scanning:
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.small) {
+                Text(currentModule.map { "Scanning \($0)…" } ?? "Preparing scan…")
+                    .font(DesignTokens.Typography.sectionTitle)
                 if let progress {
                     ProgressView(value: progress, total: 1)
                         .progressViewStyle(.linear)
@@ -72,26 +73,19 @@ struct ScanStateView<Content: View>: View {
                     ProgressView()
                         .progressViewStyle(.linear)
                 }
-                Text(currentModule.map { "Scanning \($0)…" } ?? "Preparing scan…")
-                    .font(.headline)
             }
-            .padding(16)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 12))
+            .tint(DesignTokens.Palette.accent)
+            .tersoCard()
             Button("Cancel", systemImage: "xmark.circle", action: onCancel)
                 .buttonStyle(.bordered)
         case .cancelled:
-            Label("Scan cancelled. No files were changed.", systemImage: "pause.circle")
-                .foregroundStyle(.secondary)
+            StatusMessage(text: "Scan cancelled. No files were changed.", systemImage: "pause.circle")
             scanButton("Scan Again")
         case .failed(let message):
-            Label("Scan failed: \(message)", systemImage: "exclamationmark.triangle")
-                .foregroundStyle(.red)
-                .fixedSize(horizontal: false, vertical: true)
+            StatusMessage(text: "Scan failed: \(message)", systemImage: "exclamationmark.triangle", tone: .error)
             scanButton("Scan Again")
         case .requiresPermission(let message):
-            Label(message, systemImage: "lock.fill")
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            StatusMessage(text: message, systemImage: "lock")
             scanButton("Scan Again")
         case .finished:
             EmptyView()
@@ -99,7 +93,7 @@ struct ScanStateView<Content: View>: View {
     }
 
     private func scanButton(_ label: String) -> some View {
-        Button(label, systemImage: "sparkles", action: onScan)
+        Button(label, systemImage: systemImage, action: onScan)
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
     }

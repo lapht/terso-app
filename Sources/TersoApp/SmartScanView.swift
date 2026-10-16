@@ -23,6 +23,7 @@ import SwiftUI
 struct SmartScanView: View {
     /// Owned by the shell so scan results survive switching sidebar destinations.
     @ObservedObject private var viewModel: SmartScanViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selectedModuleID: String?
     @State private var cleanupError: String?
     private let title: String
@@ -73,6 +74,7 @@ struct SmartScanView: View {
         if let summary = selectedModuleSummary {
             ModuleDetailView(
                 title: summary.title,
+                systemImage: SidebarDestination(moduleID: summary.id)?.symbol ?? systemImage,
                 items: viewModel.items(for: summary.id),
                 homeDirectory: viewModel.homeDirectory,
                 selectionViewModel: viewModel.selectionViewModel(for: summary.id),
@@ -90,12 +92,13 @@ struct SmartScanView: View {
             .id(summary.id)
         } else {
             PageScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xLarge) {
                     header
                     scanControls
                     scanContent
                 }
-                .frame(maxWidth: 720, alignment: .leading)
+                .frame(maxWidth: DesignTokens.Layout.contentMaxWidth, alignment: .leading)
+                .animation(DesignTokens.Motion.standard(reduceMotion: reduceMotion), value: viewModel.state)
             }
         }
     }
@@ -108,23 +111,19 @@ struct SmartScanView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label(title, systemImage: systemImage)
-                .font(.largeTitle.weight(.semibold))
-                .accessibilityIdentifier("smart-scan-title")
-
-            Text(description)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Label(
-                "Scanning is completely safe: it only reads files and never changes or deletes them.",
-                systemImage: "checkmark.shield"
+        PageHeader(
+            title: title,
+            systemImage: systemImage,
+            description: description,
+            titleIdentifier: "smart-scan-title"
+        ) {
+            StatusMessage(
+                text: "Scanning is designed to only read files. Nothing is moved to Trash "
+                    + "until you review the results and confirm.",
+                systemImage: "checkmark.shield",
+                tone: .brand
             )
-            .font(.callout)
-            .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
+            .padding(.top, DesignTokens.Spacing.xxSmall)
         }
     }
 
@@ -149,28 +148,31 @@ struct SmartScanView: View {
     }
 
     private var scanningProgress: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ProgressView(value: viewModel.progress?.fractionCompleted ?? 0, total: 1)
-                .progressViewStyle(.linear)
-                .animation(.easeInOut(duration: 0.25), value: viewModel.progress?.fractionCompleted)
-                .accessibilityIdentifier("smart-scan-progress")
-
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.small) {
             Text(scanningModuleMessage)
-                .font(.headline)
+                .font(DesignTokens.Typography.sectionTitle)
                 .accessibilityIdentifier("smart-scan-current-module")
 
-            HStack(spacing: 20) {
+            ProgressView(value: viewModel.progress?.fractionCompleted ?? 0, total: 1)
+                .progressViewStyle(.linear)
+                .tint(DesignTokens.Palette.accent)
+                .animation(
+                    DesignTokens.Motion.standard(reduceMotion: reduceMotion),
+                    value: viewModel.progress?.fractionCompleted
+                )
+                .accessibilityIdentifier("smart-scan-progress")
+
+            HStack(spacing: DesignTokens.Spacing.large) {
                 Label("\(viewModel.progress?.itemsFound ?? 0) items found", systemImage: "doc")
                 Label(
                     "\(SizeCalculator.formattedByteCount(viewModel.progress?.bytesFound ?? 0)) reclaimable",
                     systemImage: "internaldrive"
                 )
             }
-            .font(.callout)
+            .font(DesignTokens.Typography.metadata.monospacedDigit())
             .foregroundStyle(.secondary)
         }
-        .padding(16)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 12))
+        .tersoCard()
     }
 
     private var scanningModuleMessage: String {
@@ -197,38 +199,60 @@ struct SmartScanView: View {
         } else {
             switch viewModel.state {
             case .idle:
-                Text("Your files stay untouched until you review scan results and choose what to do.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                EmptyStateView(
+                    systemImage: "drop",
+                    title: "Ready when you are",
+                    message: "Your files stay as they are until you review the scan results and choose what to do."
+                )
             case .scanning:
                 EmptyView()
             case .finished:
                 finishedResults
             case .cancelled:
-                Label("Scan cancelled. No files were changed.", systemImage: "pause.circle")
-                    .foregroundStyle(.secondary)
+                StatusMessage(text: "Scan cancelled. No files were changed.", systemImage: "pause.circle")
             case .failed(let message):
-                Label("Scan failed: \(message)", systemImage: "exclamationmark.triangle")
-                    .foregroundStyle(.red)
-                    .fixedSize(horizontal: false, vertical: true)
+                StatusMessage(
+                    text: "Scan failed: \(message)",
+                    systemImage: "exclamationmark.triangle",
+                    tone: .error
+                )
             }
         }
     }
 
+    private var deletableItemCount: Int {
+        viewModel.result?.items.filter(\.isDeletable).count ?? 0
+    }
+
     private var finishedResults: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Potentially reclaimable")
-                    .font(.headline)
-                Text(SizeCalculator.formattedByteCount(viewModel.reclaimableBytes))
-                    .font(.title2.weight(.semibold))
-                    .accessibilityIdentifier("smart-scan-reclaimable-size")
-                Text("\(viewModel.result?.items.filter(\.isDeletable).count ?? 0) items found")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
+            if deletableItemCount == 0 {
+                EmptyStateView(
+                    systemImage: "checkmark.seal",
+                    title: "Nothing to clean right now",
+                    message: "This scan found no items that match Terso's rules."
+                )
+            } else {
+                ReclaimableSummaryView(
+                    title: "Potentially reclaimable",
+                    totalBytes: viewModel.reclaimableBytes,
+                    itemCount: deletableItemCount,
+                    segments: viewModel.moduleSummaries.map {
+                        BreakdownSegment(id: $0.id, title: $0.title, bytes: $0.bytesFound)
+                    },
+                    sizeIdentifier: "smart-scan-reclaimable-size"
+                )
             }
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
+            LazyVGrid(
+                columns: [
+                    GridItem(
+                        .adaptive(minimum: DesignTokens.Layout.cardMinWidth),
+                        spacing: DesignTokens.Spacing.small
+                    )
+                ],
+                spacing: DesignTokens.Spacing.small
+            ) {
                 ForEach(viewModel.moduleSummaries) { summary in
                     Button {
                         selectedModuleID = summary.id
@@ -244,35 +268,45 @@ struct SmartScanView: View {
     }
 
     private func moduleCard(_ summary: SmartScanModuleSummary) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(summary.title)
-                .font(.headline)
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xSmall) {
+            HStack(spacing: DesignTokens.Spacing.xSmall) {
+                Image(systemName: SidebarDestination(moduleID: summary.id)?.symbol ?? "folder")
+                    .foregroundStyle(DesignTokens.Palette.brandText)
+                    .accessibilityHidden(true)
+                Text(summary.title)
+                    .font(DesignTokens.Typography.sectionTitle)
+                Spacer(minLength: 0)
+                if summary.status == .completed {
+                    Image(systemName: "chevron.right")
+                        .font(DesignTokens.Typography.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                        .accessibilityHidden(true)
+                }
+            }
             Text(SizeCalculator.formattedByteCount(summary.bytesFound))
-                .font(.title3.weight(.medium))
+                .font(DesignTokens.Typography.figure)
             Text("\(summary.itemsFound) \(summary.itemsFound == 1 ? "item" : "items")")
-                .font(.callout)
+                .font(DesignTokens.Typography.metadata)
                 .foregroundStyle(.secondary)
 
             switch summary.status {
             case .completed:
                 EmptyView()
             case .requiresPermission(let message):
-                Label(message, systemImage: "lock.fill")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                StatusMessage(text: message, systemImage: "lock", font: DesignTokens.Typography.caption)
             case .failed(let message):
-                Label(message, systemImage: "exclamationmark.triangle")
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .fixedSize(horizontal: false, vertical: true)
+                StatusMessage(
+                    text: message,
+                    systemImage: "exclamationmark.triangle",
+                    tone: .error,
+                    font: DesignTokens.Typography.caption
+                )
             case .notScanned:
                 EmptyView()
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 12))
+        .tersoCard()
+        .contentShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.card))
     }
 }
 
