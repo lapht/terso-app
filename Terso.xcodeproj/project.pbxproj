@@ -27,6 +27,7 @@
 		1000000000000000000000FF /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001E /* DesignTokens.swift */; };
 		1000000000000000000000E0 /* TersoComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001F /* TersoComponents.swift */; };
 		10000000000000000000000D /* TCCBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000D /* TCCBannerView.swift */; };
+		1000000000000000000000A1 /* MenuBarSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000A1 /* MenuBarSpace.swift */; };
 		10000000000000000000000E /* TersoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000E /* TersoApp.swift */; };
 		1000000000000000000000F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000F0 /* Assets.xcassets */; };
 		1000000000000000000000F2 /* AuditLogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000010 /* AuditLogViewModelTests.swift */; };
@@ -71,6 +72,7 @@
 		20000000000000000000001E /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		20000000000000000000001F /* TersoComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TersoComponents.swift; sourceTree = "<group>"; };
 		20000000000000000000000D /* TCCBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCBannerView.swift; sourceTree = "<group>"; };
+		2000000000000000000000A1 /* MenuBarSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarSpace.swift; sourceTree = "<group>"; };
 		20000000000000000000000E /* TersoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TersoApp.swift; sourceTree = "<group>"; };
 		200000000000000000000010 /* AuditLogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogViewModelTests.swift; sourceTree = "<group>"; };
 		200000000000000000000011 /* CleanResultViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanResultViewTests.swift; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 				20000000000000000000000D /* TCCBannerView.swift */,
 				20000000000000000000001F /* TersoComponents.swift */,
 				20000000000000000000001E /* DesignTokens.swift */,
+				2000000000000000000000A1 /* MenuBarSpace.swift */,
 				20000000000000000000000E /* TersoApp.swift */,
 				2000000000000000000000F0 /* Assets.xcassets */,
 			);
@@ -288,6 +291,7 @@
 				10000000000000000000000D /* TCCBannerView.swift in Sources */,
 				1000000000000000000000E0 /* TersoComponents.swift in Sources */,
 				1000000000000000000000FF /* DesignTokens.swift in Sources */,
+				1000000000000000000000A1 /* MenuBarSpace.swift in Sources */,
 				10000000000000000000000E /* TersoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -22,7 +22,15 @@ import SwiftUI
 
 @main
 struct TersoApp: App {
+    @StateObject private var menuBarSpace = MenuBarSpaceModel()
+
     var body: some Scene {
+        MenuBarExtra {
+            MenuBarSpaceContent(model: menuBarSpace)
+        } label: {
+            MenuBarSpaceLabel(model: menuBarSpace)
+        }
+
         WindowGroup {
             ContentView()
                 .onAppear {
