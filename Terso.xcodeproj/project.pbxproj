@@ -19,6 +19,8 @@
 		1000000000000000000000FC /* ModuleScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001B /* ModuleScanView.swift */; };
 		1000000000000000000000FD /* ScanSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001C /* ScanSessionStore.swift */; };
 		1000000000000000000000F8 /* LargeFilesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000017 /* LargeFilesViewModel.swift */; };
+		1000000000000000000000D2 /* DuplicatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000D2 /* DuplicatesView.swift */; };
+		1000000000000000000000D1 /* DuplicatesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000D1 /* DuplicatesViewModel.swift */; };
 		1000000000000000000000B1 /* ToolScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000C1 /* ToolScanViewModel.swift */; };
 		100000000000000000000007 /* MainShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000007 /* MainShellView.swift */; };
 		100000000000000000000008 /* ModuleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000008 /* ModuleDetailView.swift */; };
@@ -43,6 +45,7 @@
 		1000000000000000000000FE /* ScanSessionStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001D /* ScanSessionStoreTests.swift */; };
 		1000000000000000000000FA /* LargeFilesViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000019 /* LargeFilesViewModelTests.swift */; };
 		1000000000000000000000B3 /* ToolScanViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000C3 /* ToolScanViewModelTests.swift */; };
+		1000000000000000000000D3 /* DuplicatesViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000D3 /* DuplicatesViewModelTests.swift */; };
 		1F1D693D3082089C004A2B1E /* CoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1F1D693C3082089C004A2B1E /* CoreKit */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +72,8 @@
 		20000000000000000000001B /* ModuleScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleScanView.swift; sourceTree = "<group>"; };
 		20000000000000000000001C /* ScanSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSessionStore.swift; sourceTree = "<group>"; };
 		200000000000000000000017 /* LargeFilesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeFilesViewModel.swift; sourceTree = "<group>"; };
+		2000000000000000000000D2 /* DuplicatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicatesView.swift; sourceTree = "<group>"; };
+		2000000000000000000000D1 /* DuplicatesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicatesViewModel.swift; sourceTree = "<group>"; };
 		2000000000000000000000C1 /* ToolScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolScanViewModel.swift; sourceTree = "<group>"; };
 		200000000000000000000007 /* MainShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShellView.swift; sourceTree = "<group>"; };
 		200000000000000000000008 /* ModuleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleDetailView.swift; sourceTree = "<group>"; };
@@ -92,6 +97,7 @@
 		20000000000000000000001D /* ScanSessionStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSessionStoreTests.swift; sourceTree = "<group>"; };
 		200000000000000000000019 /* LargeFilesViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeFilesViewModelTests.swift; sourceTree = "<group>"; };
 		2000000000000000000000C3 /* ToolScanViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolScanViewModelTests.swift; sourceTree = "<group>"; };
+		2000000000000000000000D3 /* DuplicatesViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicatesViewModelTests.swift; sourceTree = "<group>"; };
 		200000000000000000000016 /* TersoAppUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TersoAppUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2000000000000000000000F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2000000000000000000000F1 /* Terso.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Terso.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -157,6 +163,8 @@
 				20000000000000000000001B /* ModuleScanView.swift */,
 				20000000000000000000001C /* ScanSessionStore.swift */,
 				200000000000000000000017 /* LargeFilesViewModel.swift */,
+				2000000000000000000000D2 /* DuplicatesView.swift */,
+				2000000000000000000000D1 /* DuplicatesViewModel.swift */,
 				2000000000000000000000C1 /* ToolScanViewModel.swift */,
 				200000000000000000000007 /* MainShellView.swift */,
 				200000000000000000000008 /* ModuleDetailView.swift */,
@@ -188,6 +196,7 @@
 				2000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift */,
 				200000000000000000000019 /* LargeFilesViewModelTests.swift */,
 				2000000000000000000000C3 /* ToolScanViewModelTests.swift */,
+				2000000000000000000000D3 /* DuplicatesViewModelTests.swift */,
 			);
 			path = Tests/TersoAppTests;
 			sourceTree = "<group>";
@@ -298,6 +307,8 @@
 				1000000000000000000000FC /* ModuleScanView.swift in Sources */,
 				1000000000000000000000FD /* ScanSessionStore.swift in Sources */,
 				1000000000000000000000F8 /* LargeFilesViewModel.swift in Sources */,
+				1000000000000000000000D2 /* DuplicatesView.swift in Sources */,
+				1000000000000000000000D1 /* DuplicatesViewModel.swift in Sources */,
 				1000000000000000000000B1 /* ToolScanViewModel.swift in Sources */,
 				100000000000000000000007 /* MainShellView.swift in Sources */,
 				100000000000000000000008 /* ModuleDetailView.swift in Sources */,
@@ -328,6 +339,7 @@
 				1000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift in Sources */,
 				1000000000000000000000FA /* LargeFilesViewModelTests.swift in Sources */,
 				1000000000000000000000B3 /* ToolScanViewModelTests.swift in Sources */,
+				1000000000000000000000D3 /* DuplicatesViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
