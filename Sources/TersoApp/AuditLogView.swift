@@ -127,12 +127,20 @@ struct AuditLogView: View {
         panel.allowedContentTypes = [.plainText]
         panel.nameFieldStringValue = "terso-audit-report.txt"
         panel.title = "Export Audit Log"
+        panel.message = "The home folder is replaced with ~ in the exported report. The local log is not changed."
+        let redactToggle = NSButton(
+            checkboxWithTitle: "Redact file names below the cleanup root",
+            target: nil,
+            action: nil
+        )
+        redactToggle.setAccessibilityIdentifier("audit-log-export-redact")
+        panel.accessoryView = redactToggle
         guard panel.runModal() == .OK, let url = panel.url else {
             return
         }
 
         do {
-            try viewModel.export(to: url)
+            try viewModel.export(to: url, redactFileNames: redactToggle.state == .on)
         } catch {
             exportError = error.localizedDescription
         }
@@ -159,8 +167,8 @@ final class AuditLogViewModel: ObservableObject {
         }
     }
 
-    func export(to url: URL) throws {
-        try logger.exportReport(to: url)
+    func export(to url: URL, redactFileNames: Bool = false) throws {
+        try logger.exportReport(to: url, options: AuditExportOptions(redactFileNames: redactFileNames))
         errorMessage = nil
     }
 }
