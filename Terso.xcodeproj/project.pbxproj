@@ -30,6 +30,8 @@
 		1000000000000000000000E0 /* TersoComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001F /* TersoComponents.swift */; };
 		10000000000000000000000D /* TCCBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000D /* TCCBannerView.swift */; };
 		1000000000000000000000A1 /* MenuBarSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000A1 /* MenuBarSpace.swift */; };
+		1000000000000000000000A2 /* MenuBarScanCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000A2 /* MenuBarScanCoordinator.swift */; };
+		1000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift */; };
 		10000000000000000000000E /* TersoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000E /* TersoApp.swift */; };
 		1000000000000000000000F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000F0 /* Assets.xcassets */; };
 		1000000000000000000000F2 /* AuditLogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000010 /* AuditLogViewModelTests.swift */; };
@@ -78,6 +80,8 @@
 		20000000000000000000001F /* TersoComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TersoComponents.swift; sourceTree = "<group>"; };
 		20000000000000000000000D /* TCCBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCBannerView.swift; sourceTree = "<group>"; };
 		2000000000000000000000A1 /* MenuBarSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarSpace.swift; sourceTree = "<group>"; };
+		2000000000000000000000A2 /* MenuBarScanCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarScanCoordinator.swift; sourceTree = "<group>"; };
+		2000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarScanCoordinatorTests.swift; sourceTree = "<group>"; };
 		20000000000000000000000E /* TersoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TersoApp.swift; sourceTree = "<group>"; };
 		200000000000000000000010 /* AuditLogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogViewModelTests.swift; sourceTree = "<group>"; };
 		200000000000000000000011 /* CleanResultViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanResultViewTests.swift; sourceTree = "<group>"; };
@@ -164,6 +168,7 @@
 				20000000000000000000001F /* TersoComponents.swift */,
 				20000000000000000000001E /* DesignTokens.swift */,
 				2000000000000000000000A1 /* MenuBarSpace.swift */,
+				2000000000000000000000A2 /* MenuBarScanCoordinator.swift */,
 				20000000000000000000000E /* TersoApp.swift */,
 				2000000000000000000000F0 /* Assets.xcassets */,
 			);
@@ -180,6 +185,7 @@
 				200000000000000000000014 /* SidebarDestinationTests.swift */,
 				200000000000000000000015 /* SmartScanViewModelTests.swift */,
 				20000000000000000000001D /* ScanSessionStoreTests.swift */,
+				2000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift */,
 				200000000000000000000019 /* LargeFilesViewModelTests.swift */,
 				2000000000000000000000C3 /* ToolScanViewModelTests.swift */,
 			);
@@ -303,6 +309,7 @@
 				1000000000000000000000E0 /* TersoComponents.swift in Sources */,
 				1000000000000000000000FF /* DesignTokens.swift in Sources */,
 				1000000000000000000000A1 /* MenuBarSpace.swift in Sources */,
+				1000000000000000000000A2 /* MenuBarScanCoordinator.swift in Sources */,
 				10000000000000000000000E /* TersoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -318,6 +325,7 @@
 				1000000000000000000000F6 /* SidebarDestinationTests.swift in Sources */,
 				1000000000000000000000F7 /* SmartScanViewModelTests.swift in Sources */,
 				1000000000000000000000FE /* ScanSessionStoreTests.swift in Sources */,
+				1000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift in Sources */,
 				1000000000000000000000FA /* LargeFilesViewModelTests.swift in Sources */,
 				1000000000000000000000B3 /* ToolScanViewModelTests.swift in Sources */,
 			);

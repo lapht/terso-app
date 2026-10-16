@@ -31,9 +31,9 @@ final class ScanSessionStore: ObservableObject {
     private let tccManager: TCCManager
     private var moduleScans: [SidebarDestination: SmartScanViewModel] = [:]
 
-    init(tccManager: TCCManager = TCCManager()) {
+    init(tccManager: TCCManager = TCCManager(), smartScan: SmartScanViewModel? = nil) {
         self.tccManager = tccManager
-        smartScan = SmartScanViewModel(tccManager: tccManager)
+        self.smartScan = smartScan ?? SmartScanViewModel(tccManager: tccManager)
         largeFiles = LargeFilesViewModel(tccManager: tccManager)
         leftovers = ToolScanViewModel(tool: .leftovers, tccManager: tccManager)
         duplicates = ToolScanViewModel(tool: .duplicates, tccManager: tccManager)

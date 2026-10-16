@@ -24,15 +24,24 @@ struct MainShellView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var selection: SidebarDestination? = .smartScan
     @State private var tccStatus: TCCStatus
-    /// Lives here, not in the pages, so each page's last scan survives switching destinations.
-    @StateObject private var scanSessions: ScanSessionStore
+    /// Owned by the app, not the pages, so each page's last scan survives switching destinations
+    /// and the menu bar launches the same Smart Scan the window shows.
+    @ObservedObject private var coordinator: MenuBarScanCoordinator
 
+    private var scanSessions: ScanSessionStore { coordinator.scanSessions }
     private let tccManager: TCCManager
 
-    init(tccManager: TCCManager = TCCManager()) {
+    init(coordinator: MenuBarScanCoordinator, tccManager: TCCManager = TCCManager()) {
+        self.coordinator = coordinator
         self.tccManager = tccManager
         _tccStatus = State(initialValue: tccManager.status)
-        _scanSessions = StateObject(wrappedValue: ScanSessionStore(tccManager: tccManager))
+    }
+
+    init(tccManager: TCCManager = TCCManager()) {
+        self.init(
+            coordinator: MenuBarScanCoordinator(scanSessions: ScanSessionStore(tccManager: tccManager)),
+            tccManager: tccManager
+        )
     }
 
     var body: some View {
@@ -46,6 +55,10 @@ struct MainShellView: View {
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 720, minHeight: 460)
         .onAppear(perform: refreshTCCStatus)
+        .onChange(of: coordinator.focusRequestCount) { _ in
+            selection = .smartScan
+            refreshTCCStatus()
+        }
         .onChange(of: scenePhase) { newPhase in
             if newPhase == .active {
                 refreshTCCStatus()

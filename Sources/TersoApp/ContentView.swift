@@ -19,8 +19,14 @@
 import SwiftUI
 
 struct ContentView: View {
+    var coordinator: MenuBarScanCoordinator?
+
     var body: some View {
-        MainShellView()
+        if let coordinator {
+            MainShellView(coordinator: coordinator)
+        } else {
+            MainShellView()
+        }
     }
 }
 
