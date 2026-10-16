@@ -59,6 +59,10 @@ struct MainShellView: View {
             SmartScanView(viewModel: scanSessions.smartScan) {
                 selection = .auditLogs
             }
+        } else if selection == .leftovers {
+            ToolScanView(destination: .leftovers, viewModel: scanSessions.leftovers)
+        } else if selection == .duplicates {
+            ToolScanView(destination: .duplicates, viewModel: scanSessions.duplicates)
         } else if selection == .largeFiles {
             LargeFilesView(viewModel: scanSessions.largeFiles)
         } else if selection == .auditLogs {
