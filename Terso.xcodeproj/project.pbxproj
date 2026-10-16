@@ -1,0 +1,433 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		100000000000000000000001 /* AuditLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000001 /* AuditLogView.swift */; };
+		100000000000000000000002 /* CleanResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000002 /* CleanResultView.swift */; };
+		100000000000000000000003 /* ConfirmationSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000003 /* ConfirmationSheetView.swift */; };
+		100000000000000000000004 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000004 /* ContentView.swift */; };
+		100000000000000000000005 /* ItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000005 /* ItemRowView.swift */; };
+		100000000000000000000006 /* LargeFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000006 /* LargeFilesView.swift */; };
+		100000000000000000000007 /* MainShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000007 /* MainShellView.swift */; };
+		100000000000000000000008 /* ModuleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000008 /* ModuleDetailView.swift */; };
+		100000000000000000000009 /* ModuleSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000009 /* ModuleSelectionViewModel.swift */; };
+		10000000000000000000000A /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000A /* SidebarView.swift */; };
+		10000000000000000000000B /* SmartScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000B /* SmartScanView.swift */; };
+		10000000000000000000000C /* SmartScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000C /* SmartScanViewModel.swift */; };
+		10000000000000000000000D /* TCCBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000D /* TCCBannerView.swift */; };
+		10000000000000000000000E /* TersoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000E /* TersoApp.swift */; };
+		1000000000000000000000F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000F0 /* Assets.xcassets */; };
+		1000000000000000000000F2 /* AuditLogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000010 /* AuditLogViewModelTests.swift */; };
+		1000000000000000000000F3 /* CleanResultViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000011 /* CleanResultViewTests.swift */; };
+		1000000000000000000000F4 /* CleanupConfirmationViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000012 /* CleanupConfirmationViewModelTests.swift */; };
+		1000000000000000000000F5 /* ModuleSelectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000013 /* ModuleSelectionViewModelTests.swift */; };
+		1000000000000000000000F6 /* SidebarDestinationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000014 /* SidebarDestinationTests.swift */; };
+		1000000000000000000000F7 /* SmartScanViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000015 /* SmartScanViewModelTests.swift */; };
+		1F1D693D3082089C004A2B1E /* CoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1F1D693C3082089C004A2B1E /* CoreKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		800000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 500000000000000000000002 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 500000000000000000000001;
+			remoteInfo = TersoApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		200000000000000000000001 /* AuditLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogView.swift; sourceTree = "<group>"; };
+		200000000000000000000002 /* CleanResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanResultView.swift; sourceTree = "<group>"; };
+		200000000000000000000003 /* ConfirmationSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationSheetView.swift; sourceTree = "<group>"; };
+		200000000000000000000004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		200000000000000000000005 /* ItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemRowView.swift; sourceTree = "<group>"; };
+		200000000000000000000006 /* LargeFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeFilesView.swift; sourceTree = "<group>"; };
+		200000000000000000000007 /* MainShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShellView.swift; sourceTree = "<group>"; };
+		200000000000000000000008 /* ModuleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleDetailView.swift; sourceTree = "<group>"; };
+		200000000000000000000009 /* ModuleSelectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleSelectionViewModel.swift; sourceTree = "<group>"; };
+		20000000000000000000000A /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		20000000000000000000000B /* SmartScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanView.swift; sourceTree = "<group>"; };
+		20000000000000000000000C /* SmartScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanViewModel.swift; sourceTree = "<group>"; };
+		20000000000000000000000D /* TCCBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCBannerView.swift; sourceTree = "<group>"; };
+		20000000000000000000000E /* TersoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TersoApp.swift; sourceTree = "<group>"; };
+		200000000000000000000010 /* AuditLogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogViewModelTests.swift; sourceTree = "<group>"; };
+		200000000000000000000011 /* CleanResultViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanResultViewTests.swift; sourceTree = "<group>"; };
+		200000000000000000000012 /* CleanupConfirmationViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanupConfirmationViewModelTests.swift; sourceTree = "<group>"; };
+		200000000000000000000013 /* ModuleSelectionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleSelectionViewModelTests.swift; sourceTree = "<group>"; };
+		200000000000000000000014 /* SidebarDestinationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarDestinationTests.swift; sourceTree = "<group>"; };
+		200000000000000000000015 /* SmartScanViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanViewModelTests.swift; sourceTree = "<group>"; };
+		200000000000000000000016 /* TersoAppUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TersoAppUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2000000000000000000000F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2000000000000000000000F1 /* Terso.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Terso.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		300000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F1D693D3082089C004A2B1E /* CoreKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300000000000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		400000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				400000000000000000000002 /* Sources */,
+				400000000000000000000003 /* Products */,
+				400000000000000000000005 /* Tests/TersoAppTests */,
+			);
+			sourceTree = "<group>";
+		};
+		400000000000000000000002 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				400000000000000000000004 /* TersoApp */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		400000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2000000000000000000000F1 /* Terso.app */,
+				200000000000000000000016 /* TersoAppUnitTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		400000000000000000000004 /* TersoApp */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000001 /* AuditLogView.swift */,
+				200000000000000000000002 /* CleanResultView.swift */,
+				200000000000000000000003 /* ConfirmationSheetView.swift */,
+				200000000000000000000004 /* ContentView.swift */,
+				200000000000000000000005 /* ItemRowView.swift */,
+				200000000000000000000006 /* LargeFilesView.swift */,
+				200000000000000000000007 /* MainShellView.swift */,
+				200000000000000000000008 /* ModuleDetailView.swift */,
+				200000000000000000000009 /* ModuleSelectionViewModel.swift */,
+				20000000000000000000000A /* SidebarView.swift */,
+				20000000000000000000000B /* SmartScanView.swift */,
+				20000000000000000000000C /* SmartScanViewModel.swift */,
+				20000000000000000000000D /* TCCBannerView.swift */,
+				20000000000000000000000E /* TersoApp.swift */,
+				2000000000000000000000F0 /* Assets.xcassets */,
+			);
+			path = TersoApp;
+			sourceTree = "<group>";
+		};
+		400000000000000000000005 /* Tests/TersoAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000010 /* AuditLogViewModelTests.swift */,
+				200000000000000000000011 /* CleanResultViewTests.swift */,
+				200000000000000000000012 /* CleanupConfirmationViewModelTests.swift */,
+				200000000000000000000013 /* ModuleSelectionViewModelTests.swift */,
+				200000000000000000000014 /* SidebarDestinationTests.swift */,
+				200000000000000000000015 /* SmartScanViewModelTests.swift */,
+			);
+			path = Tests/TersoAppTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		500000000000000000000001 /* TersoApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700000000000000000000002 /* Build configuration list for PBXNativeTarget "TersoApp" */;
+			buildPhases = (
+				300000000000000000000002 /* Sources */,
+				300000000000000000000001 /* Frameworks */,
+				300000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TersoApp;
+			packageProductDependencies = (
+				1F1D693C3082089C004A2B1E /* CoreKit */,
+			);
+			productName = Terso;
+			productReference = 2000000000000000000000F1 /* Terso.app */;
+			productType = "com.apple.product-type.application";
+		};
+		500000000000000000000003 /* TersoAppUnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700000000000000000000007 /* Build configuration list for PBXNativeTarget "TersoAppUnitTests" */;
+			buildPhases = (
+				300000000000000000000005 /* Sources */,
+				300000000000000000000004 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				900000000000000000000001 /* PBXTargetDependency */,
+			);
+			name = TersoAppUnitTests;
+			packageProductDependencies = (
+			);
+			productName = TersoAppUnitTests;
+			productReference = 200000000000000000000016 /* TersoAppUnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		500000000000000000000002 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					500000000000000000000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 700000000000000000000001 /* Build configuration list for PBXProject "Terso" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 400000000000000000000001;
+			packageReferences = (
+				1F1D693B3082089C004A2B1E /* XCLocalSwiftPackageReference "../terso-app" */,
+			);
+			productRefGroup = 400000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				500000000000000000000001 /* TersoApp */,
+				500000000000000000000003 /* TersoAppUnitTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		300000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1000000000000000000000F0 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		300000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000001 /* AuditLogView.swift in Sources */,
+				100000000000000000000002 /* CleanResultView.swift in Sources */,
+				100000000000000000000003 /* ConfirmationSheetView.swift in Sources */,
+				100000000000000000000004 /* ContentView.swift in Sources */,
+				100000000000000000000005 /* ItemRowView.swift in Sources */,
+				100000000000000000000006 /* LargeFilesView.swift in Sources */,
+				100000000000000000000007 /* MainShellView.swift in Sources */,
+				100000000000000000000008 /* ModuleDetailView.swift in Sources */,
+				100000000000000000000009 /* ModuleSelectionViewModel.swift in Sources */,
+				10000000000000000000000A /* SidebarView.swift in Sources */,
+				10000000000000000000000B /* SmartScanView.swift in Sources */,
+				10000000000000000000000C /* SmartScanViewModel.swift in Sources */,
+				10000000000000000000000D /* TCCBannerView.swift in Sources */,
+				10000000000000000000000E /* TersoApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300000000000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1000000000000000000000F2 /* AuditLogViewModelTests.swift in Sources */,
+				1000000000000000000000F3 /* CleanResultViewTests.swift in Sources */,
+				1000000000000000000000F4 /* CleanupConfirmationViewModelTests.swift in Sources */,
+				1000000000000000000000F5 /* ModuleSelectionViewModelTests.swift in Sources */,
+				1000000000000000000000F6 /* SidebarDestinationTests.swift in Sources */,
+				1000000000000000000000F7 /* SmartScanViewModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		900000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 500000000000000000000001 /* TersoApp */;
+			targetProxy = 800000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		700000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.1.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		700000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.1.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		700000000000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Terso;
+				INFOPLIST_KEY_LSMinimumSystemVersion = 13.0;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.lapht.Terso;
+				PRODUCT_MODULE_NAME = TersoApp;
+				PRODUCT_NAME = Terso;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		700000000000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Terso;
+				INFOPLIST_KEY_LSMinimumSystemVersion = 13.0;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.lapht.Terso;
+				PRODUCT_MODULE_NAME = TersoApp;
+				PRODUCT_NAME = Terso;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		700000000000000000000008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.lapht.TersoUnitTests;
+				PRODUCT_NAME = TersoAppUnitTests;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Terso.app/Contents/MacOS/Terso";
+				TEST_TARGET_NAME = TersoApp;
+			};
+			name = Debug;
+		};
+		700000000000000000000009 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.lapht.TersoUnitTests;
+				PRODUCT_NAME = TersoAppUnitTests;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Terso.app/Contents/MacOS/Terso";
+				TEST_TARGET_NAME = TersoApp;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		700000000000000000000001 /* Build configuration list for PBXProject "Terso" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				700000000000000000000003 /* Debug */,
+				700000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		700000000000000000000002 /* Build configuration list for PBXNativeTarget "TersoApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				700000000000000000000005 /* Debug */,
+				700000000000000000000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		700000000000000000000007 /* Build configuration list for PBXNativeTarget "TersoAppUnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				700000000000000000000008 /* Debug */,
+				700000000000000000000009 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		1F1D693B3082089C004A2B1E /* XCLocalSwiftPackageReference "../terso-app" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../terso-app";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1F1D693C3082089C004A2B1E /* CoreKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CoreKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 500000000000000000000002 /* Project object */;
+}

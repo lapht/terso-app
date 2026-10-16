@@ -29,10 +29,6 @@ let package = Package(
         .library(
             name: "CoreKit",
             targets: ["CoreKit"]
-        ),
-        .executable(
-            name: "TersoApp",
-            targets: ["TersoApp"]
         )
     ],
     dependencies: [],
@@ -41,14 +37,6 @@ let package = Package(
             name: "CoreKit",
             dependencies: [],
             path: "Sources/CoreKit"
-        ),
-        .executableTarget(
-            name: "TersoApp",
-            dependencies: ["CoreKit"],
-            path: "Sources/TersoApp",
-            resources: [
-                .copy("Assets.xcassets")
-            ]
         ),
         .testTarget(
             name: "CoreKitTests",
@@ -60,8 +48,17 @@ let package = Package(
         ),
         .testTarget(
             name: "TersoAppTests",
-            dependencies: ["TersoApp", "CoreKit"],
-            path: "Tests/TersoAppTests"
+            dependencies: ["CoreKit"],
+            path: "Tests/TersoAppTests",
+            exclude: [
+                "AuditLogViewModelTests.swift",
+                "CleanResultViewTests.swift",
+                "CleanupConfirmationViewModelTests.swift",
+                "ModuleSelectionViewModelTests.swift",
+                "SidebarDestinationTests.swift",
+                "SmartScanViewModelTests.swift"
+            ],
+            sources: ["CoreKitIntegrationTests.swift"]
         )
     ],
     swiftLanguageModes: [.v6]
