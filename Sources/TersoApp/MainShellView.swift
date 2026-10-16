@@ -63,7 +63,7 @@ struct MainShellView: View {
                 selection = .auditLogs
             }
         } else if selection == .largeFiles {
-            LargeFilesView()
+            LargeFilesView(tccManager: tccManager)
         } else if selection == .auditLogs {
             AuditLogView()
         } else if let selection {

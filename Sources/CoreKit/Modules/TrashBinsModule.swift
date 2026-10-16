@@ -23,7 +23,7 @@ import Foundation
 public struct TrashBinsModule: CleanModule {
     public let id = "trash.user"
     public let title = "Trash Bins"
-    public let requiresFDA = false
+    public let requiresFDA = true
 
     private let userID: String
 

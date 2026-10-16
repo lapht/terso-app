@@ -21,8 +21,16 @@ import SwiftUI
 
 @MainActor
 struct LargeFilesView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var items: [CleanItem]?
     @State private var failureMessage: String?
+    @State private var permissionMessage: String?
+
+    private let tccManager: TCCManager
+
+    init(tccManager: TCCManager = TCCManager()) {
+        self.tccManager = tccManager
+    }
 
     private let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
 
@@ -36,6 +44,11 @@ struct LargeFilesView: View {
                     allowsSelection: false,
                     onMoveToTrash: { _ in }
                 )
+            } else if let permissionMessage {
+                Label(permissionMessage, systemImage: "lock.shield")
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("large-files-requires-fda")
             } else if let failureMessage {
                 Label("Scan failed: \(failureMessage)", systemImage: "exclamationmark.triangle")
                     .foregroundStyle(.red)
@@ -44,16 +57,27 @@ struct LargeFilesView: View {
                 ProgressView("Scanning for large files…")
             }
         }
-        .task {
+        .task(id: scenePhase) {
+            // Rescan on return to the app only if FDA was missing, so a grant is picked up.
+            guard scenePhase == .active, items == nil else { return }
             await scan()
         }
     }
 
     private func scan() async {
         do {
-            items = try await LargeFilesModule().scan(
+            let result = try await tccManager.scan(
+                module: LargeFilesModule(),
                 context: ScanContext(homeDirectory: homeDirectory)
             )
+            switch result {
+            case let .completed(scanned):
+                permissionMessage = nil
+                failureMessage = nil
+                items = scanned
+            case let .requiresPermission(message):
+                permissionMessage = message
+            }
         } catch is CancellationError {
             return
         } catch {
