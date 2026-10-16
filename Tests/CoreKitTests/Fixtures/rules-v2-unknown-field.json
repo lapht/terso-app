@@ -1,0 +1,37 @@
+{
+  "version": "2026.2",
+  "schemaVersion": 2,
+  "rules": [
+    {
+      "id": "leftovers.example.editor",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Example Editor leftovers",
+      "description": "Version-conditional exclusions are not part of the v2 contract (#106).",
+      "allowlistRoots": [
+        "~/Library/Caches"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.example.Editor",
+          "paths": [
+            "~/Library/Caches/{bundleID}"
+          ],
+          "excludedVersions": [
+            "< 3.0"
+          ]
+        }
+      ],
+      "provenance": {
+        "source": "https://example.com/editor/uninstall",
+        "author": "terso-maintainer",
+        "date": "2026-10-16",
+        "rationale": "Vendor documentation lists this cache as created by the app."
+      }
+    }
+  ]
+}

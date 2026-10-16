@@ -38,9 +38,9 @@ public enum RuleEvaluationError: Error, CustomStringConvertible, Equatable, Send
 
 /// Applies a cleanup rule to candidate paths after checking Safety allowlists.
 public struct RuleEvaluator: Sendable {
-    private let homeDirectory: URL
-    private let pathValidator: PathValidator
-    private let symlinkValidator: SymlinkValidator
+    let homeDirectory: URL
+    let pathValidator: PathValidator
+    let symlinkValidator: SymlinkValidator
 
     /// Creates an evaluator using the current user's home directory for `~` roots.
     public init(homeDirectory: URL) {
@@ -113,7 +113,7 @@ public struct RuleEvaluator: Sendable {
         return matches
     }
 
-    private func expandAllowlistRoot(_ root: String, ruleID: String) throws -> URL {
+    func expandAllowlistRoot(_ root: String, ruleID: String) throws -> URL {
         if root == "~" {
             return homeDirectory
         }

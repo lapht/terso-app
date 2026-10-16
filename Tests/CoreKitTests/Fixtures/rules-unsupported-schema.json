@@ -1,0 +1,22 @@
+{
+  "version": "2027.1",
+  "schemaVersion": 3,
+  "rules": [
+    {
+      "id": "caches.user.basic",
+      "module": "caches.user",
+      "category": "Caches",
+      "name": "User cache files",
+      "description": "A database from a future schema must not load.",
+      "allowlistRoots": [
+        "~/Library/Caches"
+      ],
+      "paths": [],
+      "patterns": [
+        "*.tmp"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    }
+  ]
+}
