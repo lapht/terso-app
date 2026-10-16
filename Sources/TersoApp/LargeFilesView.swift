@@ -57,10 +57,14 @@ struct LargeFilesView: View {
                 ProgressView("Scanning for large files…")
             }
         }
-        .task(id: scenePhase) {
-            // Rescan on return to the app only if FDA was missing, so a grant is picked up.
-            guard scenePhase == .active, items == nil else { return }
+        .task {
             await scan()
+        }
+        .onChange(of: scenePhase) { newPhase in
+            // Rescan on return to the app only if FDA was missing, so a grant is picked up.
+            if newPhase == .active, permissionMessage != nil {
+                Task { await scan() }
+            }
         }
     }
 

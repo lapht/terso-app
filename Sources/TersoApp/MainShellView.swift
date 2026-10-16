@@ -44,7 +44,9 @@ struct MainShellView: View {
                 destinationView
             }
             .padding(24)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            // A minimum width keeps wrapped text (e.g. the FDA banner) from measuring as a
+            // tall column while the split view computes its minimum size.
+            .frame(minWidth: 420, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 720, minHeight: 460)
