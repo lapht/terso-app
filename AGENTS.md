@@ -67,6 +67,16 @@ terso-app/
 7. **Graceful TCC.** Missing Full Disk Access disables only the modules that need it, with clear onboarding — never silently scans less than displayed.
 8. **No silent failures.** Every deletion is logged (locally) with timestamp, rule id, and size; logs are exportable for bug reports.
 
+> **v0.1/v0.2 note (not an invariant).** Permanent delete is not offered in v0.1 or v0.2, even though invariant 4 allows an explicit per-item opt-in. Every destructive action is trash-first through `Sources/CoreKit/Safety/`.
+
+## v0.2 boundaries (from docs/design.md §11)
+- v0.2 never removes `.app` bundles and never modifies, moves or trashes anything in `/Applications` or `~/Applications`; the only access is read-only installed-app discovery. The current Safety denials (`PathValidator`) stay unchanged. Real uninstall is v0.3 (#107).
+- Leftovers are reported only for apps that are no longer installed (bundle ID absent from a complete discovery), only under the `~/Library` roots listed in design.md §11.4, and acted on only through the existing Safety pipeline, trash-first.
+- Duplicates are read-only in v0.2: list, details, Reveal in Finder. No selection, no deletion (v0.3, #40).
+- Leftovers and duplicates are separate sidebar sections and are not part of Smart Scan.
+- Rule DB v2 follows the contract in design.md §11.2; version-conditional exclusions are out of scope for v0.2 (#106).
+- Changes to `Safety/` or `Rules/` (including `Rules/*.json`) keep requiring the `[SAFETY]` flag and human review.
+
 ## Rules of engagement
 - **Absolute ban:** no file deletion logic or APIs outside `Sources/CoreKit/Safety/`. CI blocks violations: do not look for workarounds, just report.
 - Do not expand an issue's scope. If other work is needed, propose a new issue instead of implementing it here.
