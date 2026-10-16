@@ -58,21 +58,18 @@ struct ModuleDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                if items.isEmpty {
-                    Text("No items found.")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                } else {
-                    itemList
-                }
+        // The header stays put; only the item list scrolls, so the page never nests scroll views.
+        VStack(alignment: .leading, spacing: 20) {
+            header
+            if items.isEmpty {
+                Text("No items found.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            } else {
+                itemList
             }
-            .frame(maxWidth: 720, alignment: .leading)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 8)
         }
+        .frame(maxWidth: 720, maxHeight: .infinity, alignment: .topLeading)
         .sheet(isPresented: confirmationSheetBinding) {
             ConfirmationSheetView(
                 itemCount: confirmationViewModel.pendingItems.count,
@@ -132,19 +129,22 @@ struct ModuleDetailView: View {
     }
 
     private var itemList: some View {
-        LazyVStack(spacing: 8) {
-            ForEach(items) { item in
-                ItemRowView(
-                    item: item,
-                    homeDirectory: homeDirectory,
-                    isSelected: Binding(
-                        get: { viewModel.isSelected(item) },
-                        set: { viewModel.setSelected($0, for: item) }
-                    ),
-                    allowsSelection: allowsSelection
-                )
-            }
+        List(items) { item in
+            ItemRowView(
+                item: item,
+                homeDirectory: homeDirectory,
+                isSelected: Binding(
+                    get: { viewModel.isSelected(item) },
+                    set: { viewModel.setSelected($0, for: item) }
+                ),
+                allowsSelection: allowsSelection
+            )
+            .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+            .listRowSeparator(.hidden)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .accessibilityIdentifier("module-item-list")
     }
 
     private var confirmationSheetBinding: Binding<Bool> {
