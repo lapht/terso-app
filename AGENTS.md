@@ -12,7 +12,10 @@ L'app vive nel progetto Xcode; `Package.swift` contiene solo CoreKit e i test.
 - Avvia l'app e le SwiftUI Preview con Xcode. `CoreKit` è fornito dal package
   locale definito in `Package.swift`.
 - Esegui i test del package dalla root con `swift test`.
-- Esegui i test UI/ViewModel con `xcodebuild test -project Terso.xcodeproj -scheme TersoApp`.
+- Esegui i test UI/ViewModel come la CI (senza `ONLY_ACTIVE_ARCH=YES` e `ARCHS` il
+  target di test compila anche x86_64 e fallisce con "Unable to resolve module dependency"):
+  `xcodebuild -project Terso.xcodeproj -scheme TersoApp -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO ARCHS=arm64 ONLY_ACTIVE_ARCH=YES test`
+  (su Intel usa `ARCHS=x86_64`).
 
 ## Avvio di una nuova chat o issue
 All'inizio di ogni nuova chat che deve modificare il codice, e prima di iniziare

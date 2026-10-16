@@ -44,7 +44,9 @@ struct MainShellView: View {
                 destinationView
             }
             .padding(24)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            // A minimum width keeps wrapped text (e.g. the FDA banner) from measuring as a
+            // tall column while the split view computes its minimum size.
+            .frame(minWidth: 420, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 720, minHeight: 460)
@@ -63,7 +65,7 @@ struct MainShellView: View {
                 selection = .auditLogs
             }
         } else if selection == .largeFiles {
-            LargeFilesView()
+            LargeFilesView(tccManager: tccManager)
         } else if selection == .auditLogs {
             AuditLogView()
         } else if let selection {
