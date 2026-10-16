@@ -19,73 +19,38 @@
 import CoreKit
 import SwiftUI
 
+/// Large Files never scans on appear: the user starts it, and leaving the screen cancels it.
 @MainActor
 struct LargeFilesView: View {
-    @Environment(\.scenePhase) private var scenePhase
-    @State private var items: [CleanItem]?
-    @State private var failureMessage: String?
-    @State private var permissionMessage: String?
-
-    private let tccManager: TCCManager
+    @StateObject private var viewModel: LargeFilesViewModel
 
     init(tccManager: TCCManager = TCCManager()) {
-        self.tccManager = tccManager
+        _viewModel = StateObject(wrappedValue: LargeFilesViewModel(tccManager: tccManager))
     }
 
-    private let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
+    init(viewModel: @autoclosure @escaping () -> LargeFilesViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel())
+    }
 
     var body: some View {
-        Group {
-            if let items {
-                ModuleDetailView(
-                    title: "Large Files",
-                    items: items,
-                    homeDirectory: homeDirectory,
-                    allowsSelection: false,
-                    onMoveToTrash: { _ in }
-                )
-            } else if let permissionMessage {
-                Label(permissionMessage, systemImage: "lock.shield")
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("large-files-requires-fda")
-            } else if let failureMessage {
-                Label("Scan failed: \(failureMessage)", systemImage: "exclamationmark.triangle")
-                    .foregroundStyle(.red)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                ProgressView("Scanning for large files…")
-            }
-        }
-        .task {
-            await scan()
-        }
-        .onChange(of: scenePhase) { newPhase in
-            // Rescan on return to the app only if FDA was missing, so a grant is picked up.
-            if newPhase == .active, permissionMessage != nil {
-                Task { await scan() }
-            }
-        }
-    }
-
-    private func scan() async {
-        do {
-            let result = try await tccManager.scan(
-                module: LargeFilesModule(),
-                context: ScanContext(homeDirectory: homeDirectory)
+        ScanStateView(
+            title: "Large Files",
+            systemImage: "doc.text.magnifyingglass",
+            description: "Find large files in your home folder. Scanning only reads files "
+                + "and never changes or deletes them.",
+            phase: viewModel.phase,
+            currentModule: viewModel.moduleTitle,
+            onScan: viewModel.startScan,
+            onCancel: viewModel.cancelScan
+        ) {
+            ModuleDetailView(
+                title: "Large Files",
+                items: viewModel.items,
+                homeDirectory: viewModel.homeDirectory,
+                allowsSelection: false,
+                onMoveToTrash: { _ in }
             )
-            switch result {
-            case let .completed(scanned):
-                permissionMessage = nil
-                failureMessage = nil
-                items = scanned
-            case let .requiresPermission(message):
-                permissionMessage = message
-            }
-        } catch is CancellationError {
-            return
-        } catch {
-            failureMessage = error.localizedDescription
         }
+        .onDisappear(perform: viewModel.cancelScan)
     }
 }
