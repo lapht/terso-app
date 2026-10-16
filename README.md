@@ -10,41 +10,55 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-0FB5AE" alt="GPL-3.0"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--or--later-0FB5AE" alt="GPL-3.0-or-later"/></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013%2B-0B1B2B" alt="macOS 13+"/>
   <a href="https://github.com/lapht/terso-app/actions/workflows/ci.yml"><img src="https://github.com/lapht/terso-app/actions/workflows/ci.yml/badge.svg" alt="Build"/></a>
-  <img src="https://img.shields.io/badge/telemetry-none-success" alt="No telemetry"/>
+  <img src="https://img.shields.io/badge/privacy--minded-no%20account%20required-success" alt="No account required"/>
 </p>
 
 ---
 
 ## Why Terso?
 
-Commercial Mac cleaners moved to subscriptions, run closed-source code with full
-access to your disk, and market fear ("1,247 threats found!"). Terso is the
-answer: **GPL-3.0, free forever, zero telemetry, trash-first deletions.**
+Terso is an open-source macOS cleaner built around transparency, user control,
+and cautious cleanup workflows. Its source and cleanup rules are available for
+inspection, no subscription is required, and the project is designed to avoid
+telemetry and unnecessary network access.
 
-- 🔍 **Auditable** — every cleanup rule lives in a readable JSON database you can review
-- 🛡️ **Safe by design** — deletions go through a guarded pipeline, Trash-first, dry-run everywhere
-- 🤫 **Private** — no network calls by default, no analytics, no accounts
-- 🧰 **Native** — SwiftUI, small binary, respects macOS
+- 🔍 **Auditable** — cleanup rules are readable and can be reviewed before use
+- 🛡️ **User-controlled** — review scan results and confirm cleanup actions
+- 🗑️ **Cautious by design** — guarded deletion flows, dry-run support, and
+  Trash-first cleanup
+- 🔒 **Privacy-minded** — no account is required; privacy and data minimization
+  are project goals, not a claim of absolute security
+- 🧰 **Native** — SwiftUI app for macOS
 
-> ⚠️ **Status: v0.1 in development.** Not ready for daily use yet. Watch the repo or
-> check the [v0.1 MVP milestone](../../milestones) to follow progress — contributions welcome!
+> **Status:** Terso v0.1.0 is published and development continues. Cleanup
+> software can select an item unexpectedly: review every selection, keep
+> backups of important data, and do not treat guardrails as a guarantee against
+> data loss. See the [release page](https://github.com/lapht/terso-app/releases)
+> and [open issues](https://github.com/lapht/terso-app/issues) for current work.
 
-## Roadmap
+## Features and status
 
-| Version | Contents |
+| Status | Scope |
 |---|---|
-| **v0.1** | Caches, logs, trash bins, Xcode/dev junk, large-files scanner, Smart Scan (dry-run) |
-| v0.2 | App leftovers, duplicates, menu bar extra, IT/EN localization, Homebrew tap |
-| v1.0 | Security configuration audit, localization call, public launch |
+| **In the v0.1.0 source** | Scanning user caches and logs, Trash bins, Xcode and package-manager caches; read-only large-file scanning; Smart Scan; guarded cleanup and audit logging |
+| **Planned** | App leftovers, duplicate-file detection, menu bar extra, localization, Homebrew distribution, and a read-only security configuration audit |
+| **Manual release checks** | Full Disk Access behavior, case-sensitive APFS, non-English locale, and cleanup candidates staying within their allowlisted roots |
 
-Full details: [docs/design.md](docs/design.md)
+The feature list describes the release/source scope, not a claim that every
+feature has been manually verified on every Mac. The manual checks above are
+not run by the automated release workflow and should be completed by the
+maintainer before publishing a release.
 
-## Run Terso on your Mac
+Further design details: [docs/design.md](docs/design.md).
 
-**Requires:** macOS 13+ and Xcode 16 or later (including the Swift 6 toolchain).
+## Run Terso from source
+
+**Runtime requirement:** macOS 13 or later. The app is developed with Xcode;
+CI currently selects Xcode 16.4. `Terso.xcodeproj` contains the SwiftUI app and
+uses the local `CoreKit` package defined by `Package.swift`.
 
 ```bash
 git clone https://github.com/lapht/terso-app.git
@@ -52,60 +66,88 @@ cd terso-app
 open Terso.xcodeproj
 ```
 
-In Xcode, select the `TersoApp` scheme and press **⌘R** to build and launch
-Terso. The app target owns the SwiftUI sources; `Package.swift` contains the
-`CoreKit` library and Swift Package tests only.
+In Xcode, select the `TersoApp` scheme and press **⌘R** to build and launch.
+The package alone is not the app target.
 
-Full Disk Access is not needed just to launch Terso. Modules that need it will
-tell you when permission is unavailable rather than showing an incomplete scan.
-
-## Install a release build
-
-Download `Terso-v0.1-macOS.zip` from the
-[GitHub Releases](https://github.com/lapht/terso-app/releases) page and open the
-ZIP to extract `Terso.app`. The release is an ad-hoc-signed universal build for
-Apple silicon and Intel Macs. It is not notarized. On first launch, use
-Control-click > **Open**, then confirm **Open** in the macOS dialog. Only install
-apps from a release you trust.
-
-To build the same app bundle and archive from source on macOS 13 or later with
-Swift 6.1.2 installed:
+To build the app from the command line:
 
 ```bash
-./scripts/build-release.sh
+xcodebuild \
+  -project Terso.xcodeproj \
+  -scheme TersoApp \
+  -configuration Debug \
+  -destination 'platform=macOS' \
+  CODE_SIGNING_ALLOWED=NO \
+  build
 ```
 
-The script creates `dist/Terso-v0.1-macOS.zip` and its SHA-256 sidecar file.
-Verify the downloaded archive with:
+Run the CoreKit Swift Package tests from the repository root with:
+
+```bash
+swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
+```
+
+The app's unit tests are a separate Xcode test target:
+
+```bash
+xcodebuild \
+  -project Terso.xcodeproj \
+  -scheme TersoApp \
+  -configuration Debug \
+  -destination 'platform=macOS' \
+  CODE_SIGNING_ALLOWED=NO \
+  test
+```
+
+`swift test` does not run the app tests. CI runs both test commands, in
+addition to its lint, format, build, and Safety Audit checks.
+
+## Install the v0.1.0 release
+
+Download `Terso-v0.1-macOS.zip` and
+`Terso-v0.1-macOS.zip.sha256` from the
+[v0.1.0 GitHub release](https://github.com/lapht/terso-app/releases/tag/v0.1.0).
+The release tag is `v0.1.0`; the archive filenames are versioned `v0.1`.
+Extract the ZIP to get `Terso.app`.
+
+Verify the checksum in the directory containing both downloaded files:
 
 ```bash
 shasum -a 256 -c Terso-v0.1-macOS.zip.sha256
 ```
 
-## Release verification checklist
+The published v0.1.0 archive was checked: its checksum matches the sidecar,
+its app bundle passes `codesign` verification, and its executable contains
+both `arm64` and `x86_64`. Each future release must be checked independently;
+do not infer its architectures from this release. The packaging script
+ad-hoc signs the app and does not notarize it. Only install a release you
+trust.
 
-Complete these checks on a clean macOS test environment before publishing a
-release. They require manual verification and are not implied by the automated
-build:
+On first launch, macOS may require Control-click > **Open**, followed by
+confirmation in the system dialog.
 
-- [ ] Launch on a clean VM without Full Disk Access, then grant Full Disk Access
-  and verify permission-dependent modules.
-- [ ] Test on a case-sensitive APFS volume.
-- [ ] Test with a non-English system locale.
-- [ ] Verify all cleanup candidates stay within their allowlisted roots.
-
-To build the app from the command line and run the package test suite:
+To build and package from source on macOS with Xcode installed:
 
 ```bash
-xcodebuild -project Terso.xcodeproj -scheme TersoApp build
-swift test
+./scripts/build-release.sh
 ```
+
+The script requests both `arm64` and `x86_64` and creates
+`dist/Terso-v0.1-macOS.zip` plus its SHA-256 sidecar. Verify the resulting
+binary's architectures before distributing a locally built archive.
 
 ## Contributing
 
-See [CONTRIBUTING.md](docs/CONTRIBUTING.md). Rules for the safety layer are strict:
-any change to `Sources/CoreKit/Safety` or `Rules/` requires maintainer review.
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). Changes to the safety layer
+or cleanup rules need particular human review. Read [SECURITY.md](SECURITY.md)
+before reporting a vulnerability or data-loss risk.
 
 ## License
 
-GPL-3.0 — free forever, and forks must stay free too. See [LICENSE](LICENSE).
+Terso is licensed under the **GNU General Public License v3.0 or later**
+([GPL-3.0-or-later](LICENSE)). The GPL permits commercial use and selling
+copies. If you convey a modified version, you must meet the GPL's conditions,
+including preserving notices, licensing the covered work under the GPL, and
+providing or offering the corresponding source as required for the form of
+distribution. See the license text for the exact terms; there is no requirement
+that forks be free of charge.

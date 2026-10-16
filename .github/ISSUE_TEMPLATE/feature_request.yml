@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest a focused improvement to Terso.
+title: "feature: "
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues first. Keep the proposal focused and explain the user need before suggesting an implementation.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or user need
+      description: What are you trying to accomplish?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior you would like.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional alternatives or relevant context.
