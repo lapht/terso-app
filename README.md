@@ -54,6 +54,53 @@ maintainer before publishing a release.
 
 Further design details: [docs/design.md](docs/design.md).
 
+## v0.1 — what's in this version
+
+| Area | What it does | What it does **not** do |
+|---|---|---|
+| **Smart Scan** | Runs the v0.1 modules together only when you press the scan button, shows totals per module and keeps results when you switch pages | Never scans on launch, never deletes on its own |
+| **User Caches** | Lists items under `~/Library/Caches` | Skips caches of running apps |
+| **User Logs** | Lists rotated `.log` / `.gz` logs that match safe patterns | Does not touch active logs |
+| **Trash Bins** | Shows what your Trash bins (home and mounted volumes) contain and how much space they use | — see beta test T-07 |
+| **Xcode Junk** | Lists DerivedData, simulator caches and Xcode archives older than 90 days | Leaves recent archives alone |
+| **Package caches** | Lists Homebrew, npm, yarn and pnpm caches | Runs no package-manager commands |
+| **Large Files** | Lists the biggest files, with **Reveal in Finder** | Read-only: no delete button |
+| **Cleanup** | Selection → recap (item count + total size) → confirmation → move to Trash → result screen | No permanent deletion in v0.1: items always go to the Trash |
+| **Audit log** | Records every cleanup locally (time, rule, size) and lets you export it | Sends nothing anywhere |
+| **Permissions** | Banner when Full Disk Access is missing; only the modules that need it are disabled | Does not require Full Disk Access to open the app |
+
+Terso makes no network calls and collects no analytics.
+
+## Beta testing v0.1
+
+Thanks for helping. Please test on a Mac where you have a recent backup, and
+**do not clean anything you are not sure about**: items go to the Trash, but
+an app may still behave differently after its cache is removed.
+
+Before you start, note your macOS version, chip (Apple Silicon or Intel) and
+system language. Launch `Terso.app` from Finder, not from Xcode.
+
+| ID | Test | Expected result |
+|---|---|---|
+| T-01 | First launch (Control-click > **Open** if macOS blocks it) | App opens; no scan starts by itself |
+| T-02 | Launch **without** Full Disk Access | Permission banner visible; modules that need it are marked as blocked, others work; no per-folder "Allow" prompts storm |
+| T-03 | Grant Full Disk Access in System Settings, return to Terso (relaunch if asked) | Banner disappears; blocked modules become available |
+| T-04 | Run **Smart Scan** | Progress is visible; a total and a per-module breakdown appear; numbers look plausible |
+| T-05 | Switch to another sidebar page and back | Scan results are still there |
+| T-06 | Open each module page and run its scan | Each shows its own results or a clear "nothing found" / "permission needed" state — never a blank page |
+| T-07 | **Trash Bins**: put a test file in the Trash, scan, try to clean it | Tell us exactly what happens (whether space is freed, whether the file is still in the Trash) |
+| T-08 | Select a few cache items and press clean | Recap shows item count and total size **before** anything happens; Cancel changes nothing |
+| T-09 | Confirm the cleanup | Items appear in the Finder Trash and can be put back; result screen matches the recap |
+| T-10 | Open the audit log and export it | Each cleaned item is listed with time, rule and size; export produces a readable file |
+| T-11 | **Large Files**: scan and press **Reveal in Finder** | Finder opens on the file; no delete option exists |
+| T-12 | Xcode users: check **Xcode Junk** | DerivedData listed; archives younger than 90 days not listed |
+| T-13 | Resize the window to its minimum, try light and dark mode | Sidebar stays fixed and top-aligned; one scroll area; text readable |
+| T-14 | Non-English system language or case-sensitive APFS volume (if you have one) | Scans complete without errors |
+
+Report each result (pass/fail + screenshots) in a
+[bug report issue](https://github.com/lapht/terso-app/issues/new/choose).
+Hide usernames and personal paths in screenshots and exported logs.
+
 ## Run Terso from source
 
 **Runtime requirement:** macOS 13 or later. The app is developed with Xcode;
