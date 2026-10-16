@@ -1,0 +1,404 @@
+{
+  "version": "2026.2",
+  "schemaVersion": 2,
+  "rules": [
+    {
+      "id": "caches.user.safari",
+      "module": "caches.user",
+      "category": "Caches",
+      "name": "Safari cache",
+      "description": "Finds recreatable cache files in Safari's user cache directory.",
+      "allowlistRoots": [
+        "~/Library/Caches/com.apple.Safari"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "caches.user.chrome",
+      "module": "caches.user",
+      "category": "Caches",
+      "name": "Google Chrome cache",
+      "description": "Finds recreatable cache files in Chrome's user cache directory.",
+      "allowlistRoots": [
+        "~/Library/Caches/com.google.Chrome"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "caches.user.firefox",
+      "module": "caches.user",
+      "category": "Caches",
+      "name": "Firefox cache",
+      "description": "Finds recreatable cache files in Firefox's user cache directory.",
+      "allowlistRoots": [
+        "~/Library/Caches/org.mozilla.firefox"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "caches.user.vscode",
+      "module": "caches.user",
+      "category": "Caches",
+      "name": "Visual Studio Code cache",
+      "description": "Finds recreatable cache files in Visual Studio Code's user cache directory.",
+      "allowlistRoots": [
+        "~/Library/Caches/com.microsoft.VSCode"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "logs.user.rotated",
+      "module": "logs.user",
+      "category": "Logs",
+      "name": "Old user logs",
+      "description": "Finds old user logs, compressed logs, crash reports, and numbered log rotations; keeps Terso audit logs.",
+      "allowlistRoots": [
+        "~/Library/Logs"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*.log",
+        "**/*.gz",
+        "**/*.crash",
+        "**/*.log.[0-9]*"
+      ],
+      "exclusions": [
+        "Terso/**"
+      ],
+      "minAgeSeconds": 86400,
+      "isTrashSafe": true
+    },
+    {
+      "id": "xcode.derived-data",
+      "module": "xcode.junk",
+      "category": "Xcode",
+      "name": "Xcode DerivedData",
+      "description": "Finds rebuildable Xcode build data under DerivedData.",
+      "allowlistRoots": [
+        "~/Library/Developer/Xcode/DerivedData"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "xcode.old-archives",
+      "module": "xcode.junk",
+      "category": "Xcode",
+      "name": "Old Xcode archives",
+      "description": "Finds Xcode archives older than 90 days for review before trashing.",
+      "allowlistRoots": [
+        "~/Library/Developer/Xcode/Archives"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*.xcarchive"
+      ],
+      "exclusions": [],
+      "minAgeSeconds": 7776000,
+      "isTrashSafe": true
+    },
+    {
+      "id": "xcode.simulator-caches",
+      "module": "xcode.junk",
+      "category": "Xcode",
+      "name": "Simulator caches",
+      "description": "Finds recreatable CoreSimulator cache files.",
+      "allowlistRoots": [
+        "~/Library/Developer/CoreSimulator/Caches"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "packages.homebrew",
+      "module": "packages",
+      "category": "Package caches",
+      "name": "Homebrew cache",
+      "description": "Finds downloaded package files in Homebrew's user cache.",
+      "allowlistRoots": [
+        "~/Library/Caches/Homebrew"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "packages.npm",
+      "module": "packages",
+      "category": "Package caches",
+      "name": "npm content cache",
+      "description": "Finds npm content-cache files without including npm configuration.",
+      "allowlistRoots": [
+        "~/.npm/_cacache"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "packages.yarn-library",
+      "module": "packages",
+      "category": "Package caches",
+      "name": "Yarn cache",
+      "description": "Finds downloaded packages in Yarn's Library cache.",
+      "allowlistRoots": [
+        "~/Library/Caches/Yarn"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "packages.yarn-user",
+      "module": "packages",
+      "category": "Package caches",
+      "name": "Yarn user cache",
+      "description": "Finds downloaded packages in Yarn's user cache.",
+      "allowlistRoots": [
+        "~/.cache/yarn"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "packages.pnpm",
+      "module": "packages",
+      "category": "Package caches",
+      "name": "pnpm cache",
+      "description": "Finds pnpm cache files under its user cache directory.",
+      "allowlistRoots": [
+        "~/Library/Caches/pnpm"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "leftovers.google.chrome",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Google Chrome leftovers",
+      "description": "Profile data, caches and preferences left behind by Google Chrome.",
+      "allowlistRoots": [
+        "~/Library/Application Support",
+        "~/Library/Caches",
+        "~/Library/Preferences",
+        "~/Library/Saved Application State",
+        "~/Library/HTTPStorages",
+        "~/Library/WebKit"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.google.Chrome",
+          "paths": [
+            "~/Library/Application Support/Google/Chrome",
+            "~/Library/Caches/Google/Chrome",
+            "~/Library/Caches/{bundleID}",
+            "~/Library/Preferences/{bundleID}.plist",
+            "~/Library/Saved Application State/{bundleID}.savedState",
+            "~/Library/HTTPStorages/{bundleID}",
+            "~/Library/WebKit/{bundleID}"
+          ]
+        }
+      ],
+      "provenance": {
+        "source": "Observed install of Google Chrome on macOS 26 (2026-10-16); generic locations: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/MacOSXDirectories/MacOSXDirectories.html",
+        "author": "lapht",
+        "date": "2026-10-16",
+        "rationale": "Chrome stores its profiles in Application Support/Google/Chrome and its disk cache in Caches/Google/Chrome. Only the Chrome subfolders are listed: the parent Google folders are shared with Chrome Beta, Dev, Canary and Google Updater and are never proposed. Generic per-bundle-ID locations (Caches, Preferences plist, Saved Application State, HTTPStorages, WebKit) are where macOS frameworks store data keyed by the app's bundle ID; they are matched only when they exist."
+      }
+    },
+    {
+      "id": "leftovers.microsoft.vscode",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Visual Studio Code leftovers",
+      "description": "Settings, caches and preferences left behind by Visual Studio Code.",
+      "allowlistRoots": [
+        "~/Library/Application Support",
+        "~/Library/Caches",
+        "~/Library/Preferences",
+        "~/Library/Saved Application State",
+        "~/Library/HTTPStorages",
+        "~/Library/WebKit"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.microsoft.VSCode",
+          "paths": [
+            "~/Library/Application Support/Code",
+            "~/Library/Caches/{bundleID}.ShipIt",
+            "~/Library/Caches/{bundleID}",
+            "~/Library/Preferences/{bundleID}.plist",
+            "~/Library/Saved Application State/{bundleID}.savedState",
+            "~/Library/HTTPStorages/{bundleID}",
+            "~/Library/WebKit/{bundleID}"
+          ]
+        }
+      ],
+      "provenance": {
+        "source": "Observed install of Visual Studio Code on macOS 26 (2026-10-16); generic locations: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/MacOSXDirectories/MacOSXDirectories.html",
+        "author": "lapht",
+        "date": "2026-10-16",
+        "rationale": "VS Code stores user data in Application Support/Code (Insiders uses a separate 'Code - Insiders' folder) and its updater state in Caches/com.microsoft.VSCode.ShipIt. ~/.vscode is outside the leftover roots and is not covered. Generic per-bundle-ID locations (Caches, Preferences plist, Saved Application State, HTTPStorages, WebKit) are where macOS frameworks store data keyed by the app's bundle ID; they are matched only when they exist."
+      }
+    },
+    {
+      "id": "leftovers.spotify.client",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Spotify leftovers",
+      "description": "Offline data, caches and preferences left behind by Spotify.",
+      "allowlistRoots": [
+        "~/Library/Application Support",
+        "~/Library/Caches",
+        "~/Library/Preferences",
+        "~/Library/Saved Application State",
+        "~/Library/HTTPStorages",
+        "~/Library/WebKit"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.spotify.client",
+          "paths": [
+            "~/Library/Application Support/Spotify",
+            "~/Library/Caches/{bundleID}",
+            "~/Library/Preferences/{bundleID}.plist",
+            "~/Library/Saved Application State/{bundleID}.savedState",
+            "~/Library/HTTPStorages/{bundleID}",
+            "~/Library/WebKit/{bundleID}"
+          ]
+        }
+      ],
+      "provenance": {
+        "source": "Observed install of Spotify on macOS 26 (2026-10-16); generic locations: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/MacOSXDirectories/MacOSXDirectories.html",
+        "author": "lapht",
+        "date": "2026-10-16",
+        "rationale": "Spotify stores user data in Application Support/Spotify. The separate launcher and installer HTTPStorages entries use other bundle IDs and are not listed. Generic per-bundle-ID locations (Caches, Preferences plist, Saved Application State, HTTPStorages, WebKit) are where macOS frameworks store data keyed by the app's bundle ID; they are matched only when they exist."
+      }
+    },
+    {
+      "id": "leftovers.bitwarden.desktop",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Bitwarden leftovers",
+      "description": "Sandbox containers and the app group container left behind by Bitwarden.",
+      "allowlistRoots": [
+        "~/Library/Containers",
+        "~/Library/Group Containers"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.bitwarden.desktop",
+          "paths": [
+            "~/Library/Containers/{bundleID}",
+            "~/Library/Containers/{bundleID}.loginhelper",
+            "~/Library/Containers/{bundleID}.safari"
+          ]
+        },
+        {
+          "bundleID": "com.bitwarden.desktop",
+          "paths": [
+            "~/Library/Group Containers/LTZ2PFU5D6.com.bitwarden.desktop"
+          ],
+          "shared": true,
+          "groupIdentifier": "LTZ2PFU5D6.com.bitwarden.desktop"
+        }
+      ],
+      "provenance": {
+        "source": "Observed install of Bitwarden on macOS 26 (2026-10-16); generic locations: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/MacOSXDirectories/MacOSXDirectories.html; app group from the app's com.apple.security.application-groups entitlement",
+        "author": "lapht",
+        "date": "2026-10-16",
+        "rationale": "Bitwarden is sandboxed, so its data lives in its container. The loginhelper and safari containers belong to the login item and Safari extension embedded in Bitwarden.app. The group container LTZ2PFU5D6.com.bitwarden.desktop is declared in the app's application-groups entitlement and is marked shared."
+      }
+    },
+    {
+      "id": "leftovers.c3.theunarchiver",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "The Unarchiver leftovers",
+      "description": "Sandbox container left behind by The Unarchiver.",
+      "allowlistRoots": [
+        "~/Library/Containers"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "cx.c3.theunarchiver",
+          "paths": [
+            "~/Library/Containers/{bundleID}"
+          ]
+        }
+      ],
+      "provenance": {
+        "source": "Observed install of The Unarchiver on macOS 26 (2026-10-16); generic locations: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/MacOSXDirectories/MacOSXDirectories.html",
+        "author": "lapht",
+        "date": "2026-10-16",
+        "rationale": "The Unarchiver is sandboxed and declares no app group, so all of its data lives in its own container. Group containers of other apps from the same developer team are not listed."
+      }
+    }
+  ]
+}
