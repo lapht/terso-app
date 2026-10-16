@@ -65,6 +65,61 @@ public struct AuditRecord: Codable, Sendable, Equatable {
     }
 }
 
+/// Privacy options applied to exported reports only; the local log is never altered.
+///
+/// Exports always replace the home directory with `~`. When ``redactFileNames`` is on,
+/// every path component below the matching allowlist root is replaced with `<redacted>`.
+/// A path under no known root is redacted below the home directory (fail-closed).
+public struct AuditExportOptions: Sendable, Equatable {
+    public static let redactedComponent = "<redacted>"
+
+    public var redactFileNames: Bool
+    public var homeDirectory: URL
+    public var allowlistRoots: [URL]
+
+    public init(
+        redactFileNames: Bool = false,
+        homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser,
+        allowlistRoots: [URL]? = nil
+    ) {
+        self.redactFileNames = redactFileNames
+        self.homeDirectory = homeDirectory.standardizedFileURL
+        self.allowlistRoots = (allowlistRoots ?? Self.defaultAllowlistRoots(home: homeDirectory))
+            .map(\.standardizedFileURL)
+    }
+
+    /// The `~/Library` and Trash roots that cleanup modules are allowed to touch.
+    public static func defaultAllowlistRoots(home: URL) -> [URL] {
+        ["Library/Caches", "Library/Logs", "Library/Developer", "Library/Application Support",
+         "Library/Preferences", "Library/Containers", "Library/Group Containers",
+         "Library/Saved Application State", "Library/HTTPStorages", "Library/WebKit", ".Trash"]
+            .map { home.appendingPathComponent($0) }
+    }
+
+    /// Returns the export-safe form of `path`.
+    func sanitize(_ path: String) -> String {
+        let components = URL(fileURLWithPath: path).standardizedFileURL.pathComponents
+        let homeComponents = homeDirectory.pathComponents
+        let underHome = components.starts(with: homeComponents)
+
+        var keep = components.count
+        if redactFileNames {
+            let matched = allowlistRoots.map(\.pathComponents)
+                .filter { components.starts(with: $0) }
+                .map(\.count).max()
+            keep = matched ?? (underHome ? homeComponents.count : 1)
+        }
+
+        var output = Array(components.prefix(keep))
+        output += Array(repeating: Self.redactedComponent, count: components.count - keep)
+        if underHome {
+            output.replaceSubrange(0..<homeComponents.count, with: ["~"])
+            return output.joined(separator: "/")
+        }
+        return "/" + output.dropFirst().joined(separator: "/")
+    }
+}
+
 /// Errors raised while writing or exporting the audit log.
 public enum AuditLoggerError: Error, LocalizedError, Sendable, Hashable {
     case invalidResult
@@ -192,7 +247,10 @@ public final class AuditLogger: @unchecked Sendable {
     /// Exports the current JSON Lines log as a readable plain-text report.
     ///
     /// If no events have been recorded yet, the report contains its header only.
-    public func exportReport(to url: URL) throws {
+    ///
+    /// - Parameter options: Path-privacy options. By default the home directory is
+    ///   replaced with `~`; the local log keeps full paths (invariant 8).
+    public func exportReport(to url: URL, options: AuditExportOptions = AuditExportOptions()) throws {
         let destinationURL = url.standardizedFileURL
         guard destinationURL != logURL else {
             throw AuditLoggerError.exportDestinationIsLog(path: destinationURL.path)
@@ -202,7 +260,7 @@ public final class AuditLogger: @unchecked Sendable {
         defer { lock.unlock() }
         do {
             let logData = try readLogData()
-            let report = try makeReport(from: logData)
+            let report = try makeReport(from: logData, options: options)
             try Data(report.utf8).write(to: destinationURL, options: .atomic)
         } catch let error as AuditLoggerError {
             throw error
@@ -222,7 +280,7 @@ public final class AuditLogger: @unchecked Sendable {
         }
     }
 
-    private func makeReport(from data: Data) throws -> String {
+    private func makeReport(from data: Data, options: AuditExportOptions) throws -> String {
         var report = "Terso Audit Report\n===================\n"
         guard !data.isEmpty else {
             return report
@@ -244,8 +302,8 @@ public final class AuditLogger: @unchecked Sendable {
             [\(record.timestamp)] \(record.action.rawValue) — \(record.result.rawValue)
               Module: \(record.moduleId)
               Rule: \(record.ruleId)
-              Original path: \(record.originalPath)
-              Resolved path: \(record.resolvedPath)
+              Original path: \(options.sanitize(record.originalPath))
+              Resolved path: \(options.sanitize(record.resolvedPath))
               Size: \(record.sizeBytes) bytes
             """
             if let errorCode = record.errorCode {

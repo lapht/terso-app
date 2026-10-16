@@ -140,6 +140,48 @@ struct AuditLoggerTests {
         #expect(try String(contentsOf: fixture.logURL, encoding: .utf8).contains("\"action\":\"dryRun\""))
     }
 
+    @Test func exportReplacesHomeAndRedactsNamesBelowRootWhileLocalLogIsUnchanged() throws {
+        let fixture = try AuditLoggerFixture()
+        let home = fixture.rootURL.appendingPathComponent("home", isDirectory: true)
+        let itemURL = home.appendingPathComponent("Library/Caches/com.secret.App/tax-2025.cache")
+        let item = CleanItem(
+            url: itemURL, resolvedURL: itemURL, sizeBytes: 9,
+            moduleId: "caches.user", ruleId: "caches.user.example"
+        )
+        let logger = AuditLogger(fileURL: fixture.logURL)
+        try logger.record(action: .trash, item: item, result: .success)
+        let logBefore = try Data(contentsOf: fixture.logURL)
+
+        try logger.exportReport(to: fixture.reportURL, options: AuditExportOptions(homeDirectory: home))
+        var report = try String(contentsOf: fixture.reportURL, encoding: .utf8)
+        #expect(report.contains("Original path: ~/Library/Caches/com.secret.App/tax-2025.cache"))
+        #expect(!report.contains(home.path))
+
+        try logger.exportReport(
+            to: fixture.reportURL,
+            options: AuditExportOptions(redactFileNames: true, homeDirectory: home)
+        )
+        report = try String(contentsOf: fixture.reportURL, encoding: .utf8)
+        #expect(report.contains("Original path: ~/Library/Caches/<redacted>/<redacted>"))
+        #expect(!report.contains("tax-2025"))
+        #expect(!report.contains("com.secret.App"))
+        #expect(report.contains("Rule: caches.user.example"))
+        #expect(report.contains("Size: 9 bytes"))
+
+        #expect(try Data(contentsOf: fixture.logURL) == logBefore)
+        #expect(try logger.readRecords()[0].originalPath == itemURL.standardizedFileURL.path)
+    }
+
+    @Test func redactionIsFailClosedOutsideKnownRoots() {
+        let home = URL(fileURLWithPath: "/Users/alice")
+        let options = AuditExportOptions(redactFileNames: true, homeDirectory: home)
+        #expect(options.sanitize("/Users/alice/Library/Caches") == "~/Library/Caches")
+        #expect(options.sanitize("/Users/alice/Secret/a.txt") == "~/<redacted>/<redacted>")
+        let outside = options.sanitize("/Users/alice-evil/Library/Caches/x")
+        #expect(!outside.contains("alice") && !outside.contains("Caches"))
+        #expect(!options.sanitize("/private/tmp/x").contains("tmp"))
+    }
+
     @Test func readsRecentRecordsNewestFirstAndHonorsLimit() throws {
         let fixture = try AuditLoggerFixture()
         let item = fixture.makeItem()

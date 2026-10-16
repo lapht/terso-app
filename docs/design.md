@@ -305,6 +305,22 @@ Implemented by #33 (schema) and #34 (loader/validation); content by #101.
 - Moving duplicates to Trash is v0.3 (#40) and depends on the protected-area
   decision for Desktop/Documents/Downloads (#105).
 
+### 11.5b Audit log: contents and path privacy (#103)
+
+- **What is logged:** one JSON Lines record per item operation (trash or dry-run):
+  UTC timestamp, action, module id, rule id, original path, resolved path, size in
+  bytes, result and error code. File contents are never read or stored.
+- **Where:** `~/Library/Logs/Terso/audit.log`, local only, never transmitted
+  (telemetry-free).
+- **For how long:** Terso never rotates or prunes it; entries stay until the user
+  deletes the file. The in-app view shows the newest 500 records.
+- **Local log is complete (invariant 8):** it always keeps full paths.
+- **Exports:** the exported report replaces the home directory with `~`. The export
+  panel offers "Redact file names below the cleanup root": every path component
+  below the matching allowlist root becomes `<redacted>` (e.g.
+  `~/Library/Caches/<redacted>/<redacted>`). A path under no known root is redacted
+  below the home directory (fail-closed). Timestamp, rule id and size stay readable.
+
 ### 11.6 Update mechanism decision
 - #46 compares **self-hosted Sparkle** and **brew-only** updates, using at
   least: compatibility with ad-hoc signing (no Developer ID/notarization, §6),
