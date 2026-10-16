@@ -19,45 +19,34 @@
 import CoreKit
 import SwiftUI
 
+/// Large Files never scans on appear: the user starts it, and leaving the screen cancels it.
 @MainActor
 struct LargeFilesView: View {
-    @State private var items: [CleanItem]?
-    @State private var failureMessage: String?
+    @StateObject private var viewModel: LargeFilesViewModel
 
-    private let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
-
-    var body: some View {
-        Group {
-            if let items {
-                ModuleDetailView(
-                    title: "Large Files",
-                    items: items,
-                    homeDirectory: homeDirectory,
-                    allowsSelection: false,
-                    onMoveToTrash: { _ in }
-                )
-            } else if let failureMessage {
-                Label("Scan failed: \(failureMessage)", systemImage: "exclamationmark.triangle")
-                    .foregroundStyle(.red)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                ProgressView("Scanning for large files…")
-            }
-        }
-        .task {
-            await scan()
-        }
+    init(viewModel: @autoclosure @escaping () -> LargeFilesViewModel = LargeFilesViewModel()) {
+        _viewModel = StateObject(wrappedValue: viewModel())
     }
 
-    private func scan() async {
-        do {
-            items = try await LargeFilesModule().scan(
-                context: ScanContext(homeDirectory: homeDirectory)
+    var body: some View {
+        ScanStateView(
+            title: "Large Files",
+            systemImage: "doc.text.magnifyingglass",
+            description: "Find large files in your home folder. Scanning only reads files "
+                + "and never changes or deletes them.",
+            phase: viewModel.phase,
+            currentModule: viewModel.moduleTitle,
+            onScan: viewModel.startScan,
+            onCancel: viewModel.cancelScan
+        ) {
+            ModuleDetailView(
+                title: "Large Files",
+                items: viewModel.items,
+                homeDirectory: viewModel.homeDirectory,
+                allowsSelection: false,
+                onMoveToTrash: { _ in }
             )
-        } catch is CancellationError {
-            return
-        } catch {
-            failureMessage = error.localizedDescription
         }
+        .onDisappear(perform: viewModel.cancelScan)
     }
 }
