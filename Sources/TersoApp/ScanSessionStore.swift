@@ -25,6 +25,8 @@ import Foundation
 final class ScanSessionStore: ObservableObject {
     let smartScan: SmartScanViewModel
     let largeFiles: LargeFilesViewModel
+    let leftovers: ToolScanViewModel
+    let duplicates: ToolScanViewModel
 
     private let tccManager: TCCManager
     private var moduleScans: [SidebarDestination: SmartScanViewModel] = [:]
@@ -33,6 +35,8 @@ final class ScanSessionStore: ObservableObject {
         self.tccManager = tccManager
         smartScan = SmartScanViewModel(tccManager: tccManager)
         largeFiles = LargeFilesViewModel(tccManager: tccManager)
+        leftovers = ToolScanViewModel(tool: .leftovers, tccManager: tccManager)
+        duplicates = ToolScanViewModel(tool: .duplicates, tccManager: tccManager)
     }
 
     /// The view model for a single module's page, created on first visit and reused afterwards.

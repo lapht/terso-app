@@ -48,6 +48,8 @@ struct ScanSessionStoreTests {
         let store = Self.store()
 
         #expect(store.moduleScan(for: .smartScan) == nil)
+        #expect(store.moduleScan(for: .leftovers) == nil)
+        #expect(store.moduleScan(for: .duplicates) == nil)
         #expect(store.moduleScan(for: .largeFiles) == nil)
         #expect(store.moduleScan(for: .auditLogs) == nil)
     }

@@ -30,6 +30,8 @@ struct SidebarDestinationTests {
             "Trash Bins",
             "Xcode Junk",
             "Package Caches",
+            "Leftovers",
+            "Duplicates",
             "Large Files",
             "Audit Log"
         ])
@@ -70,7 +72,7 @@ struct SidebarDestinationTests {
 
     @MainActor @Test func nonModuleDestinationsHaveNoModuleScanPage() {
         let scanSessions = ScanSessionStore()
-        for destination in [SidebarDestination.smartScan, .largeFiles, .auditLogs] {
+        for destination in [SidebarDestination.smartScan, .leftovers, .duplicates, .largeFiles, .auditLogs] {
             #expect(destination.cleanModule == nil)
             #expect(ModuleScanView(destination: destination, scanSessions: scanSessions) == nil)
         }

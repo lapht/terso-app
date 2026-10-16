@@ -38,6 +38,9 @@ struct ScanStateView<Content: View>: View {
     let phase: ScanPhase
     var currentModule: String?
     var progress: Double?
+    /// False when the owner has nothing to run yet; the button is disabled and `unavailableNote` says why.
+    var isScanEnabled = true
+    var unavailableNote: String?
     let onScan: () -> Void
     let onCancel: () -> Void
     @ViewBuilder let content: () -> Content
@@ -61,6 +64,9 @@ struct ScanStateView<Content: View>: View {
     private var controls: some View {
         switch phase {
         case .idle:
+            if !isScanEnabled, let unavailableNote {
+                StatusMessage(text: unavailableNote, systemImage: "info.circle")
+            }
             scanButton("Scan")
         case .scanning:
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.small) {
@@ -96,6 +102,7 @@ struct ScanStateView<Content: View>: View {
         Button(label, systemImage: systemImage, action: onScan)
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
+            .disabled(!isScanEnabled)
     }
 }
 

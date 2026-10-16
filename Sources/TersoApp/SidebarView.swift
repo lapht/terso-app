@@ -25,6 +25,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     case trashBins
     case xcodeJunk
     case packageCaches
+    case leftovers
+    case duplicates
     case largeFiles
     case auditLogs
 
@@ -44,6 +46,10 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "Xcode Junk"
         case .packageCaches:
             "Package Caches"
+        case .leftovers:
+            "Leftovers"
+        case .duplicates:
+            "Duplicates"
         case .largeFiles:
             "Large Files"
         case .auditLogs:
@@ -65,6 +71,10 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "hammer"
         case .packageCaches:
             "shippingbox"
+        case .leftovers:
+            "tray.full"
+        case .duplicates:
+            "square.on.square"
         case .largeFiles:
             "doc.text.magnifyingglass"
         case .auditLogs:
@@ -86,6 +96,10 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "Find rebuildable Xcode and simulator data."
         case .packageCaches:
             "Review known Homebrew, npm, Yarn, and pnpm download caches."
+        case .leftovers:
+            "Find files left behind by apps that are no longer installed. Scans only when you start it."
+        case .duplicates:
+            "Find identical files in folders you choose. Read-only, and scans only when you start it."
         case .largeFiles:
             "Find large files in your home folder. This scanner is read-only."
         case .auditLogs:
@@ -119,7 +133,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         case .modules:
             [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches]
         case .tools:
-            [.largeFiles, .auditLogs]
+            [.leftovers, .duplicates, .largeFiles, .auditLogs]
         }
     }
 }
