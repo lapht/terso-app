@@ -81,7 +81,7 @@ extension RuleEvaluator {
         return matches
     }
 
-    private func expandAppPath(_ path: String, bundleID: String) -> URL {
+    func expandAppPath(_ path: String, bundleID: String) -> URL {
         let expandedPath = path.replacingOccurrences(of: RuleValidator.bundleIDPlaceholder, with: bundleID)
         return homeDirectory.appendingPathComponent(String(expandedPath.dropFirst(2))).standardizedFileURL
     }
