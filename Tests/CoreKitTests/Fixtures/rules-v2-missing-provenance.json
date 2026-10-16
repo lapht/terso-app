@@ -1,0 +1,28 @@
+{
+  "version": "2026.2",
+  "schemaVersion": 2,
+  "rules": [
+    {
+      "id": "leftovers.example.editor",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Example Editor leftovers",
+      "description": "App patterns without provenance must be rejected.",
+      "allowlistRoots": [
+        "~/Library/Caches"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.example.Editor",
+          "paths": [
+            "~/Library/Caches/{bundleID}"
+          ]
+        }
+      ]
+    }
+  ]
+}

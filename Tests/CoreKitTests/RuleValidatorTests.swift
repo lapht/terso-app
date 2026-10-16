@@ -131,13 +131,14 @@ struct RuleValidatorTests {
         }
     }
 
-    @Test func rejectsUnsupportedSchemaVersion() throws {
-        let data = try makeDatabaseData(roots: ["~/Library/Caches"], schemaVersion: 2)
+    @Test(arguments: [0, 3])
+    func rejectsUnsupportedSchemaVersion(schemaVersion: Int) throws {
+        let data = try makeDatabaseData(roots: ["~/Library/Caches"], schemaVersion: schemaVersion)
         do {
             _ = try RuleValidator.decode(data)
             Issue.record("Expected unsupported schema version to be rejected")
         } catch let error as RuleValidationError {
-            #expect(error == .unsupportedSchemaVersion(2))
+            #expect(error == .unsupportedSchemaVersion(schemaVersion))
         }
     }
 
