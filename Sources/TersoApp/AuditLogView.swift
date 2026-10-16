@@ -40,7 +40,7 @@ struct AuditLogView: View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
             HStack(alignment: .center) {
                 PageHeader(
-                    title: "Audit Log",
+                    title: SidebarDestination.auditLogs.title,
                     systemImage: SidebarDestination.auditLogs.symbol,
                     description: SidebarDestination.auditLogs.description,
                     titleIdentifier: "audit-log-title"
@@ -56,8 +56,10 @@ struct AuditLogView: View {
             } else if viewModel.records.isEmpty {
                 EmptyStateView(
                     systemImage: "list.bullet.rectangle",
-                    title: "No Audit Events",
-                    message: "Every item Terso moves to Trash is recorded here with time, rule and size."
+                    title: String(localized: "No Audit Events"),
+                    message: String(
+                        localized: "Every item Terso moves to Trash is recorded here with time, rule and size."
+                    )
                 )
                 .frame(maxWidth: DesignTokens.Layout.contentMaxWidth)
                 .accessibilityIdentifier("audit-log-empty")
@@ -85,7 +87,9 @@ struct AuditLogView: View {
 
                     TableColumn("Result") { entry in
                         Label(
-                            entry.record.result.rawValue.capitalized,
+                            entry.record.result == .success
+                                ? String(localized: "Success")
+                                : String(localized: "Failed"),
                             systemImage: entry.record.result == .success
                                 ? "checkmark.circle"
                                 : "exclamationmark.circle"
@@ -126,10 +130,12 @@ struct AuditLogView: View {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.plainText]
         panel.nameFieldStringValue = "terso-audit-report.txt"
-        panel.title = "Export Audit Log"
-        panel.message = "The home folder is replaced with ~ in the exported report. The local log is not changed."
+        panel.title = String(localized: "Export Audit Log")
+        panel.message = String(
+            localized: "The home folder is replaced with ~ in the exported report. The local log is not changed."
+        )
         let redactToggle = NSButton(
-            checkboxWithTitle: "Redact file names below the cleanup root",
+            checkboxWithTitle: String(localized: "Redact file names below the cleanup root"),
             target: nil,
             action: nil
         )

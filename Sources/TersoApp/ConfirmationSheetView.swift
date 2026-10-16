@@ -79,10 +79,7 @@ struct ConfirmationSheetView: View {
                     .accessibilityAddTraits(.isHeader)
             }
 
-            Text(
-                "Will move \(itemCount) \(itemCount == 1 ? "item" : "items") "
-                    + "totaling \(formattedGigabytes) to Trash."
-            )
+            Text("Will move \(itemCount) items totaling \(formattedGigabytes) to Trash.")
             .font(DesignTokens.Typography.body)
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier("cleanup-confirmation-summary")

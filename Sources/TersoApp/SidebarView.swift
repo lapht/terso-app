@@ -35,25 +35,25 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .smartScan:
-            "Smart Scan"
+            String(localized: "Smart Scan")
         case .userCaches:
-            "User Caches"
+            String(localized: "User Caches")
         case .userLogs:
-            "User Logs"
+            String(localized: "User Logs")
         case .trashBins:
-            "Trash Bins"
+            String(localized: "Trash Bins")
         case .xcodeJunk:
-            "Xcode Junk"
+            String(localized: "Xcode Junk")
         case .packageCaches:
-            "Package Caches"
+            String(localized: "Package Caches")
         case .leftovers:
-            "Leftovers"
+            String(localized: "Leftovers")
         case .duplicates:
-            "Duplicates"
+            String(localized: "Duplicates")
         case .largeFiles:
-            "Large Files"
+            String(localized: "Large Files")
         case .auditLogs:
-            "Audit Log"
+            String(localized: "Audit Log")
         }
     }
 
@@ -85,25 +85,33 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     var description: String {
         switch self {
         case .smartScan:
-            "Review cleanup candidates from Terso's available modules in one place."
+            String(localized: "Review cleanup candidates from Terso's available modules in one place.")
         case .userCaches:
-            "Find rebuildable caches in your user Library, excluding caches used by running apps."
+            String(
+                localized: "Find rebuildable caches in your user Library, excluding caches used by running apps."
+            )
         case .userLogs:
-            "Find older rotated logs while avoiding files that are currently open for writing."
+            String(
+                localized: "Find older rotated logs while avoiding files that are currently open for writing."
+            )
         case .trashBins:
-            "Review items in your Trash, including supported mounted volumes."
+            String(localized: "Review items in your Trash, including supported mounted volumes.")
         case .xcodeJunk:
-            "Find rebuildable Xcode and simulator data."
+            String(localized: "Find rebuildable Xcode and simulator data.")
         case .packageCaches:
-            "Review known Homebrew, npm, Yarn, and pnpm download caches."
+            String(localized: "Review known Homebrew, npm, Yarn, and pnpm download caches.")
         case .leftovers:
-            "Find files left behind by apps that are no longer installed. Scans only when you start it."
+            String(
+                localized: "Find files left behind by apps that are no longer installed. Scans only when you start it."
+            )
         case .duplicates:
-            "Find identical files in folders you choose. Read-only, and scans only when you start it."
+            String(
+                localized: "Find identical files in folders you choose. Read-only, and scans only when you start it."
+            )
         case .largeFiles:
-            "Find large files in your home folder. This scanner is read-only."
+            String(localized: "Find large files in your home folder. This scanner is read-only.")
         case .auditLogs:
-            "Review local records of cleanup activity."
+            String(localized: "Review local records of cleanup activity.")
         }
     }
 }
@@ -118,11 +126,11 @@ enum SidebarSection: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .scan:
-            "Scan"
+            String(localized: "Scan")
         case .modules:
-            "Modules"
+            String(localized: "Modules")
         case .tools:
-            "Tools"
+            String(localized: "Tools")
         }
     }
 

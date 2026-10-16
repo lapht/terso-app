@@ -33,9 +33,9 @@ struct SmartScanView: View {
 
     /// A view model created with specific `modules` scopes the page to those modules.
     init(
-        title: String = "Smart Scan",
+        title: String = SidebarDestination.smartScan.title,
         systemImage: String = "sparkles",
-        description: String = "Review cleanup candidates from Terso's available modules in one place.",
+        description: String = SidebarDestination.smartScan.description,
         viewModel: SmartScanViewModel,
         onViewAuditLog: @escaping () -> Void = {}
     ) {
@@ -73,7 +73,7 @@ struct SmartScanView: View {
     private var page: some View {
         if let summary = selectedModuleSummary {
             ModuleDetailView(
-                title: summary.title,
+                title: displayTitle(for: summary),
                 systemImage: SidebarDestination(moduleID: summary.id)?.symbol ?? systemImage,
                 items: viewModel.items(for: summary.id),
                 homeDirectory: viewModel.homeDirectory,
@@ -87,7 +87,7 @@ struct SmartScanView: View {
                     }
                 },
                 onBack: { selectedModuleID = nil },
-                backTitle: "Back to \(title)"
+                backTitle: String(localized: "Back to \(title)")
             )
             .id(summary.id)
         } else {
@@ -118,8 +118,12 @@ struct SmartScanView: View {
             titleIdentifier: "smart-scan-title"
         ) {
             StatusMessage(
-                text: "Scanning is designed to only read files. Nothing is moved to Trash "
-                    + "until you review the results and confirm.",
+                text: String(
+                    localized: """
+                        Scanning is designed to only read files. Nothing is moved to Trash \
+                        until you review the results and confirm.
+                        """
+                ),
                 systemImage: "checkmark.shield",
                 tone: .brand
             )
@@ -137,7 +141,10 @@ struct SmartScanView: View {
             .buttonStyle(.bordered)
             .accessibilityIdentifier("smart-scan-cancel")
         } else {
-            Button(viewModel.state == .idle ? "Scan" : "Scan Again", systemImage: systemImage) {
+            Button(
+                viewModel.state == .idle ? String(localized: "Scan") : String(localized: "Scan Again"),
+                systemImage: systemImage
+            ) {
                 selectedModuleID = nil
                 viewModel.startScan()
             }
@@ -177,9 +184,10 @@ struct SmartScanView: View {
 
     private var scanningModuleMessage: String {
         if viewModel.activeModuleTitles.isEmpty {
-            return "Preparing available modules…"
+            return String(localized: "Preparing available modules…")
         }
-        return "Scanning \(viewModel.activeModuleTitles.joined(separator: ", "))…"
+        let titles = viewModel.activeModuleTitles.formatted(.list(type: .and, width: .narrow))
+        return String(localized: "Scanning \(titles)…")
     }
 
     @ViewBuilder
@@ -201,18 +209,26 @@ struct SmartScanView: View {
             case .idle:
                 EmptyStateView(
                     systemImage: "drop",
-                    title: "Ready when you are",
-                    message: "Your files stay as they are until you review the scan results and choose what to do."
+                    title: String(localized: "Ready when you are"),
+                    message: String(
+                        localized: """
+                            Your files stay as they are until you review the scan results \
+                            and choose what to do.
+                            """
+                    )
                 )
             case .scanning:
                 EmptyView()
             case .finished:
                 finishedResults
             case .cancelled:
-                StatusMessage(text: "Scan cancelled. No files were changed.", systemImage: "pause.circle")
+                StatusMessage(
+                    text: String(localized: "Scan cancelled. No files were changed."),
+                    systemImage: "pause.circle"
+                )
             case .failed(let message):
                 StatusMessage(
-                    text: "Scan failed: \(message)",
+                    text: String(localized: "Scan failed: \(message)"),
                     systemImage: "exclamationmark.triangle",
                     tone: .error
                 )
@@ -229,16 +245,16 @@ struct SmartScanView: View {
             if deletableItemCount == 0 {
                 EmptyStateView(
                     systemImage: "checkmark.seal",
-                    title: "Nothing to clean right now",
-                    message: "This scan found no items that match Terso's rules."
+                    title: String(localized: "Nothing to clean right now"),
+                    message: String(localized: "This scan found no items that match Terso's rules.")
                 )
             } else {
                 ReclaimableSummaryView(
-                    title: "Potentially reclaimable",
+                    title: String(localized: "Potentially reclaimable"),
                     totalBytes: viewModel.reclaimableBytes,
                     itemCount: deletableItemCount,
                     segments: viewModel.moduleSummaries.map {
-                        BreakdownSegment(id: $0.id, title: $0.title, bytes: $0.bytesFound)
+                        BreakdownSegment(id: $0.id, title: displayTitle(for: $0), bytes: $0.bytesFound)
                     },
                     sizeIdentifier: "smart-scan-reclaimable-size"
                 )
@@ -267,13 +283,18 @@ struct SmartScanView: View {
         }
     }
 
+    /// Module titles come from CoreKit in English; the sidebar owns their localized names.
+    private func displayTitle(for summary: SmartScanModuleSummary) -> String {
+        SidebarDestination(moduleID: summary.id)?.title ?? summary.title
+    }
+
     private func moduleCard(_ summary: SmartScanModuleSummary) -> some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.xSmall) {
             HStack(spacing: DesignTokens.Spacing.xSmall) {
                 Image(systemName: SidebarDestination(moduleID: summary.id)?.symbol ?? "folder")
                     .foregroundStyle(DesignTokens.Palette.brandText)
                     .accessibilityHidden(true)
-                Text(summary.title)
+                Text(displayTitle(for: summary))
                     .font(DesignTokens.Typography.sectionTitle)
                 Spacer(minLength: 0)
                 if summary.status == .completed {
@@ -285,7 +306,7 @@ struct SmartScanView: View {
             }
             Text(SizeCalculator.formattedByteCount(summary.bytesFound))
                 .font(DesignTokens.Typography.figure)
-            Text("\(summary.itemsFound) \(summary.itemsFound == 1 ? "item" : "items")")
+            Text("\(summary.itemsFound) items")
                 .font(DesignTokens.Typography.metadata)
                 .foregroundStyle(.secondary)
 

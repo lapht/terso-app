@@ -27,9 +27,9 @@ enum ScanTool: Equatable {
     var title: String {
         switch self {
         case .leftovers:
-            "Leftovers"
+            String(localized: "Leftovers")
         case .duplicates:
-            "Duplicates"
+            String(localized: "Duplicates")
         }
     }
 }

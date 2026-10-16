@@ -67,10 +67,10 @@ struct ScanStateView<Content: View>: View {
             if !isScanEnabled, let unavailableNote {
                 StatusMessage(text: unavailableNote, systemImage: "info.circle")
             }
-            scanButton("Scan")
+            scanButton(String(localized: "Scan"))
         case .scanning:
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.small) {
-                Text(currentModule.map { "Scanning \($0)…" } ?? "Preparing scan…")
+                Text(currentModule.map { String(localized: "Scanning \($0)…") } ?? String(localized: "Preparing scan…"))
                     .font(DesignTokens.Typography.sectionTitle)
                 if let progress {
                     ProgressView(value: progress, total: 1)
@@ -85,10 +85,17 @@ struct ScanStateView<Content: View>: View {
             Button("Cancel", systemImage: "xmark.circle", action: onCancel)
                 .buttonStyle(.bordered)
         case .cancelled:
-            StatusMessage(text: "Scan cancelled. No files were changed.", systemImage: "pause.circle")
+            StatusMessage(
+                text: String(localized: "Scan cancelled. No files were changed."),
+                systemImage: "pause.circle"
+            )
             scanButton("Scan Again")
         case .failed(let message):
-            StatusMessage(text: "Scan failed: \(message)", systemImage: "exclamationmark.triangle", tone: .error)
+            StatusMessage(
+                text: String(localized: "Scan failed: \(message)"),
+                systemImage: "exclamationmark.triangle",
+                tone: .error
+            )
             scanButton("Scan Again")
         case .requiresPermission(let message):
             StatusMessage(text: message, systemImage: "lock")

@@ -66,6 +66,25 @@ xcodebuild \
 Run tests relevant to your change and report precisely what you ran. The
 automated CI also builds the app with Xcode for both architectures.
 
+## Add user-visible strings
+
+All UI text lives in the String Catalog `Sources/TersoApp/Localizable.xcstrings`.
+English is the base language; Italian (`it`) is the first translation.
+
+- Every new feature PR adds its keys to the catalog in **both EN and IT**.
+- The key is the English sentence itself. Use `Text("…")`, `Button("…")` and similar
+  directly; where an API takes a `String`, use `String(localized: "…")`.
+- Never build a phrase from fragments (`"Moved " + count + " items"`). Use one key with
+  interpolation, e.g. `"Will move \(count) items totaling \(size) to Trash."`.
+- Plurals use plural variations in the catalog (`one` / `other`), never `count == 1 ? … : …`.
+- Sizes, numbers, durations and lists use system formatters (`ByteCountFormatter`,
+  `Duration.formatted`, `.formatted(.list(…))`), not hand-written text.
+- Missing keys or unsupported languages fall back to English; never show a technical key or an empty string.
+- Keep the same placeholders (`%@`, `%lld`) in every language.
+  `LocalizationTests` checks that every key has non-empty EN and IT values.
+- Localization must not change scan or Safety behavior. Do not translate rule IDs or audit log fields.
+- UI tests run with the language forced to English in the `TersoApp` scheme.
+
 ## Open a pull request
 
 Push your branch to your fork and open a pull request with base

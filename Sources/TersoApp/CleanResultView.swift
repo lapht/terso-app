@@ -30,7 +30,8 @@ struct CleanResultView: View {
     }
 
     var formattedDuration: String {
-        String(format: "%.1f seconds", result.executionDuration)
+        Duration.seconds(result.executionDuration)
+            .formatted(.units(allowed: [.seconds], width: .wide, fractionalPart: .show(length: 1)))
     }
 
     var body: some View {
@@ -54,10 +55,7 @@ struct CleanResultView: View {
                         .font(DesignTokens.Typography.heroFigure)
                         .foregroundStyle(DesignTokens.Palette.brandText)
                         .accessibilityIdentifier("clean-result-bytes")
-                    Text(
-                        "\(result.itemsTrashed.count) "
-                            + "\(result.itemsTrashed.count == 1 ? "item" : "items")"
-                    )
+                    Text("\(result.itemsTrashed.count) items")
                     .font(DesignTokens.Typography.metadata)
                     .foregroundStyle(.secondary)
                 }
@@ -65,7 +63,7 @@ struct CleanResultView: View {
                     .font(DesignTokens.Typography.metadata)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                StatusMessage(text: "Completed in \(formattedDuration)", systemImage: "clock")
+                StatusMessage(text: String(localized: "Completed in \(formattedDuration)"), systemImage: "clock")
                     .accessibilityIdentifier("clean-result-duration")
             }
             .tersoCard()
@@ -73,7 +71,7 @@ struct CleanResultView: View {
             if !warnings.isEmpty {
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xSmall) {
                     StatusMessage(
-                        text: "Some scan warnings need your attention",
+                        text: String(localized: "Some scan warnings need your attention"),
                         systemImage: "exclamationmark.triangle",
                         tone: .warning,
                         font: DesignTokens.Typography.sectionTitle
