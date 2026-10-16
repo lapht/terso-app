@@ -37,32 +37,29 @@ struct AuditLogView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Label("Audit Log", systemImage: "list.bullet.rectangle")
-                    .font(.largeTitle.weight(.semibold))
-                    .accessibilityIdentifier("audit-log-title")
-                Spacer()
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
+            HStack(alignment: .center) {
+                PageHeader(
+                    title: "Audit Log",
+                    systemImage: SidebarDestination.auditLogs.symbol,
+                    description: SidebarDestination.auditLogs.description,
+                    titleIdentifier: "audit-log-title"
+                )
+                Spacer(minLength: DesignTokens.Spacing.small)
                 Button("Export Audit Log", systemImage: "square.and.arrow.up", action: exportLog)
                     .accessibilityIdentifier("audit-log-export")
             }
 
             if let errorMessage = viewModel.errorMessage {
-                Label(errorMessage, systemImage: "exclamationmark.triangle")
-                    .foregroundStyle(.red)
-                    .fixedSize(horizontal: false, vertical: true)
+                StatusMessage(text: errorMessage, systemImage: "exclamationmark.triangle", tone: .error)
                     .accessibilityIdentifier("audit-log-error")
             } else if viewModel.records.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "list.bullet.rectangle")
-                        .font(.largeTitle)
-                        .foregroundStyle(.secondary)
-                    Text("No Audit Events")
-                        .font(.headline)
-                    Text("Cleanup operations will appear here.")
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                EmptyStateView(
+                    systemImage: "list.bullet.rectangle",
+                    title: "No Audit Events",
+                    message: "Every item Terso moves to Trash is recorded here with time, rule and size."
+                )
+                .frame(maxWidth: DesignTokens.Layout.contentMaxWidth)
                 .accessibilityIdentifier("audit-log-empty")
             } else {
                 Table(viewModel.records.enumerated().map {
@@ -93,7 +90,9 @@ struct AuditLogView: View {
                                 ? "checkmark.circle"
                                 : "exclamationmark.circle"
                         )
-                        .foregroundStyle(entry.record.result == .success ? Color.secondary : Color.red)
+                        .foregroundStyle(
+                            entry.record.result == .success ? Color.secondary : DesignTokens.Palette.error
+                        )
                     }
                     .width(min: 110)
                 }

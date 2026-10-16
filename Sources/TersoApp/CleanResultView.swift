@@ -34,45 +34,58 @@ struct CleanResultView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Label("Cleanup Complete", systemImage: "checkmark.circle.fill")
-                .font(.largeTitle.weight(.semibold))
-                .foregroundStyle(.green)
-                .accessibilityIdentifier("clean-result-title")
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.large) {
+            Label {
+                Text("Cleanup Complete")
+                    .font(DesignTokens.Typography.pageTitle)
+            } icon: {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(DesignTokens.Typography.pageTitle)
+                    .foregroundStyle(DesignTokens.Palette.success)
+            }
+            .accessibilityIdentifier("clean-result-title")
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xSmall) {
                 Text("Moved to Trash")
-                    .font(.headline)
-                Text(formattedBytes)
-                    .font(.title2.weight(.semibold))
-                    .accessibilityIdentifier("clean-result-bytes")
+                    .font(DesignTokens.Typography.sectionTitle)
+                    .foregroundStyle(.secondary)
+                HStack(alignment: .firstTextBaseline, spacing: DesignTokens.Spacing.small) {
+                    Text(formattedBytes)
+                        .font(DesignTokens.Typography.heroFigure)
+                        .foregroundStyle(DesignTokens.Palette.brandText)
+                        .accessibilityIdentifier("clean-result-bytes")
+                    Text(
+                        "\(result.itemsTrashed.count) "
+                            + "\(result.itemsTrashed.count == 1 ? "item" : "items")"
+                    )
+                    .font(DesignTokens.Typography.metadata)
+                    .foregroundStyle(.secondary)
+                }
                 Text("Estimated size of the items moved to Trash. Empty Trash to reclaim disk space.")
-                    .font(.callout)
+                    .font(DesignTokens.Typography.metadata)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                Text(
-                    "\(result.itemsTrashed.count) "
-                        + "\(result.itemsTrashed.count == 1 ? "item" : "items") moved to Trash"
-                )
-                .font(.callout)
-                .foregroundStyle(.secondary)
+                StatusMessage(text: "Completed in \(formattedDuration)", systemImage: "clock")
+                    .accessibilityIdentifier("clean-result-duration")
             }
-
-            Label("Completed in \(formattedDuration)", systemImage: "clock")
-                .accessibilityIdentifier("clean-result-duration")
+            .tersoCard()
 
             if !warnings.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("Some scan warnings need your attention", systemImage: "exclamationmark.triangle")
-                        .font(.headline)
-                        .foregroundStyle(.orange)
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xSmall) {
+                    StatusMessage(
+                        text: "Some scan warnings need your attention",
+                        systemImage: "exclamationmark.triangle",
+                        tone: .warning,
+                        font: DesignTokens.Typography.sectionTitle
+                    )
                     ForEach(Array(warnings.enumerated()), id: \.offset) { _, warning in
                         Text(warning)
-                            .font(.callout)
+                            .font(DesignTokens.Typography.metadata)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
+                .tersoCard()
                 .accessibilityIdentifier("clean-result-warnings")
             }
 

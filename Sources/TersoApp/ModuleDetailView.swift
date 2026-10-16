@@ -25,6 +25,7 @@ struct ModuleDetailView: View {
     @StateObject private var confirmationViewModel: CleanupConfirmationViewModel
 
     private let title: String
+    private let systemImage: String
     private let items: [CleanItem]
     private let homeDirectory: URL
     private let allowsSelection: Bool
@@ -34,6 +35,7 @@ struct ModuleDetailView: View {
 
     init(
         title: String,
+        systemImage: String = "doc.text.magnifyingglass",
         items: [CleanItem],
         homeDirectory: URL,
         allowsSelection: Bool = true,
@@ -43,6 +45,7 @@ struct ModuleDetailView: View {
         backTitle: String = "Back to Smart Scan"
     ) {
         self.title = title
+        self.systemImage = systemImage
         self.items = items
         self.homeDirectory = homeDirectory
         self.allowsSelection = allowsSelection
@@ -62,17 +65,19 @@ struct ModuleDetailView: View {
 
     var body: some View {
         // The header stays put; only the item list scrolls, so the page never nests scroll views.
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.large) {
             header
             if items.isEmpty {
-                Text("No items found.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                EmptyStateView(
+                    systemImage: "checkmark.seal",
+                    title: "No items found",
+                    message: "This scan found no items that match Terso's rules here."
+                )
             } else {
                 itemList
             }
         }
-        .frame(maxWidth: 720, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: DesignTokens.Layout.contentMaxWidth, maxHeight: .infinity, alignment: .topLeading)
         .sheet(isPresented: confirmationSheetBinding) {
             ConfirmationSheetView(
                 itemCount: confirmationViewModel.pendingItems.count,
@@ -85,50 +90,59 @@ struct ModuleDetailView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
             if let onBack {
                 Button(backTitle, systemImage: "chevron.left", action: onBack)
                     .buttonStyle(.plain)
+                    .foregroundStyle(DesignTokens.Palette.brandText)
             }
 
-            Label(title, systemImage: "doc.text.magnifyingglass")
-                .font(.largeTitle.weight(.semibold))
+            PageHeader(title: title, systemImage: systemImage)
 
             if allowsSelection {
-                Text(
-                    "\(viewModel.selectedItems.count) selected · "
-                        + "\(SizeCalculator.formattedByteCount(viewModel.selectedBytes))"
-                )
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .accessibilityIdentifier("module-selected-size")
-            } else {
-                Label("Read-only — items can only be revealed in Finder.", systemImage: "eye")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-            }
-
-            if allowsSelection, !items.isEmpty {
-                HStack {
-                    Button("Select All", action: viewModel.selectAll)
-                        .accessibilityIdentifier("module-select-all")
-                    Button("Deselect All", action: viewModel.deselectAll)
-                        .accessibilityIdentifier("module-deselect-all")
+                if !items.isEmpty {
+                    selectionBar
                 }
-                .buttonStyle(.bordered)
-
-                Button(
-                    "Move \(viewModel.selectedItems.count) to Trash",
-                    systemImage: "trash",
-                    action: {
-                        confirmationViewModel.requestConfirmation(for: viewModel.selectedItems)
-                    }
-                )
-                .buttonStyle(.borderedProminent)
-                .disabled(viewModel.selectedItems.isEmpty)
-                .accessibilityIdentifier("module-move-to-trash")
+            } else {
+                StatusMessage(text: "Read-only — items can only be revealed in Finder.", systemImage: "eye")
             }
         }
+    }
+
+    /// Selection recap and actions; the Trash button repeats count and size (design.md §5.6).
+    private var selectionBar: some View {
+        HStack(spacing: DesignTokens.Spacing.small) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxSmall) {
+                Text(SizeCalculator.formattedByteCount(viewModel.selectedBytes))
+                    .font(DesignTokens.Typography.figure)
+                    .foregroundStyle(DesignTokens.Palette.brandText)
+                Text("\(viewModel.selectedItems.count) of \(items.count) selected")
+                    .font(DesignTokens.Typography.metadata)
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("module-selected-size")
+
+            Spacer(minLength: DesignTokens.Spacing.small)
+
+            Button("Select All", action: viewModel.selectAll)
+                .accessibilityIdentifier("module-select-all")
+            Button("Deselect All", action: viewModel.deselectAll)
+                .accessibilityIdentifier("module-deselect-all")
+
+            Button(
+                "Move \(viewModel.selectedItems.count) to Trash",
+                systemImage: "trash",
+                action: {
+                    confirmationViewModel.requestConfirmation(for: viewModel.selectedItems)
+                }
+            )
+            .buttonStyle(.borderedProminent)
+            .disabled(viewModel.selectedItems.isEmpty)
+            .accessibilityIdentifier("module-move-to-trash")
+        }
+        .buttonStyle(.bordered)
+        .tersoCard(padding: DesignTokens.Spacing.small)
     }
 
     private var itemList: some View {

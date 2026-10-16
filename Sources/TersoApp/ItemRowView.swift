@@ -27,30 +27,33 @@ struct ItemRowView: View {
     let allowsSelection: Bool
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: DesignTokens.Spacing.small) {
             Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
                 .resizable()
-                .frame(width: 32, height: 32)
+                .frame(width: DesignTokens.Layout.rowIconSize, height: DesignTokens.Layout.rowIconSize)
                 .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxSmall) {
                 Text(item.url.lastPathComponent)
-                    .font(.body.weight(.medium))
+                    .font(DesignTokens.Typography.body.weight(.medium))
                     .lineLimit(1)
+                    .truncationMode(.middle)
                     .help(item.url.lastPathComponent)
 
                 Text(relativePath)
-                    .font(.caption)
+                    .font(DesignTokens.Typography.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+                    .truncationMode(.middle)
                     .help(relativePath)
             }
 
-            Spacer(minLength: 12)
+            Spacer(minLength: DesignTokens.Spacing.small)
 
             Text(SizeCalculator.formattedByteCount(item.sizeBytes))
-                .font(.callout.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .font(DesignTokens.Typography.rowFigure.weight(.medium))
+                .foregroundStyle(isRowSelected ? DesignTokens.Palette.brandText : Color.primary)
+                .frame(minWidth: 72, alignment: .trailing)
 
             if allowsSelection, item.isDeletable, !item.isProtected, let isSelected {
                 Toggle("Select \(item.url.lastPathComponent)", isOn: isSelected)
@@ -60,13 +63,24 @@ struct ItemRowView: View {
                 revealButton
             }
         }
-        .padding(12)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
+        .padding(DesignTokens.Spacing.small)
+        .background(
+            isRowSelected ? DesignTokens.Palette.brandWash : DesignTokens.Palette.rowFill,
+            in: RoundedRectangle(cornerRadius: DesignTokens.Radius.row)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.row)
+                .strokeBorder(isRowSelected ? DesignTokens.Palette.brandStroke : .clear, lineWidth: 1)
+        }
         .contextMenu {
             Button("Reveal in Finder", systemImage: "magnifyingglass") {
                 revealInFinder()
             }
         }
+    }
+
+    private var isRowSelected: Bool {
+        allowsSelection && (isSelected?.wrappedValue ?? false)
     }
 
     private var relativePath: String {

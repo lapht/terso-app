@@ -37,6 +37,26 @@ extension SidebarDestination {
             nil
         }
     }
+
+    /// The sidebar entry for a CoreKit module id, so cards and detail pages reuse its title and icon.
+    init?(moduleID: String) {
+        switch moduleID {
+        case "caches.user":
+            self = .userCaches
+        case "logs.user":
+            self = .userLogs
+        case "trash.user":
+            self = .trashBins
+        case "xcode.junk":
+            self = .xcodeJunk
+        case "caches.packages":
+            self = .packageCaches
+        case "files.large":
+            self = .largeFiles
+        default:
+            return nil
+        }
+    }
 }
 
 /// A single module's page: the Smart Scan flow scoped to one module, so scanning, review,

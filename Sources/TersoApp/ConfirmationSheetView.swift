@@ -71,20 +71,24 @@ struct ConfirmationSheetView: View {
     let onConfirm: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Label("Confirm Cleanup", systemImage: "trash")
-                .font(.title2.weight(.semibold))
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.large) {
+            HStack(spacing: DesignTokens.Spacing.small) {
+                BrandBadge(systemImage: "trash", size: 36)
+                Text("Confirm Cleanup")
+                    .font(.title2.weight(.semibold))
+                    .accessibilityAddTraits(.isHeader)
+            }
 
             Text(
                 "Will move \(itemCount) \(itemCount == 1 ? "item" : "items") "
                     + "totaling \(formattedGigabytes) to Trash."
             )
-            .font(.body)
+            .font(DesignTokens.Typography.body)
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier("cleanup-confirmation-summary")
 
-            Text("All items will be moved to the Trash and can be restored at any time.")
-                .font(.callout)
+            Text("Items are moved to the Trash, so you can put them back until you empty it.")
+                .font(DesignTokens.Typography.metadata)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("cleanup-confirmation-reassurance")
@@ -100,7 +104,7 @@ struct ConfirmationSheetView: View {
                     .accessibilityIdentifier("cleanup-confirmation-confirm")
             }
         }
-        .padding(24)
+        .padding(DesignTokens.Spacing.xLarge)
         .frame(minWidth: 420, maxWidth: 520)
         .accessibilityIdentifier("cleanup-confirmation-sheet")
     }

@@ -24,6 +24,8 @@
 		10000000000000000000000A /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000A /* SidebarView.swift */; };
 		10000000000000000000000B /* SmartScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000B /* SmartScanView.swift */; };
 		10000000000000000000000C /* SmartScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000C /* SmartScanViewModel.swift */; };
+		1000000000000000000000FF /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001E /* DesignTokens.swift */; };
+		1000000000000000000000E0 /* TersoComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001F /* TersoComponents.swift */; };
 		10000000000000000000000D /* TCCBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000D /* TCCBannerView.swift */; };
 		10000000000000000000000E /* TersoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000E /* TersoApp.swift */; };
 		1000000000000000000000F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000F0 /* Assets.xcassets */; };
@@ -66,6 +68,8 @@
 		20000000000000000000000A /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		20000000000000000000000B /* SmartScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanView.swift; sourceTree = "<group>"; };
 		20000000000000000000000C /* SmartScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanViewModel.swift; sourceTree = "<group>"; };
+		20000000000000000000001E /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
+		20000000000000000000001F /* TersoComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TersoComponents.swift; sourceTree = "<group>"; };
 		20000000000000000000000D /* TCCBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCBannerView.swift; sourceTree = "<group>"; };
 		20000000000000000000000E /* TersoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TersoApp.swift; sourceTree = "<group>"; };
 		200000000000000000000010 /* AuditLogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogViewModelTests.swift; sourceTree = "<group>"; };
@@ -147,6 +151,8 @@
 				20000000000000000000000B /* SmartScanView.swift */,
 				20000000000000000000000C /* SmartScanViewModel.swift */,
 				20000000000000000000000D /* TCCBannerView.swift */,
+				20000000000000000000001F /* TersoComponents.swift */,
+				20000000000000000000001E /* DesignTokens.swift */,
 				20000000000000000000000E /* TersoApp.swift */,
 				2000000000000000000000F0 /* Assets.xcassets */,
 			);
@@ -280,6 +286,8 @@
 				10000000000000000000000B /* SmartScanView.swift in Sources */,
 				10000000000000000000000C /* SmartScanViewModel.swift in Sources */,
 				10000000000000000000000D /* TCCBannerView.swift in Sources */,
+				1000000000000000000000E0 /* TersoComponents.swift in Sources */,
+				1000000000000000000000FF /* DesignTokens.swift in Sources */,
 				10000000000000000000000E /* TersoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -338,6 +346,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -362,6 +371,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Terso;

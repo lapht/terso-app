@@ -72,9 +72,12 @@ struct MainShellView: View {
             // Each module page keeps its own scan state instead of reusing the previous module's.
             moduleScanView.id(selection)
         } else {
-            Label("Select a module", systemImage: "sidebar.left")
-                .font(.title2)
-                .foregroundStyle(.secondary)
+            EmptyStateView(
+                systemImage: "sidebar.left",
+                title: "Select a module",
+                message: "Choose Smart Scan or a module in the sidebar to get started."
+            )
+            .frame(maxWidth: DesignTokens.Layout.contentMaxWidth)
         }
     }
 

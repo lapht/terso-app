@@ -27,30 +27,36 @@ struct TCCBannerView: View {
     @State private var isShowingSettingsError = false
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
+        // Informative, not alarming (design.md §5.7): brand tint instead of warning colors.
+        HStack(alignment: .center, spacing: DesignTokens.Spacing.small) {
             Image(systemName: "lock.shield")
-                .font(.title3)
-                .foregroundStyle(.secondary)
+                .font(.title2)
+                .foregroundStyle(DesignTokens.Palette.brandText)
                 .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxSmall) {
                 Text(title)
-                    .font(.headline)
+                    .font(DesignTokens.Typography.sectionTitle)
                 Text(message)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            Spacer(minLength: 12)
+            Spacer(minLength: DesignTokens.Spacing.small)
 
             Button("Open System Settings", action: openPrivacySettings)
                 .buttonStyle(.bordered)
                 .accessibilityIdentifier("open-full-disk-access-settings")
         }
-        .padding(12)
+        .padding(DesignTokens.Spacing.small)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 10))
+        .background(DesignTokens.Palette.brandWash, in: RoundedRectangle(cornerRadius: DesignTokens.Radius.card))
+        .overlay {
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
+                .strokeBorder(DesignTokens.Palette.brandStroke, lineWidth: 1)
+        }
+        .accessibilityElement(children: .contain)
         .alert(isPresented: $isShowingSettingsError) {
             Alert(
                 title: Text("Unable to Open System Settings"),

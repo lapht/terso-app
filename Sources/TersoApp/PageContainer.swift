@@ -28,7 +28,7 @@ struct PageContainer<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.large) {
             if tccStatus != .granted {
                 TCCBannerView(status: tccStatus)
             }
@@ -36,10 +36,15 @@ struct PageContainer<Content: View>: View {
             content()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
-        .padding(24)
+        .padding(DesignTokens.Spacing.xLarge)
         // A minimum width keeps wrapped text (e.g. the FDA banner) from measuring as a
         // tall column while the split view computes its minimum size.
-        .frame(minWidth: 420, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(
+            minWidth: DesignTokens.Layout.pageMinWidth,
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .topLeading
+        )
     }
 }
 
