@@ -26,7 +26,7 @@ public struct LargeFilesModule: CleanModule {
 
     public let id = "files.large"
     public let title = "Large Files"
-    public let requiresFDA = false
+    public let requiresFDA = true
 
     private let minimumSizeBytes: Int64
 

@@ -24,7 +24,11 @@ import SwiftUI
 struct LargeFilesView: View {
     @StateObject private var viewModel: LargeFilesViewModel
 
-    init(viewModel: @autoclosure @escaping () -> LargeFilesViewModel = LargeFilesViewModel()) {
+    init(tccManager: TCCManager = TCCManager()) {
+        _viewModel = StateObject(wrappedValue: LargeFilesViewModel(tccManager: tccManager))
+    }
+
+    init(viewModel: @autoclosure @escaping () -> LargeFilesViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel())
     }
 

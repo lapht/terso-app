@@ -267,7 +267,10 @@ final class SmartScanViewModel: ObservableObject {
     private static func makeScanContext(tccManager: TCCManager) -> ScanContext {
         let fileManager = FileManager.default
         let mountedVolumes =
+            // External, removable and network volumes are excluded by default: scanning them
+            // makes macOS ask for access per volume.
             fileManager.mountedVolumeURLs(includingResourceValuesForKeys: nil, options: [])?
+            .filter { !isExternalVolumeMount($0) }
             .map {
                 VolumeInfo(
                     mountPath: $0,

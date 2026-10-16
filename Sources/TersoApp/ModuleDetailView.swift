@@ -158,3 +158,28 @@ struct ModuleDetailView: View {
         )
     }
 }
+
+struct ModuleDetailView_Previews: PreviewProvider {
+    private static let homeDirectory = URL(fileURLWithPath: "/Users/preview", isDirectory: true)
+    private static let items: [CleanItem] = (1...3).map { index in
+        let url = homeDirectory.appendingPathComponent("Library/Caches/com.example.app\(index)")
+        return CleanItem(
+            url: url,
+            resolvedURL: url,
+            sizeBytes: Int64(index) * 48_000_000,
+            moduleId: "user-caches",
+            ruleId: "preview.rule"
+        )
+    }
+
+    static var previews: some View {
+        // The preview never deletes anything: the trash action is a no-op.
+        ModuleDetailView(
+            title: "User Caches",
+            items: items,
+            homeDirectory: homeDirectory,
+            onMoveToTrash: { _ in }
+        )
+        .frame(width: 720, height: 480)
+    }
+}

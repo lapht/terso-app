@@ -94,3 +94,38 @@ struct ItemRowView: View {
         NSWorkspace.shared.activateFileViewerSelecting([item.url])
     }
 }
+
+struct ItemRowView_Previews: PreviewProvider {
+    private static let homeDirectory = URL(fileURLWithPath: "/Users/preview", isDirectory: true)
+    private static let item: CleanItem = {
+        let url = homeDirectory.appendingPathComponent("Library/Caches/com.example.preview")
+        return CleanItem(
+            url: url,
+            resolvedURL: url,
+            sizeBytes: 48_000_000,
+            moduleId: "user-caches",
+            ruleId: "preview.rule"
+        )
+    }()
+
+    static var previews: some View {
+        Group {
+            ItemRowView(
+                item: item,
+                homeDirectory: homeDirectory,
+                isSelected: .constant(true),
+                allowsSelection: true
+            )
+            .previewDisplayName("Selectable")
+            ItemRowView(
+                item: item,
+                homeDirectory: homeDirectory,
+                isSelected: nil,
+                allowsSelection: false
+            )
+            .previewDisplayName("Read-only")
+        }
+        .padding()
+        .frame(width: 560)
+    }
+}
