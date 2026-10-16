@@ -60,10 +60,24 @@ struct MenuBarSpaceLabel: View {
 }
 
 struct MenuBarSpaceContent: View {
+    static let mainWindowID = "main"
+
     @ObservedObject var model: MenuBarSpaceModel
+    @ObservedObject var scanCoordinator: MenuBarScanCoordinator
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Text(model.display.detail)
+        Divider()
+        // Read-only scan: opens the window on Smart Scan and never starts a cleanup.
+        Button(scanCoordinator.isScanning ? "Smart Scan Running…" : "Run Smart Scan") {
+            scanCoordinator.launchSmartScan()
+            openWindow(id: Self.mainWindowID)
+            NSApplication.shared.activate(ignoringOtherApps: true)
+        }
+        if let status = scanCoordinator.statusText {
+            Text(status)
+        }
         Divider()
         Button("Refresh") { model.refresh() }
         Button("Quit Terso") { NSApplication.shared.terminate(nil) }

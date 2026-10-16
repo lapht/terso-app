@@ -23,16 +23,18 @@ import SwiftUI
 @main
 struct TersoApp: App {
     @StateObject private var menuBarSpace = MenuBarSpaceModel()
+    @StateObject private var scanCoordinator = MenuBarScanCoordinator()
 
     var body: some Scene {
         MenuBarExtra {
-            MenuBarSpaceContent(model: menuBarSpace)
+            MenuBarSpaceContent(model: menuBarSpace, scanCoordinator: scanCoordinator)
         } label: {
             MenuBarSpaceLabel(model: menuBarSpace)
         }
 
-        WindowGroup {
-            ContentView()
+        // A single window, so the menu bar action reuses it instead of opening duplicates.
+        Window("Terso", id: MenuBarSpaceContent.mainWindowID) {
+            ContentView(coordinator: scanCoordinator)
                 .onAppear {
                     Task { @MainActor in
                         let application = NSApplication.shared
