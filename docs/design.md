@@ -152,8 +152,9 @@ CODEOWNERS on `Safety/` and `Rules/`, issue templates (bug / module request /
 rule proposal), monthly dependency & rule-DB review cadence.
 
 ## 11. v0.2 decisions
-Decisions recorded before v0.2 code is written (#32). Where an issue and this
-section disagree, this section wins until it is amended by a reviewed PR.
+Decisions recorded before v0.2 code is written (#32). Issues #33–#107
+implement these decisions; a disagreement must be resolved by amending this
+section in a reviewed PR, not in code.
 The invariants in §5 are unchanged by everything below.
 
 ### 11.1 Boundaries
