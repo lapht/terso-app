@@ -66,7 +66,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         case .packageCaches:
             "shippingbox"
         case .largeFiles:
-            "doc.magnifyingglass"
+            "doc.text.magnifyingglass"
         case .auditLogs:
             "list.bullet.rectangle"
         }

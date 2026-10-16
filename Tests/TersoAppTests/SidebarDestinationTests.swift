@@ -16,6 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import AppKit
 import Testing
 @testable import TersoApp
 
@@ -37,6 +38,15 @@ struct SidebarDestinationTests {
         for destination in SidebarDestination.allCases {
             #expect(destination.id == destination)
             #expect(!destination.symbol.isEmpty)
+        }
+    }
+
+    @Test func everySymbolExistsInSFSymbols() {
+        for destination in SidebarDestination.allCases {
+            #expect(
+                NSImage(systemSymbolName: destination.symbol, accessibilityDescription: nil) != nil,
+                "Missing SF Symbol: \(destination.symbol)"
+            )
         }
     }
 
