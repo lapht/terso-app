@@ -1,0 +1,52 @@
+name: Cleanup rule proposal
+description: Propose or discuss a cleanup rule before changing the rule database.
+title: "rule: "
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cleanup rules can affect user data. Use a narrow, evidence-based proposal and do not include real user files or personal paths. Rule changes need particular human review.
+  - type: input
+    id: target
+    attributes:
+      label: Application or component
+      description: Identify the app, developer tool, or system component.
+    validations:
+      required: true
+  - type: textarea
+    id: paths
+    attributes:
+      label: Proposed paths and patterns
+      description: Include example paths or glob patterns. Replace usernames and personal directory names with placeholders.
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why is this safe to clean?
+      description: Explain why the matched data is disposable or reproducible and identify any conditions or exclusions needed.
+    validations:
+      required: true
+  - type: textarea
+    id: affected-data
+    attributes:
+      label: Data that could be affected
+      description: Describe potentially user-generated, unique, or sensitive data that could match, including known risks.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Link relevant vendor documentation, upstream documentation, or other evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Proposed tests
+      description: Describe fixture-based tests for included and excluded paths, plus a symlink case if relevant. Use synthetic data only.
+    validations:
+      required: true
