@@ -377,6 +377,7 @@
 				PRODUCT_MODULE_NAME = TersoApp;
 				PRODUCT_NAME = Terso;
 				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
