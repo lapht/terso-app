@@ -81,6 +81,8 @@ jobs:
           test
 
       - name: Build, sign, package, and checksum
+        env:
+          RELEASE_TAG: ${{ inputs.tag_name }}
         run: ./scripts/build-release.sh
 
       - name: Create tag and publish GitHub Release
@@ -91,8 +93,8 @@ jobs:
           git tag "$RELEASE_TAG" "$GITHUB_SHA"
           git push origin "refs/tags/$RELEASE_TAG"
           gh release create "$RELEASE_TAG" \
-            dist/Terso-v0.1-macOS.zip \
-            dist/Terso-v0.1-macOS.zip.sha256 \
+            "dist/Terso-${RELEASE_TAG}-macOS.zip" \
+            "dist/Terso-${RELEASE_TAG}-macOS.zip.sha256" \
             --title "Terso $RELEASE_TAG" \
             --generate-notes \
             --target "$GITHUB_SHA"

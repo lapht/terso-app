@@ -2,6 +2,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 set -euo pipefail
 
+# Usage: build-release.sh <tag>   (or set RELEASE_TAG; the argument wins)
+RELEASE_TAG="${1:-${RELEASE_TAG:-}}"
+if [[ -z "$RELEASE_TAG" ]]; then
+    echo "Usage: $0 <tag> (or set RELEASE_TAG), for example v0.1.1" >&2
+    exit 1
+fi
+if [[ ! "$RELEASE_TAG" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+    echo "Invalid release tag: $RELEASE_TAG" >&2
+    exit 1
+fi
+
 if [[ "$(uname -s)" != "Darwin" ]]; then
     echo "Release packaging requires macOS." >&2
     exit 1
@@ -20,7 +31,7 @@ BUILD_ROOT="$REPO_ROOT/.build/release-packaging"
 DERIVED_DATA="$BUILD_ROOT/DerivedData"
 APP_BUNDLE="$DERIVED_DATA/Build/Products/Release/Terso.app"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/dist}"
-ZIP_PATH="$OUTPUT_DIR/Terso-v0.1-macOS.zip"
+ZIP_PATH="$OUTPUT_DIR/Terso-${RELEASE_TAG}-macOS.zip"
 
 rm -rf "$BUILD_ROOT"
 mkdir -p "$OUTPUT_DIR"
