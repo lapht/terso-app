@@ -39,4 +39,9 @@ struct SidebarDestinationTests {
             #expect(!destination.symbol.isEmpty)
         }
     }
+
+    @Test func sectionsPartitionAllDestinationsInDisplayOrder() {
+        let grouped = SidebarSection.allCases.flatMap(\.destinations)
+        #expect(grouped == SidebarDestination.allCases)
+    }
 }

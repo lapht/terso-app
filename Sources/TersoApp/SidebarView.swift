@@ -94,39 +94,52 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     }
 }
 
+enum SidebarSection: String, CaseIterable, Identifiable {
+    case scan
+    case modules
+    case tools
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .scan:
+            "Scan"
+        case .modules:
+            "Modules"
+        case .tools:
+            "Tools"
+        }
+    }
+
+    var destinations: [SidebarDestination] {
+        switch self {
+        case .scan:
+            [.smartScan]
+        case .modules:
+            [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches]
+        case .tools:
+            [.largeFiles, .auditLogs]
+        }
+    }
+}
+
 struct SidebarView: View {
     @Binding var selection: SidebarDestination?
 
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView {
-                VStack(spacing: 4) {
-                    Spacer(minLength: 0)
-                    ForEach(SidebarDestination.allCases) { destination in
-                        Button {
-                            selection = destination
-                        } label: {
-                            Label(destination.title, systemImage: destination.symbol)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 6)
-                        .background(
-                            selection == destination ? Color.accentColor.opacity(0.16) : .clear,
-                            in: RoundedRectangle(cornerRadius: 6)
-                        )
-                        .foregroundStyle(selection == destination ? Color.accentColor : Color.primary)
+        List(selection: $selection) {
+            ForEach(SidebarSection.allCases) { section in
+                Section(section.title) {
+                    ForEach(section.destinations) { destination in
+                        Label(destination.title, systemImage: destination.symbol)
+                            .tag(destination)
                     }
-                    Spacer(minLength: 0)
                 }
-                .padding(.horizontal, 8)
-                .frame(minHeight: geometry.size.height)
             }
-            .accessibilityIdentifier("navigation-sidebar")
         }
-        .frame(minWidth: 190, idealWidth: 220, maxWidth: 280)
+        .listStyle(.sidebar)
+        .accessibilityIdentifier("navigation-sidebar")
         .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
         .navigationTitle("Terso")
     }
