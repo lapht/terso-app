@@ -31,6 +31,8 @@ public enum RuleValidationError: Error, CustomStringConvertible, Equatable, Send
     case invalidAppPattern(ruleID: String, field: String, value: String, reason: String)
     case missingProvenance(ruleID: String)
     case invalidProvenance(ruleID: String, field: String, reason: String)
+    /// A key outside the documented schema; `ruleID` is `nil` for top-level keys.
+    case unknownField(ruleID: String?, field: String)
 
     public var description: String {
         switch self {
@@ -56,6 +58,10 @@ public enum RuleValidationError: Error, CustomStringConvertible, Equatable, Send
             "Rule '\(ruleID)' defines 'appPatterns' and must define 'provenance'"
         case let .invalidProvenance(ruleID, field, reason):
             "Rule '\(ruleID)' has an invalid 'provenance.\(field)': \(reason)"
+        case let .unknownField(ruleID?, field):
+            "Rule '\(ruleID)' has unknown field '\(field)'"
+        case let .unknownField(nil, field):
+            "Rule database has unknown top-level field '\(field)'"
         }
     }
 }

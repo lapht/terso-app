@@ -234,7 +234,15 @@ Implemented by #33 (schema) and #34 (loader/validation); content by #101.
     in a `schemaVersion: 1` database are rejected
     (`schemaV2FieldInV1Database`).
 - **Unknown fields** are reported with a diagnostic naming rule and field and
-  the database is not loaded; they are never silently ignored.
+  the database is not loaded; they are never silently ignored. This applies to
+  both schema versions and to every level: top level, rule, `appPatterns[i]`
+  and `provenance` (`unknownField`).
+- **Engine matching.** `RuleEvaluator.evaluateAppPatterns` re-validates the
+  rule's v2 fields, applies the same allowlist and symlink checks as
+  `evaluate`, and returns candidates whose path equals an app pattern path
+  after `{bundleID}` substitution (exact, case-sensitive comparison). Results
+  follow candidate order, then pattern and path order. It is read-only and
+  does not decide whether an app is removed (§11.4, #36).
 - **Compatibility with v0.1.** A `schemaVersion: 1` database (e.g.
   `Rules/v2026.1.json`) loads with unchanged behavior. A v1 rule copied into a
   v2 database without the new fields keeps its meaning.

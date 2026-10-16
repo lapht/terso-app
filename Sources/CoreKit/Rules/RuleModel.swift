@@ -36,7 +36,16 @@ public struct RuleDatabase: Codable, Equatable, Sendable {
         try RuleValidator.validate(self)
     }
 
+    enum CodingKeys: String, CodingKey, CaseIterable {
+        case version, schemaVersion, rules
+    }
+
     public init(from decoder: Decoder) throws {
+        do {
+            try decoder.rejectUnknownKeys(CodingKeys.self)
+        } catch let error as UnknownFieldError {
+            throw RuleValidationError.unknownField(ruleID: nil, field: error.field(relativeTo: decoder.codingPath))
+        }
         let container = try decoder.container(keyedBy: CodingKeys.self)
         version = try container.decode(String.self, forKey: .version)
         schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
@@ -115,6 +124,37 @@ public struct CleanupRule: Codable, Equatable, Sendable {
         self.appPatterns = appPatterns
         self.provenance = provenance
     }
+
+    enum CodingKeys: String, CodingKey, CaseIterable {
+        case id, module, category, name, description, allowlistRoots, paths, patterns, exclusions
+        case minAgeSeconds, isTrashSafe, appPatterns, provenance
+    }
+
+    /// Decodes a rule and reports unknown keys, including nested ones, with this rule's id.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(String.self, forKey: .id)
+        do {
+            try decoder.rejectUnknownKeys(CodingKeys.self)
+            self.init(
+                id: id,
+                module: try container.decode(String.self, forKey: .module),
+                category: try container.decode(String.self, forKey: .category),
+                name: try container.decode(String.self, forKey: .name),
+                description: try container.decode(String.self, forKey: .description),
+                allowlistRoots: try container.decode([String].self, forKey: .allowlistRoots),
+                paths: try container.decode([String].self, forKey: .paths),
+                patterns: try container.decode([String].self, forKey: .patterns),
+                exclusions: try container.decode([String].self, forKey: .exclusions),
+                minAgeSeconds: try container.decodeIfPresent(Int64.self, forKey: .minAgeSeconds),
+                isTrashSafe: try container.decode(Bool.self, forKey: .isTrashSafe),
+                appPatterns: try container.decodeIfPresent([AppPattern].self, forKey: .appPatterns),
+                provenance: try container.decodeIfPresent(Provenance.self, forKey: .provenance)
+            )
+        } catch let error as UnknownFieldError {
+            throw RuleValidationError.unknownField(ruleID: id, field: error.field(relativeTo: decoder.codingPath))
+        }
+    }
 }
 
 /// Schema v2 set of `~/Library` paths that belong to a single app bundle ID.
@@ -138,7 +178,12 @@ public struct AppPattern: Codable, Equatable, Sendable {
         self.groupIdentifier = groupIdentifier
     }
 
+    enum CodingKeys: String, CodingKey, CaseIterable {
+        case bundleID, paths, shared, groupIdentifier
+    }
+
     public init(from decoder: Decoder) throws {
+        try decoder.rejectUnknownKeys(CodingKeys.self)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         bundleID = try container.decode(String.self, forKey: .bundleID)
         paths = try container.decode([String].self, forKey: .paths)
@@ -166,5 +211,18 @@ public struct Provenance: Codable, Equatable, Sendable {
         self.author = author
         self.date = date
         self.rationale = rationale
+    }
+
+    enum CodingKeys: String, CodingKey, CaseIterable {
+        case source, author, date, rationale
+    }
+
+    public init(from decoder: Decoder) throws {
+        try decoder.rejectUnknownKeys(CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        source = try container.decode(String.self, forKey: .source)
+        author = try container.decode(String.self, forKey: .author)
+        date = try container.decode(String.self, forKey: .date)
+        rationale = try container.decode(String.self, forKey: .rationale)
     }
 }
