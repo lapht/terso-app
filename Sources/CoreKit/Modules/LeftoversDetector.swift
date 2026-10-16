@@ -262,13 +262,18 @@ private struct SharingResolver {
 
     mutating func exclusionReason(for groupIdentifier: String) -> LeftoverExclusion.Reason? {
         // Installed apps whose Rule DB patterns declare the same group.
-        var sharers = Set(rules
-            .flatMap { $0.appPatterns ?? [] }
-            .filter { $0.groupIdentifier == groupIdentifier }
-            .flatMap { pattern in
-                discovery.apps.filter { $0.bundleIdentifier.value == pattern.bundleID }
+        var sharingBundleIDs: Set<String> = []
+        for rule in rules {
+            for pattern in rule.appPatterns ?? [] where pattern.groupIdentifier == groupIdentifier {
+                sharingBundleIDs.insert(pattern.bundleID)
             }
-            .map(Self.label))
+        }
+        var sharers: Set<String> = []
+        for app in discovery.apps {
+            if let bundleID = app.bundleIdentifier.value, sharingBundleIDs.contains(bundleID) {
+                sharers.insert(Self.label(app))
+            }
+        }
         var unverified: Set<String> = []
 
         for (app, membership) in loadMemberships() {
