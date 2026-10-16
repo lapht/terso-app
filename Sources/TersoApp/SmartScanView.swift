@@ -24,13 +24,26 @@ struct SmartScanView: View {
     @StateObject private var viewModel: SmartScanViewModel
     @State private var selectedModuleID: String?
     @State private var cleanupError: String?
+    private let title: String
+    private let systemImage: String
+    private let description: String
     private let onViewAuditLog: () -> Void
 
+    /// Passing `modules` scopes the page to those modules; `nil` scans every available module.
     init(
+        title: String = "Smart Scan",
+        systemImage: String = "sparkles",
+        description: String = "Review cleanup candidates from Terso's available modules in one place.",
+        modules: [any CleanModule]? = nil,
         tccManager: TCCManager = TCCManager(),
         onViewAuditLog: @escaping () -> Void = {}
     ) {
-        _viewModel = StateObject(wrappedValue: SmartScanViewModel(tccManager: tccManager))
+        _viewModel = StateObject(
+            wrappedValue: SmartScanViewModel(tccManager: tccManager, modules: modules)
+        )
+        self.title = title
+        self.systemImage = systemImage
+        self.description = description
         self.onViewAuditLog = onViewAuditLog
     }
 
@@ -73,7 +86,8 @@ struct SmartScanView: View {
                         cleanupError = error.localizedDescription
                     }
                 },
-                onBack: { selectedModuleID = nil }
+                onBack: { selectedModuleID = nil },
+                backTitle: "Back to \(title)"
             )
             .id(summary.id)
         } else {
@@ -97,11 +111,11 @@ struct SmartScanView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Smart Scan", systemImage: "sparkles")
+            Label(title, systemImage: systemImage)
                 .font(.largeTitle.weight(.semibold))
                 .accessibilityIdentifier("smart-scan-title")
 
-            Text("Review cleanup candidates from Terso's available modules in one place.")
+            Text(description)
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -126,7 +140,7 @@ struct SmartScanView: View {
             .buttonStyle(.bordered)
             .accessibilityIdentifier("smart-scan-cancel")
         } else {
-            Button(viewModel.state == .idle ? "Scan" : "Scan Again", systemImage: "sparkles") {
+            Button(viewModel.state == .idle ? "Scan" : "Scan Again", systemImage: systemImage) {
                 selectedModuleID = nil
                 viewModel.startScan()
             }

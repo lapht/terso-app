@@ -17,6 +17,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import AppKit
+import CoreKit
 import Testing
 @testable import TersoApp
 
@@ -47,6 +48,29 @@ struct SidebarDestinationTests {
                 NSImage(systemSymbolName: destination.symbol, accessibilityDescription: nil) != nil,
                 "Missing SF Symbol: \(destination.symbol)"
             )
+        }
+    }
+
+    @MainActor @Test func everyModuleDestinationScansItsOwnModule() {
+        let expectedModuleIDs: [SidebarDestination: String] = [
+            .userCaches: "caches.user",
+            .userLogs: "logs.user",
+            .trashBins: "trash.user",
+            .xcodeJunk: "xcode.junk",
+            .packageCaches: "caches.packages"
+        ]
+        for destination in SidebarSection.modules.destinations {
+            let module = destination.cleanModule
+            #expect(module?.id == expectedModuleIDs[destination])
+            #expect(module?.title == destination.title)
+            #expect(ModuleScanView(destination: destination) != nil)
+        }
+    }
+
+    @MainActor @Test func nonModuleDestinationsHaveNoModuleScanPage() {
+        for destination in [SidebarDestination.smartScan, .largeFiles, .auditLogs] {
+            #expect(destination.cleanModule == nil)
+            #expect(ModuleScanView(destination: destination) == nil)
         }
     }
 

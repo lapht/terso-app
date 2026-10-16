@@ -60,18 +60,14 @@ struct MainShellView: View {
             LargeFilesView(tccManager: tccManager)
         } else if selection == .auditLogs {
             AuditLogView()
-        } else if let selection {
-            VStack(alignment: .leading, spacing: 12) {
-                Label(selection.title, systemImage: selection.symbol)
-                    .font(.largeTitle.weight(.semibold))
-                    .accessibilityIdentifier("detail-title")
-
-                Text(selection.description)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: 640, alignment: .leading)
+        } else if let selection,
+            let moduleScanView = ModuleScanView(
+                destination: selection,
+                tccManager: tccManager,
+                onViewAuditLog: { self.selection = .auditLogs }
+            ) {
+            // Each module page keeps its own scan state instead of reusing the previous module's.
+            moduleScanView.id(selection)
         } else {
             Label("Select a module", systemImage: "sidebar.left")
                 .font(.title2)

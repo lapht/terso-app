@@ -30,6 +30,7 @@ struct ModuleDetailView: View {
     private let allowsSelection: Bool
     private let onMoveToTrash: ([CleanItem]) -> Void
     private let onBack: (() -> Void)?
+    private let backTitle: String
 
     init(
         title: String,
@@ -38,7 +39,8 @@ struct ModuleDetailView: View {
         allowsSelection: Bool = true,
         selectionViewModel: ModuleSelectionViewModel? = nil,
         onMoveToTrash: @escaping ([CleanItem]) -> Void,
-        onBack: (() -> Void)? = nil
+        onBack: (() -> Void)? = nil,
+        backTitle: String = "Back to Smart Scan"
     ) {
         self.title = title
         self.items = items
@@ -46,6 +48,7 @@ struct ModuleDetailView: View {
         self.allowsSelection = allowsSelection
         self.onMoveToTrash = onMoveToTrash
         self.onBack = onBack
+        self.backTitle = backTitle
         _viewModel = StateObject(
             wrappedValue: selectionViewModel ?? ModuleSelectionViewModel(
                 items: items,
@@ -84,7 +87,7 @@ struct ModuleDetailView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let onBack {
-                Button("Back to Smart Scan", systemImage: "chevron.left", action: onBack)
+                Button(backTitle, systemImage: "chevron.left", action: onBack)
                     .buttonStyle(.plain)
             }
 
