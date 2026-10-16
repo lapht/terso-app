@@ -222,7 +222,7 @@
 			);
 			mainGroup = 400000000000000000000001;
 			packageReferences = (
-				1F1D693B3082089C004A2B1E /* XCLocalSwiftPackageReference "../terso-app" */,
+				1F1D693B3082089C004A2B1E /* XCLocalSwiftPackageReference "." */,
 			);
 			productRefGroup = 400000000000000000000003 /* Products */;
 			projectDirPath = "";
@@ -428,9 +428,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		1F1D693B3082089C004A2B1E /* XCLocalSwiftPackageReference "../terso-app" */ = {
+		1F1D693B3082089C004A2B1E /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../terso-app";
+			relativePath = ".";
 		};
 /* End XCLocalSwiftPackageReference section */
 
