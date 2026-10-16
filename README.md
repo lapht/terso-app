@@ -16,6 +16,10 @@
   <img src="https://img.shields.io/badge/privacy--minded-no%20account%20required-success" alt="No account required"/>
 </p>
 
+<p align="center">
+  <img src="docs/assets/screenshot-home.png" width="800" alt="Terso Smart Scan home screen"/>
+</p>
+
 ---
 
 ## Why Terso?
