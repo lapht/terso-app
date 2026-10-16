@@ -7,27 +7,63 @@ on:
         description: Tag to publish (for example, v0.1.0)
         required: true
         type: string
-  push:
-    tags:
-      - "v0.1*"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   release:
     name: Build and publish macOS release
-    runs-on: macos-14
+    runs-on: macos-15
+    if: github.ref == 'refs/heads/main'
+    environment: release
+    permissions:
+      contents: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
 
-      - name: Set up Swift 6.1.2
-        uses: swift-actions/setup-swift@v2
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
         with:
-          swift-version: "6.1.2"
+          xcode-version: '16.4'
+
+      - name: Verify checked-out commit and toolchain
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          xcodebuild -version
+          xcrun swift --version
+
+      - name: Validate version and check for existing tag or release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag_name }}
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Invalid release version: $RELEASE_TAG (expected vMAJOR.MINOR.PATCH)." >&2
+            exit 1
+          fi
+
+          existing_tags=$(git ls-remote --refs origin "refs/tags/$RELEASE_TAG")
+          if [[ -n "$existing_tags" ]]; then
+            echo "Tag already exists: $RELEASE_TAG" >&2
+            exit 1
+          fi
+
+          if response=$(gh api --include --silent \
+            "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" 2>&1); then
+            echo "Release already exists: $RELEASE_TAG" >&2
+            exit 1
+          else
+            gh_status=$?
+            if ! grep -Eq '^HTTP/[^ ]+ 404([[:space:]]|$)' <<<"$response"; then
+              printf '%s\n' "$response" >&2
+              exit "$gh_status"
+            fi
+          fi
 
       - name: Run unit and integration tests
         run: swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
@@ -47,20 +83,16 @@ jobs:
       - name: Build, sign, package, and checksum
         run: ./scripts/build-release.sh
 
-      - name: Create or update GitHub Release
+      - name: Create tag and publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag_name }}
+          RELEASE_TAG: ${{ inputs.tag_name }}
         run: |
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" \
-              dist/Terso-v0.1-macOS.zip \
-              dist/Terso-v0.1-macOS.zip.sha256 \
-              --clobber
-          else
-            gh release create "$RELEASE_TAG" \
-              dist/Terso-v0.1-macOS.zip \
-              dist/Terso-v0.1-macOS.zip.sha256 \
-              --title "Terso $RELEASE_TAG" \
-              --generate-notes
-          fi
+          git tag "$RELEASE_TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/$RELEASE_TAG"
+          gh release create "$RELEASE_TAG" \
+            dist/Terso-v0.1-macOS.zip \
+            dist/Terso-v0.1-macOS.zip.sha256 \
+            --title "Terso $RELEASE_TAG" \
+            --generate-notes \
+            --target "$GITHUB_SHA"
