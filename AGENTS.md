@@ -1,45 +1,45 @@
-# AGENTS.md — Istruzioni per agenti AI che lavorano su Terso
+# AGENTS.md — Instructions for AI agents working on Terso
 
-Leggi questo file per intero prima di toccare qualsiasi file. Il design document
-è `docs/design.md` e prevale su ogni tua interpretazione.
+Read this file in its entirety before touching any file. The design document
+is `docs/design.md` and takes precedence over any interpretation of yours.
 
-## Progetto
-Terso: cleaner macOS open source, GPL-3.0, Swift 6 + SwiftUI, macOS 13+.
-L'app vive nel progetto Xcode; `Package.swift` contiene solo CoreKit e i test.
+## Project
+Terso: open-source macOS cleaner, GPL-3.0, Swift 6 + SwiftUI, macOS 13+.
+The app lives in the Xcode project; `Package.swift` contains only CoreKit and tests.
 
-## Aprire, eseguire e testare
-- Apri `Terso.xcodeproj` in Xcode e seleziona lo schema `TersoApp`.
-- Avvia l'app e le SwiftUI Preview con Xcode. `CoreKit` è fornito dal package
-  locale definito in `Package.swift`.
-- Esegui i test del package dalla root con `swift test`.
-- Esegui i test UI/ViewModel come la CI (senza `ONLY_ACTIVE_ARCH=YES` e `ARCHS` il
-  target di test compila anche x86_64 e fallisce con "Unable to resolve module dependency"):
+## Opening, running, and testing
+- Open `Terso.xcodeproj` in Xcode and select the `TersoApp` scheme.
+- Run the app and SwiftUI Preview in Xcode. `CoreKit` is provided by the
+  local package defined in `Package.swift`.
+- Run package tests from the root with `swift test`.
+- Run UI/ViewModel tests as CI does (without `ONLY_ACTIVE_ARCH=YES` and `ARCHS` the
+  test target compiles for both x86_64 and fails with "Unable to resolve module dependency"):
   `xcodebuild -project Terso.xcodeproj -scheme TersoApp -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO ARCHS=arm64 ONLY_ACTIVE_ARCH=YES test`
-  (su Intel usa `ARCHS=x86_64`).
+  (on Intel use `ARCHS=x86_64`).
 
-## Avvio di una nuova chat o issue
-All'inizio di ogni nuova chat che deve modificare il codice, e prima di iniziare
-l'implementazione di una issue, prepara il repository da `main` aggiornato:
+## Starting a new chat or issue
+At the beginning of any new chat that must modify code, and before starting
+implementation of an issue, prepare the repository from an updated `main`:
 
-1. Controlla branch corrente e `git status`. Se ci sono modifiche non salvate,
-   non cambiare branch né sovrascriverle: fermati e chiedi all'utente come
-   procedere.
-2. Esegui `git fetch origin --prune`, poi `git switch main` e
-   `git pull --ff-only origin main`. Se `main` non esiste, il pull fallisce o
-   l'aggiornamento richiede una risoluzione manuale, fermati e segnala il
-   problema; non usare reset o force-push per aggirarlo.
-3. Esamina `git branch -vv` e rimuovi i branch locali il cui upstream risulta
-   `[gone]`, dopo esserti assicurato che non contengano lavoro locale unico.
-   Usa `git branch -d`; non forzare la cancellazione con `-D`. Se un branch
-   contiene commit non integrati, conservalo e chiedi all'utente prima di
-   eliminarlo.
-4. Crea un nuovo branch dedicato alla chat/issue a partire dal `main`
-   aggiornato, ad esempio con `git switch -c <nome-issue> main`. Scegli un nome
-   non già in uso e non riutilizzare o sovrascrivere un branch esistente.
+1. Check current branch and `git status`. If there are unsaved changes,
+   do not switch branches or overwrite them: stop and ask the user how to
+   proceed.
+2. Run `git fetch origin --prune`, then `git switch main` and
+   `git pull --ff-only origin main`. If `main` does not exist, the pull fails, or
+   the update requires manual resolution, stop and report the problem; do not
+   use reset or force-push to work around it.
+3. Examine `git branch -vv` and remove local branches whose upstream is
+   `[gone]`, after ensuring they contain no unique local work.
+   Use `git branch -d`; do not force-delete with `-D`. If a branch
+   contains unintegrated commits, keep it and ask the user before
+   deleting it.
+4. Create a new branch dedicated to the chat/issue from updated `main`,
+   e.g., with `git switch -c <issue-name> main`. Choose an unused name and do not
+   reuse or overwrite an existing branch.
 
-Non iniziare l'implementazione finché il branch di lavoro non è stato creato
-da `main` aggiornato. Non eliminare o scartare modifiche dell'utente durante
-questa preparazione.
+Do not start implementation until the work branch has been created
+from updated `main`. Do not delete or discard user changes during
+this preparation.
 
 ## Mappa dell'architettura (da docs/design.md §3)
 ```
@@ -67,14 +67,14 @@ terso-app/
 7. **Graceful TCC.** Missing Full Disk Access disables only the modules that need it, with clear onboarding — never silently scans less than displayed.
 8. **No silent failures.** Every deletion is logged (locally) with timestamp, rule id, and size; logs are exportable for bug reports.
 
-## Regole di ingaggio
-- **Divieto assoluto:** nessuna logica né API di cancellazione file fuori da `Sources/CoreKit/Safety/`. La CI blocca le violazioni: non cercare workaround, segnala e basta.
-- Non allargare lo scope di un issue. Se serve altro lavoro, proponi un nuovo issue invece di implementarlo.
-- Ogni modifica a `Safety/` o `Rules/` richiede review umana obbligatoria: segnalalo esplicitamente nella PR description con il flag `[SAFETY]`.
-- Codice conforme a SwiftLint; esegui i test prima di proporre la PR.
-- Commit in formato Conventional Commits (`feat:`, `fix:`, `test:`...).
-- Un issue = una PR. PR piccole e leggibili.
+## Rules of engagement
+- **Absolute ban:** no file deletion logic or APIs outside `Sources/CoreKit/Safety/`. CI blocks violations: do not look for workarounds, just report.
+- Do not expand an issue's scope. If other work is needed, propose a new issue instead of implementing it here.
+- Any change to `Safety/` or `Rules/` requires mandatory human review: flag it explicitly in the PR description with `[SAFETY]`.
+- Code conforms to SwiftLint; run tests before proposing the PR.
+- Commits in Conventional Commits format (`feat:`, `fix:`, `test:`...).
+- One issue = one PR. Small, readable PRs.
 
-## Test obbligatori per modifica
-- Rule engine: validazione schema e pattern con fixture in `Tests/`.
-- Ogni nuovo modulo: fixture tree con contenuto noto + test su risultato esatto di scan e deletion set. Includi un caso symlink-attack quando rilevante.
+## Mandatory tests for any change
+- Rule engine: schema and pattern validation with fixtures in `Tests/`.
+- Any new module: fixture tree with known content + test on exact scan and deletion set results. Include a symlink-attack case when relevant.
