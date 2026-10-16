@@ -88,3 +88,32 @@ struct CleanResultView: View {
         .accessibilityIdentifier("clean-result")
     }
 }
+
+struct CleanResultView_Previews: PreviewProvider {
+    private static let result: CleanResult = {
+        let url = URL(fileURLWithPath: "/Users/preview/Library/Caches/com.example.preview")
+        let item = CleanItem(
+            url: url,
+            resolvedURL: url,
+            sizeBytes: 125_000_000,
+            moduleId: "user-caches",
+            ruleId: "preview.rule"
+        )
+        return CleanResult(
+            itemsTrashed: [item],
+            bytesFreed: item.sizeBytes,
+            errors: [.permissionDenied(path: "/Users/preview/Library/Caches/com.example.locked")],
+            executionDuration: 1.2
+        )
+    }()
+
+    static var previews: some View {
+        CleanResultView(
+            result: result,
+            warnings: ["Preview warning"],
+            onScanAgain: {},
+            onViewAuditLog: {}
+        )
+        .padding()
+    }
+}
