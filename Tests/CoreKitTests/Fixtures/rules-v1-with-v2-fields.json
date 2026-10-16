@@ -1,0 +1,28 @@
+{
+  "version": "2026.1",
+  "schemaVersion": 1,
+  "rules": [
+    {
+      "id": "leftovers.example.editor",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Example Editor leftovers",
+      "description": "v2 fields are not part of schema v1.",
+      "allowlistRoots": [
+        "~/Library/Caches"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.example.Editor",
+          "paths": [
+            "~/Library/Caches/{bundleID}"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -27,13 +27,17 @@ public enum RuleValidationError: Error, CustomStringConvertible, Equatable, Send
     case genericAllowlistRoot(ruleID: String, root: String)
     case duplicateRuleID(String)
     case invalidGlobPattern(ruleID: String, field: String, pattern: String, reason: String)
+    case schemaV2FieldInV1Database(ruleID: String, field: String)
+    case invalidAppPattern(ruleID: String, field: String, value: String, reason: String)
+    case missingProvenance(ruleID: String)
+    case invalidProvenance(ruleID: String, field: String, reason: String)
 
     public var description: String {
         switch self {
         case let .malformedJSON(reason):
             "Invalid rule database JSON: \(reason)"
         case let .unsupportedSchemaVersion(version):
-            "Unsupported rule database schemaVersion \(version); expected 1"
+            "Unsupported rule database schemaVersion \(version); expected 1 or 2"
         case let .emptyAllowlistRoots(ruleID):
             "Rule '\(ruleID)' must define at least one allowlist root"
         case let .emptyAllowlistRoot(ruleID):
@@ -44,11 +48,19 @@ public enum RuleValidationError: Error, CustomStringConvertible, Equatable, Send
             "Duplicate rule id '\(id)'"
         case let .invalidGlobPattern(ruleID, field, pattern, reason):
             "Rule '\(ruleID)' has an invalid glob in '\(field)': '\(pattern)' (\(reason))"
+        case let .schemaV2FieldInV1Database(ruleID, field):
+            "Rule '\(ruleID)' uses schema v2 field '\(field)' in a schemaVersion 1 database"
+        case let .invalidAppPattern(ruleID, field, value, reason):
+            "Rule '\(ruleID)' has an invalid '\(field)' value '\(value)': \(reason)"
+        case let .missingProvenance(ruleID):
+            "Rule '\(ruleID)' defines 'appPatterns' and must define 'provenance'"
+        case let .invalidProvenance(ruleID, field, reason):
+            "Rule '\(ruleID)' has an invalid 'provenance.\(field)': \(reason)"
         }
     }
 }
 
-/// Validates the semantic constraints of schema v1 rule databases.
+/// Validates the semantic constraints of schema v1 and v2 rule databases.
 public enum RuleValidator {
     /// Decodes JSON and reports malformed input or semantic failures as descriptive errors.
     public static func decode(_ data: Data) throws -> RuleDatabase {
@@ -63,7 +75,7 @@ public enum RuleValidator {
 
     /// Validates a database independently of its decoding path.
     public static func validate(_ database: RuleDatabase) throws {
-        guard database.schemaVersion == 1 else {
+        guard database.schemaVersion == 1 || database.schemaVersion == 2 else {
             throw RuleValidationError.unsupportedSchemaVersion(database.schemaVersion)
         }
 
@@ -75,6 +87,11 @@ public enum RuleValidator {
             try validate(allowlistRoots: rule.allowlistRoots, ruleID: rule.id)
             try validate(patterns: rule.patterns, field: "patterns", ruleID: rule.id)
             try validate(patterns: rule.exclusions, field: "exclusions", ruleID: rule.id)
+            if database.schemaVersion == 1 {
+                try rejectSchemaV2Fields(in: rule)
+            } else {
+                try validateSchemaV2Fields(of: rule)
+            }
         }
     }
 
@@ -109,7 +126,7 @@ public enum RuleValidator {
         }
     }
 
-    private static func normalizeAllowlistRoot(_ path: String) -> String {
+    static func normalizeAllowlistRoot(_ path: String) -> String {
         let isHomeRoot = path == "~" || path.hasPrefix("~/")
         guard isHomeRoot || path.hasPrefix("/") else {
             return path

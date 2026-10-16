@@ -1,0 +1,34 @@
+{
+  "version": "2026.2",
+  "schemaVersion": 2,
+  "rules": [
+    {
+      "id": "leftovers.hostile",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Hostile leftovers",
+      "description": "An app pattern that tries to climb out of the allowlist root.",
+      "allowlistRoots": [
+        "~/Library/Caches"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.example.Hostile",
+          "paths": [
+            "~/Library/Caches/{bundleID}/../../../Documents"
+          ]
+        }
+      ],
+      "provenance": {
+        "source": "https://example.com/hostile",
+        "author": "attacker",
+        "date": "2026-10-16",
+        "rationale": "Attempts to reach the Documents root."
+      }
+    }
+  ]
+}

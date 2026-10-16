@@ -1,0 +1,85 @@
+{
+  "version": "2026.2",
+  "schemaVersion": 2,
+  "rules": [
+    {
+      "id": "caches.user.basic",
+      "module": "caches.user",
+      "category": "Caches",
+      "name": "User cache files",
+      "description": "A v1 rule copied into a v2 database without new fields.",
+      "allowlistRoots": [
+        "~/Library/Caches"
+      ],
+      "paths": [],
+      "patterns": [
+        "*.tmp"
+      ],
+      "exclusions": [],
+      "minAgeSeconds": 86400,
+      "isTrashSafe": true
+    },
+    {
+      "id": "leftovers.example.editor",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Example Editor leftovers",
+      "description": "Support files left behind by Example Editor.",
+      "allowlistRoots": [
+        "~/Library/Application Support",
+        "~/Library/Caches",
+        "~/Library/Preferences"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.example.Editor",
+          "paths": [
+            "~/Library/Application Support/Example Editor",
+            "~/Library/Caches/{bundleID}",
+            "~/Library/Preferences/{bundleID}.plist"
+          ]
+        }
+      ],
+      "provenance": {
+        "source": "https://example.com/editor/uninstall",
+        "author": "terso-maintainer",
+        "date": "2026-10-16",
+        "rationale": "Vendor documentation lists these locations as created by the app."
+      }
+    },
+    {
+      "id": "leftovers.example.suite",
+      "module": "leftovers",
+      "category": "Leftovers",
+      "name": "Example Suite shared container",
+      "description": "Group container shared by Example Suite apps.",
+      "allowlistRoots": [
+        "~/Library/Group Containers"
+      ],
+      "paths": [],
+      "patterns": [],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "appPatterns": [
+        {
+          "bundleID": "com.example.suite.Writer",
+          "paths": [
+            "~/Library/Group Containers/ABCDE12345.com.example.suite"
+          ],
+          "shared": true,
+          "groupIdentifier": "ABCDE12345.com.example.suite"
+        }
+      ],
+      "provenance": {
+        "source": "Observed install of Example Suite 3.2",
+        "author": "terso-maintainer",
+        "date": "2026-02-28",
+        "rationale": "The group container is created on first launch and shared by suite apps."
+      }
+    }
+  ]
+}

@@ -218,7 +218,21 @@ Implemented by #33 (schema) and #34 (loader/validation); content by #101.
   allowlist roots, cannot contain `..`, absolute paths outside `~/Library`, or
   globs in the bundle ID, and cannot authorize protected paths. Invalid rules
   are rejected with a diagnostic naming the rule, the field and the reason;
-  there is no success-shaped fallback.
+  there is no success-shaped fallback. Concretely (`RuleValidator+SchemaV2.swift`):
+  - `bundleID` and `groupIdentifier` use only ASCII letters, digits, `-` and
+    `.`, with no empty components; `bundleID` has at least two components.
+  - `paths` start with `~/Library/`, contain no `..` component, no glob
+    characters (`* ? [ ] \`), no control characters, no placeholder other than
+    `{bundleID}`, and no literal `.app` component. After substitution and
+    normalization a path lies strictly inside a §11.4 root (case-sensitive) and
+    inside or equal to one of the rule's `allowlistRoots`.
+  - `groupIdentifier` is required when `shared` is `true` and rejected
+    otherwise.
+  - `provenance.source`, `author` and `rationale` are non-empty; `author` has
+    no whitespace; `date` is a valid calendar date in `YYYY-MM-DD` form.
+  - `appPatterns`, when present, is non-empty; `appPatterns` and `provenance`
+    in a `schemaVersion: 1` database are rejected
+    (`schemaV2FieldInV1Database`).
 - **Unknown fields** are reported with a diagnostic naming rule and field and
   the database is not loaded; they are never silently ignored.
 - **Compatibility with v0.1.** A `schemaVersion: 1` database (e.g.

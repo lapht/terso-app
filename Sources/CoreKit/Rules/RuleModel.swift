@@ -80,6 +80,12 @@ public struct CleanupRule: Codable, Equatable, Sendable {
     /// Whether matching items may be recommended for trashing.
     public let isTrashSafe: Bool
 
+    /// Schema v2 paths associated with installed or removed apps, keyed by bundle ID.
+    public let appPatterns: [AppPattern]?
+
+    /// Schema v2 metadata describing where the rule comes from and why it is correct.
+    public let provenance: Provenance?
+
     public init(
         id: String,
         module: String,
@@ -91,7 +97,9 @@ public struct CleanupRule: Codable, Equatable, Sendable {
         patterns: [String],
         exclusions: [String],
         minAgeSeconds: Int64?,
-        isTrashSafe: Bool
+        isTrashSafe: Bool,
+        appPatterns: [AppPattern]? = nil,
+        provenance: Provenance? = nil
     ) {
         self.id = id
         self.module = module
@@ -104,5 +112,59 @@ public struct CleanupRule: Codable, Equatable, Sendable {
         self.exclusions = exclusions
         self.minAgeSeconds = minAgeSeconds
         self.isTrashSafe = isTrashSafe
+        self.appPatterns = appPatterns
+        self.provenance = provenance
+    }
+}
+
+/// Schema v2 set of `~/Library` paths that belong to a single app bundle ID.
+public struct AppPattern: Codable, Equatable, Sendable {
+    /// Reverse-DNS bundle ID matched exactly and case-sensitively.
+    public let bundleID: String
+
+    /// `~/Library/...` paths; `{bundleID}` is the only placeholder allowed.
+    public let paths: [String]
+
+    /// Whether the location is used by several apps, such as a group container.
+    public let shared: Bool
+
+    /// Team or group identifier used to detect other installed apps sharing a `shared` location.
+    public let groupIdentifier: String?
+
+    public init(bundleID: String, paths: [String], shared: Bool = false, groupIdentifier: String? = nil) {
+        self.bundleID = bundleID
+        self.paths = paths
+        self.shared = shared
+        self.groupIdentifier = groupIdentifier
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        bundleID = try container.decode(String.self, forKey: .bundleID)
+        paths = try container.decode([String].self, forKey: .paths)
+        shared = try container.decodeIfPresent(Bool.self, forKey: .shared) ?? false
+        groupIdentifier = try container.decodeIfPresent(String.self, forKey: .groupIdentifier)
+    }
+}
+
+/// Schema v2 audit metadata explaining the origin of a rule.
+public struct Provenance: Codable, Equatable, Sendable {
+    /// URL or reference, such as vendor documentation, an observed install or an issue.
+    public let source: String
+
+    /// GitHub handle of the person who proposed the rule.
+    public let author: String
+
+    /// ISO 8601 date (`YYYY-MM-DD`) of the last review.
+    public let date: String
+
+    /// Why the paths belong to the app and are safe to propose.
+    public let rationale: String
+
+    public init(source: String, author: String, date: String, rationale: String) {
+        self.source = source
+        self.author = author
+        self.date = date
+        self.rationale = rationale
     }
 }
