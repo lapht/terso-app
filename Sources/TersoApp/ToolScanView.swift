@@ -19,8 +19,8 @@
 import CoreKit
 import SwiftUI
 
-/// Page for a tool that scans only on an explicit user action (Leftovers, Duplicates).
-/// Results are read-only here: moving to Trash arrives with #37 and #40.
+/// Page for a tool that scans only on an explicit user action (Leftovers).
+/// Results are read-only here: moving to Trash arrives with #37.
 @MainActor
 struct ToolScanView: View {
     @ObservedObject private var viewModel: ToolScanViewModel
