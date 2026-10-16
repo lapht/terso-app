@@ -19,17 +19,14 @@
 import CoreKit
 import SwiftUI
 
-/// Large Files never scans on appear: the user starts it, and leaving the screen cancels it.
+/// Large Files never scans on appear: the user starts it. The view model is owned by the shell,
+/// so a running or finished scan survives switching to another page; only Cancel stops it.
 @MainActor
 struct LargeFilesView: View {
-    @StateObject private var viewModel: LargeFilesViewModel
+    @ObservedObject private var viewModel: LargeFilesViewModel
 
-    init(tccManager: TCCManager = TCCManager()) {
-        _viewModel = StateObject(wrappedValue: LargeFilesViewModel(tccManager: tccManager))
-    }
-
-    init(viewModel: @autoclosure @escaping () -> LargeFilesViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel())
+    init(viewModel: LargeFilesViewModel) {
+        self.viewModel = viewModel
     }
 
     var body: some View {
@@ -51,6 +48,5 @@ struct LargeFilesView: View {
                 onMoveToTrash: { _ in }
             )
         }
-        .onDisappear(perform: viewModel.cancelScan)
     }
 }

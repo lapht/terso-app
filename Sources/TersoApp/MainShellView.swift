@@ -24,15 +24,15 @@ struct MainShellView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var selection: SidebarDestination? = .smartScan
     @State private var tccStatus: TCCStatus
-    /// Lives here, not in `SmartScanView`, so the last scan survives switching destinations.
-    @StateObject private var smartScanViewModel: SmartScanViewModel
+    /// Lives here, not in the pages, so each page's last scan survives switching destinations.
+    @StateObject private var scanSessions: ScanSessionStore
 
     private let tccManager: TCCManager
 
     init(tccManager: TCCManager = TCCManager()) {
         self.tccManager = tccManager
         _tccStatus = State(initialValue: tccManager.status)
-        _smartScanViewModel = StateObject(wrappedValue: SmartScanViewModel(tccManager: tccManager))
+        _scanSessions = StateObject(wrappedValue: ScanSessionStore(tccManager: tccManager))
     }
 
     var body: some View {
@@ -56,25 +56,21 @@ struct MainShellView: View {
     @ViewBuilder
     private var destinationView: some View {
         if selection == .smartScan {
-            SmartScanView(viewModel: smartScanViewModel) {
+            SmartScanView(viewModel: scanSessions.smartScan) {
                 selection = .auditLogs
             }
         } else if selection == .largeFiles {
-            LargeFilesView(tccManager: tccManager)
+            LargeFilesView(viewModel: scanSessions.largeFiles)
         } else if selection == .auditLogs {
             AuditLogView()
-        } else if let selection {
-            VStack(alignment: .leading, spacing: 12) {
-                Label(selection.title, systemImage: selection.symbol)
-                    .font(.largeTitle.weight(.semibold))
-                    .accessibilityIdentifier("detail-title")
-
-                Text(selection.description)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: 640, alignment: .leading)
+        } else if let selection,
+            let moduleScanView = ModuleScanView(
+                destination: selection,
+                scanSessions: scanSessions,
+                onViewAuditLog: { self.selection = .auditLogs }
+            ) {
+            // Each module page keeps its own scan state instead of reusing the previous module's.
+            moduleScanView.id(selection)
         } else {
             Label("Select a module", systemImage: "sidebar.left")
                 .font(.title2)
