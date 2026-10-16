@@ -21,16 +21,17 @@ import SwiftUI
 
 @MainActor
 struct SmartScanView: View {
-    @StateObject private var viewModel: SmartScanViewModel
+    /// Owned by the shell so scan results survive switching sidebar destinations.
+    @ObservedObject private var viewModel: SmartScanViewModel
     @State private var selectedModuleID: String?
     @State private var cleanupError: String?
     private let onViewAuditLog: () -> Void
 
     init(
-        tccManager: TCCManager = TCCManager(),
+        viewModel: SmartScanViewModel,
         onViewAuditLog: @escaping () -> Void = {}
     ) {
-        _viewModel = StateObject(wrappedValue: SmartScanViewModel(tccManager: tccManager))
+        self.viewModel = viewModel
         self.onViewAuditLog = onViewAuditLog
     }
 
@@ -275,7 +276,9 @@ private struct SmartScanPreviewTCCAccessChecker: TCCAccessChecking {
 struct SmartScanView_Previews: PreviewProvider {
     static var previews: some View {
         SmartScanView(
-            tccManager: TCCManager(accessChecker: SmartScanPreviewTCCAccessChecker(status: .granted))
+            viewModel: SmartScanViewModel(
+                tccManager: TCCManager(accessChecker: SmartScanPreviewTCCAccessChecker(status: .granted))
+            )
         )
         .frame(width: 760, height: 560)
     }

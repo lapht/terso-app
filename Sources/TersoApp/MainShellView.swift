@@ -24,12 +24,15 @@ struct MainShellView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var selection: SidebarDestination? = .smartScan
     @State private var tccStatus: TCCStatus
+    /// Lives here, not in `SmartScanView`, so the last scan survives switching destinations.
+    @StateObject private var smartScanViewModel: SmartScanViewModel
 
     private let tccManager: TCCManager
 
     init(tccManager: TCCManager = TCCManager()) {
         self.tccManager = tccManager
         _tccStatus = State(initialValue: tccManager.status)
+        _smartScanViewModel = StateObject(wrappedValue: SmartScanViewModel(tccManager: tccManager))
     }
 
     var body: some View {
@@ -53,7 +56,7 @@ struct MainShellView: View {
     @ViewBuilder
     private var destinationView: some View {
         if selection == .smartScan {
-            SmartScanView(tccManager: tccManager) {
+            SmartScanView(viewModel: smartScanViewModel) {
                 selection = .auditLogs
             }
         } else if selection == .largeFiles {
