@@ -35,24 +35,7 @@ struct SmartScanView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView {
-                VStack(spacing: 0) {
-                    Spacer(minLength: 0)
-                    VStack(alignment: .leading, spacing: 24) {
-                        header
-                        scanControls
-                        scanContent
-                    }
-                    .frame(maxWidth: 720, alignment: .leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    Spacer(minLength: 0)
-                }
-                .padding(.vertical, 8)
-                .frame(minHeight: geometry.size.height)
-            }
-        }
-        .alert(
+        page.alert(
             "Unable to Move Items to Trash",
             isPresented: Binding(
                 get: { cleanupError != nil },
@@ -71,6 +54,45 @@ struct SmartScanView: View {
                 Text(cleanupError)
             }
         }
+    }
+
+    /// A selected module replaces the overview, so its item list is the page's only scroll.
+    @ViewBuilder
+    private var page: some View {
+        if let summary = selectedModuleSummary {
+            ModuleDetailView(
+                title: summary.title,
+                items: viewModel.items(for: summary.id),
+                homeDirectory: viewModel.homeDirectory,
+                selectionViewModel: viewModel.selectionViewModel(for: summary.id),
+                onMoveToTrash: { items in
+                    do {
+                        try viewModel.moveToTrash(items: items)
+                        selectedModuleID = nil
+                    } catch {
+                        cleanupError = error.localizedDescription
+                    }
+                },
+                onBack: { selectedModuleID = nil }
+            )
+            .id(summary.id)
+        } else {
+            PageScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    header
+                    scanControls
+                    scanContent
+                }
+                .frame(maxWidth: 720, alignment: .leading)
+            }
+        }
+    }
+
+    private var selectedModuleSummary: SmartScanModuleSummary? {
+        guard viewModel.cleanupResult == nil, viewModel.state == .finished else {
+            return nil
+        }
+        return viewModel.moduleSummaries.first { $0.id == selectedModuleID }
     }
 
     private var header: some View {
@@ -182,49 +204,28 @@ struct SmartScanView: View {
     }
 
     private var finishedResults: some View {
-        Group {
-            if let summary = viewModel.moduleSummaries.first(where: { $0.id == selectedModuleID }) {
-                ModuleDetailView(
-                    title: summary.title,
-                    items: viewModel.items(for: summary.id),
-                    homeDirectory: viewModel.homeDirectory,
-                    selectionViewModel: viewModel.selectionViewModel(for: summary.id),
-                    onMoveToTrash: { items in
-                        do {
-                            try viewModel.moveToTrash(items: items)
-                            selectedModuleID = nil
-                        } catch {
-                            cleanupError = error.localizedDescription
-                        }
-                    },
-                    onBack: { selectedModuleID = nil }
-                )
-                .id(summary.id)
-            } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Potentially reclaimable")
-                            .font(.headline)
-                        Text(SizeCalculator.formattedByteCount(viewModel.reclaimableBytes))
-                            .font(.title2.weight(.semibold))
-                            .accessibilityIdentifier("smart-scan-reclaimable-size")
-                        Text("\(viewModel.result?.items.filter(\.isDeletable).count ?? 0) items found")
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                    }
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Potentially reclaimable")
+                    .font(.headline)
+                Text(SizeCalculator.formattedByteCount(viewModel.reclaimableBytes))
+                    .font(.title2.weight(.semibold))
+                    .accessibilityIdentifier("smart-scan-reclaimable-size")
+                Text("\(viewModel.result?.items.filter(\.isDeletable).count ?? 0) items found")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
 
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
-                        ForEach(viewModel.moduleSummaries) { summary in
-                            Button {
-                                selectedModuleID = summary.id
-                            } label: {
-                                moduleCard(summary)
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(summary.status != .completed)
-                            .accessibilityIdentifier("module-card-\(summary.id)")
-                        }
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
+                ForEach(viewModel.moduleSummaries) { summary in
+                    Button {
+                        selectedModuleID = summary.id
+                    } label: {
+                        moduleCard(summary)
                     }
+                    .buttonStyle(.plain)
+                    .disabled(summary.status != .completed)
+                    .accessibilityIdentifier("module-card-\(summary.id)")
                 }
             }
         }
