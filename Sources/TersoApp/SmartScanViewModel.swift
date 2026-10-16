@@ -56,7 +56,11 @@ final class SmartScanViewModel: ObservableObject {
     private let aggregator: SmartScanAggregator
     private let deletionPipeline: DeletionPipeline
     private let modules: [any CleanModule]
-    private let context: ScanContext
+    private let tccManager: TCCManager
+    /// Rebuilt before every scan unless injected, so a long-lived view model
+    /// picks up Full Disk Access and volume changes made since the last scan.
+    private var context: ScanContext
+    private let refreshesContextBeforeScan: Bool
     private var scanTask: Task<Void, Never>?
     private var selectionViewModels: [String: ModuleSelectionViewModel] = [:]
 
@@ -137,8 +141,10 @@ final class SmartScanViewModel: ObservableObject {
     ) {
         self.aggregator = aggregator ?? SmartScanAggregator(tccManager: tccManager)
         self.modules = modules ?? Self.defaultModules
+        self.tccManager = tccManager
         let resolvedContext = context ?? Self.makeScanContext(tccManager: tccManager)
         self.context = resolvedContext
+        refreshesContextBeforeScan = context == nil
         deletionPipeline = DeletionPipeline(homeDirectory: resolvedContext.homeDirectory)
     }
 
@@ -155,6 +161,9 @@ final class SmartScanViewModel: ObservableObject {
         selectionViewModels.removeAll()
         state = .scanning
 
+        if refreshesContextBeforeScan {
+            context = Self.makeScanContext(tccManager: tccManager)
+        }
         let aggregator = self.aggregator
         let modules = self.modules
         let context = self.context

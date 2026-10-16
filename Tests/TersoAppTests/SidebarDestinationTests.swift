@@ -52,6 +52,7 @@ struct SidebarDestinationTests {
     }
 
     @MainActor @Test func everyModuleDestinationScansItsOwnModule() {
+        let scanSessions = ScanSessionStore()
         let expectedModuleIDs: [SidebarDestination: String] = [
             .userCaches: "caches.user",
             .userLogs: "logs.user",
@@ -63,14 +64,15 @@ struct SidebarDestinationTests {
             let module = destination.cleanModule
             #expect(module?.id == expectedModuleIDs[destination])
             #expect(module?.title == destination.title)
-            #expect(ModuleScanView(destination: destination) != nil)
+            #expect(ModuleScanView(destination: destination, scanSessions: scanSessions) != nil)
         }
     }
 
     @MainActor @Test func nonModuleDestinationsHaveNoModuleScanPage() {
+        let scanSessions = ScanSessionStore()
         for destination in [SidebarDestination.smartScan, .largeFiles, .auditLogs] {
             #expect(destination.cleanModule == nil)
-            #expect(ModuleScanView(destination: destination) == nil)
+            #expect(ModuleScanView(destination: destination, scanSessions: scanSessions) == nil)
         }
     }
 

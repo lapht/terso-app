@@ -24,12 +24,15 @@ struct MainShellView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var selection: SidebarDestination? = .smartScan
     @State private var tccStatus: TCCStatus
+    /// Lives here, not in the pages, so each page's last scan survives switching destinations.
+    @StateObject private var scanSessions: ScanSessionStore
 
     private let tccManager: TCCManager
 
     init(tccManager: TCCManager = TCCManager()) {
         self.tccManager = tccManager
         _tccStatus = State(initialValue: tccManager.status)
+        _scanSessions = StateObject(wrappedValue: ScanSessionStore(tccManager: tccManager))
     }
 
     var body: some View {
@@ -53,17 +56,17 @@ struct MainShellView: View {
     @ViewBuilder
     private var destinationView: some View {
         if selection == .smartScan {
-            SmartScanView(tccManager: tccManager) {
+            SmartScanView(viewModel: scanSessions.smartScan) {
                 selection = .auditLogs
             }
         } else if selection == .largeFiles {
-            LargeFilesView(tccManager: tccManager)
+            LargeFilesView(viewModel: scanSessions.largeFiles)
         } else if selection == .auditLogs {
             AuditLogView()
         } else if let selection,
             let moduleScanView = ModuleScanView(
                 destination: selection,
-                tccManager: tccManager,
+                scanSessions: scanSessions,
                 onViewAuditLog: { self.selection = .auditLogs }
             ) {
             // Each module page keeps its own scan state instead of reusing the previous module's.

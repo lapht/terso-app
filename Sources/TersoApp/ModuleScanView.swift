@@ -44,21 +44,20 @@ extension SidebarDestination {
 @MainActor
 struct ModuleScanView: View {
     private let destination: SidebarDestination
-    private let module: any CleanModule
-    private let tccManager: TCCManager
+    private let viewModel: SmartScanViewModel
     private let onViewAuditLog: () -> Void
 
+    /// The view model comes from `scanSessions`, so the module's last scan survives navigation.
     init?(
         destination: SidebarDestination,
-        tccManager: TCCManager = TCCManager(),
+        scanSessions: ScanSessionStore,
         onViewAuditLog: @escaping () -> Void = {}
     ) {
-        guard let module = destination.cleanModule else {
+        guard let viewModel = scanSessions.moduleScan(for: destination) else {
             return nil
         }
         self.destination = destination
-        self.module = module
-        self.tccManager = tccManager
+        self.viewModel = viewModel
         self.onViewAuditLog = onViewAuditLog
     }
 
@@ -67,8 +66,7 @@ struct ModuleScanView: View {
             title: destination.title,
             systemImage: destination.symbol,
             description: destination.description,
-            modules: [module],
-            tccManager: tccManager,
+            viewModel: viewModel,
             onViewAuditLog: onViewAuditLog
         )
     }
@@ -86,7 +84,9 @@ struct ModuleScanView_Previews: PreviewProvider {
     static var previews: some View {
         ModuleScanView(
             destination: .userCaches,
-            tccManager: TCCManager(accessChecker: ModuleScanPreviewTCCAccessChecker(status: .granted))
+            scanSessions: ScanSessionStore(
+                tccManager: TCCManager(accessChecker: ModuleScanPreviewTCCAccessChecker(status: .granted))
+            )
         )
         .frame(width: 760, height: 560)
     }

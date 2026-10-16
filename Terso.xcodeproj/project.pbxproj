@@ -16,6 +16,7 @@
 		1000000000000000000000F9 /* ScanStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000018 /* ScanStateView.swift */; };
 		1000000000000000000000FB /* PageContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001A /* PageContainer.swift */; };
 		1000000000000000000000FC /* ModuleScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001B /* ModuleScanView.swift */; };
+		1000000000000000000000FD /* ScanSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001C /* ScanSessionStore.swift */; };
 		1000000000000000000000F8 /* LargeFilesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000017 /* LargeFilesViewModel.swift */; };
 		100000000000000000000007 /* MainShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000007 /* MainShellView.swift */; };
 		100000000000000000000008 /* ModuleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000008 /* ModuleDetailView.swift */; };
@@ -32,6 +33,7 @@
 		1000000000000000000000F5 /* ModuleSelectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000013 /* ModuleSelectionViewModelTests.swift */; };
 		1000000000000000000000F6 /* SidebarDestinationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000014 /* SidebarDestinationTests.swift */; };
 		1000000000000000000000F7 /* SmartScanViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000015 /* SmartScanViewModelTests.swift */; };
+		1000000000000000000000FE /* ScanSessionStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001D /* ScanSessionStoreTests.swift */; };
 		1000000000000000000000FA /* LargeFilesViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000019 /* LargeFilesViewModelTests.swift */; };
 		1F1D693D3082089C004A2B1E /* CoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1F1D693C3082089C004A2B1E /* CoreKit */; };
 /* End PBXBuildFile section */
@@ -56,6 +58,7 @@
 		200000000000000000000018 /* ScanStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanStateView.swift; sourceTree = "<group>"; };
 		20000000000000000000001A /* PageContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageContainer.swift; sourceTree = "<group>"; };
 		20000000000000000000001B /* ModuleScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleScanView.swift; sourceTree = "<group>"; };
+		20000000000000000000001C /* ScanSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSessionStore.swift; sourceTree = "<group>"; };
 		200000000000000000000017 /* LargeFilesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeFilesViewModel.swift; sourceTree = "<group>"; };
 		200000000000000000000007 /* MainShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShellView.swift; sourceTree = "<group>"; };
 		200000000000000000000008 /* ModuleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleDetailView.swift; sourceTree = "<group>"; };
@@ -71,6 +74,7 @@
 		200000000000000000000013 /* ModuleSelectionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleSelectionViewModelTests.swift; sourceTree = "<group>"; };
 		200000000000000000000014 /* SidebarDestinationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarDestinationTests.swift; sourceTree = "<group>"; };
 		200000000000000000000015 /* SmartScanViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanViewModelTests.swift; sourceTree = "<group>"; };
+		20000000000000000000001D /* ScanSessionStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSessionStoreTests.swift; sourceTree = "<group>"; };
 		200000000000000000000019 /* LargeFilesViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeFilesViewModelTests.swift; sourceTree = "<group>"; };
 		200000000000000000000016 /* TersoAppUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TersoAppUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2000000000000000000000F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -134,6 +138,7 @@
 				200000000000000000000018 /* ScanStateView.swift */,
 				20000000000000000000001A /* PageContainer.swift */,
 				20000000000000000000001B /* ModuleScanView.swift */,
+				20000000000000000000001C /* ScanSessionStore.swift */,
 				200000000000000000000017 /* LargeFilesViewModel.swift */,
 				200000000000000000000007 /* MainShellView.swift */,
 				200000000000000000000008 /* ModuleDetailView.swift */,
@@ -157,6 +162,7 @@
 				200000000000000000000013 /* ModuleSelectionViewModelTests.swift */,
 				200000000000000000000014 /* SidebarDestinationTests.swift */,
 				200000000000000000000015 /* SmartScanViewModelTests.swift */,
+				20000000000000000000001D /* ScanSessionStoreTests.swift */,
 				200000000000000000000019 /* LargeFilesViewModelTests.swift */,
 			);
 			path = Tests/TersoAppTests;
@@ -265,6 +271,7 @@
 				1000000000000000000000F9 /* ScanStateView.swift in Sources */,
 				1000000000000000000000FB /* PageContainer.swift in Sources */,
 				1000000000000000000000FC /* ModuleScanView.swift in Sources */,
+				1000000000000000000000FD /* ScanSessionStore.swift in Sources */,
 				1000000000000000000000F8 /* LargeFilesViewModel.swift in Sources */,
 				100000000000000000000007 /* MainShellView.swift in Sources */,
 				100000000000000000000008 /* ModuleDetailView.swift in Sources */,
@@ -287,6 +294,7 @@
 				1000000000000000000000F5 /* ModuleSelectionViewModelTests.swift in Sources */,
 				1000000000000000000000F6 /* SidebarDestinationTests.swift in Sources */,
 				1000000000000000000000F7 /* SmartScanViewModelTests.swift in Sources */,
+				1000000000000000000000FE /* ScanSessionStoreTests.swift in Sources */,
 				1000000000000000000000FA /* LargeFilesViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

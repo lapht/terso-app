@@ -21,7 +21,8 @@ import SwiftUI
 
 @MainActor
 struct SmartScanView: View {
-    @StateObject private var viewModel: SmartScanViewModel
+    /// Owned by the shell so scan results survive switching sidebar destinations.
+    @ObservedObject private var viewModel: SmartScanViewModel
     @State private var selectedModuleID: String?
     @State private var cleanupError: String?
     private let title: String
@@ -29,18 +30,15 @@ struct SmartScanView: View {
     private let description: String
     private let onViewAuditLog: () -> Void
 
-    /// Passing `modules` scopes the page to those modules; `nil` scans every available module.
+    /// A view model created with specific `modules` scopes the page to those modules.
     init(
         title: String = "Smart Scan",
         systemImage: String = "sparkles",
         description: String = "Review cleanup candidates from Terso's available modules in one place.",
-        modules: [any CleanModule]? = nil,
-        tccManager: TCCManager = TCCManager(),
+        viewModel: SmartScanViewModel,
         onViewAuditLog: @escaping () -> Void = {}
     ) {
-        _viewModel = StateObject(
-            wrappedValue: SmartScanViewModel(tccManager: tccManager, modules: modules)
-        )
+        self.viewModel = viewModel
         self.title = title
         self.systemImage = systemImage
         self.description = description
@@ -289,7 +287,9 @@ private struct SmartScanPreviewTCCAccessChecker: TCCAccessChecking {
 struct SmartScanView_Previews: PreviewProvider {
     static var previews: some View {
         SmartScanView(
-            tccManager: TCCManager(accessChecker: SmartScanPreviewTCCAccessChecker(status: .granted))
+            viewModel: SmartScanViewModel(
+                tccManager: TCCManager(accessChecker: SmartScanPreviewTCCAccessChecker(status: .granted))
+            )
         )
         .frame(width: 760, height: 560)
     }
