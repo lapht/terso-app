@@ -262,3 +262,20 @@ struct SmartScanView: View {
         .background(.quaternary, in: RoundedRectangle(cornerRadius: 12))
     }
 }
+
+private struct SmartScanPreviewTCCAccessChecker: TCCAccessChecking {
+    let status: TCCStatus
+
+    func fullDiskAccessStatus() -> TCCStatus {
+        status
+    }
+}
+
+struct SmartScanView_Previews: PreviewProvider {
+    static var previews: some View {
+        SmartScanView(
+            tccManager: TCCManager(accessChecker: SmartScanPreviewTCCAccessChecker(status: .granted))
+        )
+        .frame(width: 760, height: 560)
+    }
+}

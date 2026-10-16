@@ -165,3 +165,10 @@ final class AuditLogViewModel: ObservableObject {
         errorMessage = nil
     }
 }
+
+struct AuditLogView_Previews: PreviewProvider {
+    static var previews: some View {
+        AuditLogView()
+            .frame(width: 720, height: 480)
+    }
+}

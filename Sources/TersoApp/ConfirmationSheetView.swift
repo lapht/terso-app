@@ -109,3 +109,14 @@ struct ConfirmationSheetView: View {
         String(format: "%.2f GB", Double(totalBytes) / 1_000_000_000)
     }
 }
+
+struct ConfirmationSheetView_Previews: PreviewProvider {
+    static var previews: some View {
+        ConfirmationSheetView(
+            itemCount: 12,
+            totalBytes: 1_250_000_000,
+            onCancel: {},
+            onConfirm: {}
+        )
+    }
+}
