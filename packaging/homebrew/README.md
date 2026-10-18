@@ -20,9 +20,10 @@ brew install --cask lapht/tap/terso
   `x86_64`.
 - `lapht/homebrew-tap` is published with this cask; `brew tap lapht/tap`
   succeeds.
-- Not yet done: `brew audit --strict --online --cask lapht/tap/terso`
-  (needs up-to-date Command Line Tools) and install/upgrade/uninstall on
-  clean Apple Silicon and Intel machines.
+- `brew audit --strict --online --cask lapht/tap/terso` passes with no
+  offenses (re-downloads the release and checks the checksum).
+- Not yet done: install/upgrade/uninstall on clean Apple Silicon and Intel
+  machines, to be run by the maintainer.
 
 The cask installs only `Terso.app`: no hidden components, no `postflight`,
 no `livecheck`-driven or in-app update checks. The build is ad-hoc signed and
