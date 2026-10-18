@@ -26,6 +26,7 @@ final class ScanSessionStore: ObservableObject {
     let smartScan: SmartScanViewModel
     let largeFiles: LargeFilesViewModel
     let leftovers: ToolScanViewModel
+    let leftoversReview: LeftoversViewModel
     let duplicates: DuplicatesViewModel
 
     private let tccManager: TCCManager
@@ -35,7 +36,8 @@ final class ScanSessionStore: ObservableObject {
         self.tccManager = tccManager
         self.smartScan = smartScan ?? SmartScanViewModel(tccManager: tccManager)
         largeFiles = LargeFilesViewModel(tccManager: tccManager)
-        leftovers = ToolScanViewModel(tool: .leftovers, tccManager: tccManager)
+        leftovers = ToolScanViewModel(tool: .leftovers, scanner: LeftoversToolScanner(), tccManager: tccManager)
+        leftoversReview = LeftoversViewModel()
         duplicates = DuplicatesViewModel()
     }
 

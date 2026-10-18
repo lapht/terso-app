@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1000000000000000000000E5 /* LeftoversToolScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000E6 /* LeftoversToolScannerTests.swift */; };
+		1000000000000000000000E1 /* v2026.2.json in Resources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000E2 /* v2026.2.json */; };
+		1000000000000000000000E3 /* LeftoversToolScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000E4 /* LeftoversToolScanner.swift */; };
+		100000000000000000000D3B /* LeftoversViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000D3F /* LeftoversViewModelTests.swift */; };
+		100000000000000000000D2B /* LeftoversReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000D2F /* LeftoversReviewView.swift */; };
+		100000000000000000000D1B /* LeftoversViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000D1F /* LeftoversViewModel.swift */; };
 		100000000000000000000001 /* AuditLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000001 /* AuditLogView.swift */; };
 		100000000000000000000002 /* CleanResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000002 /* CleanResultView.swift */; };
 		100000000000000000000003 /* ConfirmationSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000003 /* ConfirmationSheetView.swift */; };
@@ -62,6 +68,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2000000000000000000000E6 /* LeftoversToolScannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversToolScannerTests.swift; sourceTree = "<group>"; };
+		2000000000000000000000E2 /* v2026.2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = v2026.2.json; path = Rules/v2026.2.json; sourceTree = SOURCE_ROOT; };
+		2000000000000000000000E4 /* LeftoversToolScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversToolScanner.swift; sourceTree = "<group>"; };
+		200000000000000000000D3F /* LeftoversViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversViewModelTests.swift; sourceTree = "<group>"; };
+		200000000000000000000D2F /* LeftoversReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversReviewView.swift; sourceTree = "<group>"; };
+		200000000000000000000D1F /* LeftoversViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversViewModel.swift; sourceTree = "<group>"; };
 		200000000000000000000001 /* AuditLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogView.swift; sourceTree = "<group>"; };
 		200000000000000000000002 /* CleanResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanResultView.swift; sourceTree = "<group>"; };
 		200000000000000000000003 /* ConfirmationSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationSheetView.swift; sourceTree = "<group>"; };
@@ -132,6 +144,7 @@
 				400000000000000000000002 /* Sources */,
 				400000000000000000000003 /* Products */,
 				400000000000000000000005 /* Tests/TersoAppTests */,
+				2000000000000000000000E2 /* v2026.2.json */,
 			);
 			sourceTree = "<group>";
 		};
@@ -170,6 +183,9 @@
 				2000000000000000000000D2 /* DuplicatesView.swift */,
 				2000000000000000000000D1 /* DuplicatesViewModel.swift */,
 				2000000000000000000000C1 /* ToolScanViewModel.swift */,
+				2000000000000000000000E4 /* LeftoversToolScanner.swift */,
+				200000000000000000000D2F /* LeftoversReviewView.swift */,
+				200000000000000000000D1F /* LeftoversViewModel.swift */,
 				200000000000000000000007 /* MainShellView.swift */,
 				200000000000000000000008 /* ModuleDetailView.swift */,
 				200000000000000000000009 /* ModuleSelectionViewModel.swift */,
@@ -202,6 +218,8 @@
 				2000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift */,
 				200000000000000000000019 /* LargeFilesViewModelTests.swift */,
 				2000000000000000000000C3 /* ToolScanViewModelTests.swift */,
+				2000000000000000000000E6 /* LeftoversToolScannerTests.swift */,
+				200000000000000000000D3F /* LeftoversViewModelTests.swift */,
 				2000000000000000000000D3 /* DuplicatesViewModelTests.swift */,
 			);
 			path = Tests/TersoAppTests;
@@ -293,6 +311,7 @@
 			files = (
 				1000000000000000000000F0 /* Assets.xcassets in Resources */,
 				1000000000000000000000D8 /* Localizable.xcstrings in Resources */,
+				1000000000000000000000E1 /* v2026.2.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,6 +337,9 @@
 				1000000000000000000000D2 /* DuplicatesView.swift in Sources */,
 				1000000000000000000000D1 /* DuplicatesViewModel.swift in Sources */,
 				1000000000000000000000B1 /* ToolScanViewModel.swift in Sources */,
+				1000000000000000000000E3 /* LeftoversToolScanner.swift in Sources */,
+				100000000000000000000D2B /* LeftoversReviewView.swift in Sources */,
+				100000000000000000000D1B /* LeftoversViewModel.swift in Sources */,
 				100000000000000000000007 /* MainShellView.swift in Sources */,
 				100000000000000000000008 /* ModuleDetailView.swift in Sources */,
 				100000000000000000000009 /* ModuleSelectionViewModel.swift in Sources */,
@@ -348,6 +370,8 @@
 				1000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift in Sources */,
 				1000000000000000000000FA /* LargeFilesViewModelTests.swift in Sources */,
 				1000000000000000000000B3 /* ToolScanViewModelTests.swift in Sources */,
+				1000000000000000000000E5 /* LeftoversToolScannerTests.swift in Sources */,
+				100000000000000000000D3B /* LeftoversViewModelTests.swift in Sources */,
 				1000000000000000000000D3 /* DuplicatesViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

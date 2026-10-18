@@ -321,6 +321,40 @@
         }
       }
     },
+    "Dry Run" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dry Run"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulazione"
+          }
+        }
+      }
+    },
+    "Dry run: %lld items, %@ would move to Trash. Nothing was changed." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dry run: %lld items, %@ would move to Trash. Nothing was changed."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulazione: %lld elementi, %@ verrebbero spostati nel Cestino. Non è stato modificato nulla."
+          }
+        }
+      }
+    },
     "Duplicates" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -576,6 +610,23 @@
         }
       }
     },
+    "Installed apps could not be listed completely, so no leftovers are reported." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed apps could not be listed completely, so no leftovers are reported."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è stato possibile elencare tutte le app installate, quindi non viene segnalato alcun residuo."
+          }
+        }
+      }
+    },
     "Items are moved to the Trash, so you can put them back until you empty it." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -674,6 +725,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sposta nel Cestino"
+          }
+        }
+      }
+    },
+    "Moved %lld items (%@) to Trash." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moved %lld items (%@) to Trash."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spostati %lld elementi (%@) nel Cestino."
           }
         }
       }
@@ -1290,6 +1358,23 @@
         }
       }
     },
+    "Some items were refused and left untouched. See the audit log." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some items were refused and left untouched. See the audit log."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni elementi sono stati rifiutati e lasciati intatti. Vedi il registro di controllo."
+          }
+        }
+      }
+    },
     "Some modules need this permission to scan completely. You can enable it in System Settings." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1422,6 +1507,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nel report esportato la cartella Home è sostituita da ~. Il registro locale non viene modificato."
+          }
+        }
+      }
+    },
+    "The rule database could not be loaded: %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The rule database could not be loaded: %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare il database delle regole: %@"
           }
         }
       }

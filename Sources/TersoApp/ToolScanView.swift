@@ -20,15 +20,18 @@ import CoreKit
 import SwiftUI
 
 /// Page for a tool that scans only on an explicit user action (Leftovers).
-/// Results are read-only here: moving to Trash arrives with #37.
+/// With a `review` model the results can be selected and moved to Trash through the Safety
+/// pipeline (#37); without one they stay read-only.
 @MainActor
 struct ToolScanView: View {
     @ObservedObject private var viewModel: ToolScanViewModel
     private let destination: SidebarDestination
+    private let review: LeftoversViewModel?
 
-    init(destination: SidebarDestination, viewModel: ToolScanViewModel) {
+    init(destination: SidebarDestination, viewModel: ToolScanViewModel, review: LeftoversViewModel? = nil) {
         self.destination = destination
         self.viewModel = viewModel
+        self.review = review
     }
 
     var body: some View {
@@ -49,14 +52,27 @@ struct ToolScanView: View {
                 if viewModel.isPartial {
                     partialNotice
                 }
-                ModuleDetailView(
-                    title: destination.title,
-                    systemImage: destination.symbol,
-                    items: viewModel.items,
-                    homeDirectory: viewModel.homeDirectory,
-                    allowsSelection: false,
-                    onMoveToTrash: { _ in }
-                )
+                if let review {
+                    LeftoversReviewView(
+                        title: destination.title,
+                        systemImage: destination.symbol,
+                        viewModel: review
+                    )
+                } else {
+                    ModuleDetailView(
+                        title: destination.title,
+                        systemImage: destination.symbol,
+                        items: viewModel.items,
+                        homeDirectory: viewModel.homeDirectory,
+                        allowsSelection: false,
+                        onMoveToTrash: { _ in }
+                    )
+                }
+            }
+        }
+        .onChange(of: viewModel.phase) { phase in
+            if phase == .finished {
+                review?.load(items: viewModel.items, reasons: viewModel.reasons)
             }
         }
     }
