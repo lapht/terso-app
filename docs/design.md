@@ -329,3 +329,30 @@ Implemented by #33 (schema) and #34 (loader/validation); content by #101.
   tap (#104, #45), and auditability.
 - The outcome is recorded in this section by #46. Issue #32 only documents the
   decision process; it does not implement Sparkle or any update check.
+
+## Spike #104 — Homebrew cask viability (ad-hoc signed)
+
+**Date:** 2026-10-18
+**Outcome:** viable via third-party tap, with documented Gatekeeper step
+
+### Context
+Homebrew 4.7 removed `--no-quarantine`. Since September 2026, Homebrew 5.x
+requires Developer ID + notarization for the official tap. The official
+`homebrew/cask` tap is not an option for an ad-hoc signed app.
+
+### Findings
+- Official tap: requires notarization, ruled out.
+- Third-party tap (`lapht/homebrew-terso`): not subject to the same rules, viable.
+- On first launch, Gatekeeper blocks the app even with an ad-hoc signature.
+- User workaround: System Settings → Privacy & Security → "Open Anyway".
+
+### Recommendation for #45
+Distribute via a third-party tap `lapht/homebrew-terso`.
+Document the Gatekeeper first-launch step in the tap README and release notes.
+Defer notarization to a future release if/when an Apple Developer Program
+membership is obtained.
+
+### References
+- https://workbrew.com/blog/what-homebrew-5-0-0-means-for-your-mac-fleet
+- https://feedbagel.com/post/homebrew-to-remove-no-quarantine-flag-support-for-macos-security-compliance
+- https://github.com/ivoronin/TomatoBar/issues/102
