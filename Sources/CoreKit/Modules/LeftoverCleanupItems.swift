@@ -18,14 +18,14 @@
 
 import Foundation
 
-extension LeftoversDetector {
+public extension LeftoversDetector {
     /// Module ID carried by leftover `CleanItem`s; the key of their allowlist roots.
-    public static let moduleID = "leftovers"
+    static let moduleID = "leftovers"
 
     /// The `~/Library` roots of design §11.4, expanded for `homeDirectory`.
     ///
     /// These are the only roots the deletion pipeline accepts for leftover items.
-    public static func allowedRoots(homeDirectory: URL) -> [URL] {
+    static func allowedRoots(homeDirectory: URL) -> [URL] {
         let home = homeDirectory.standardizedFileURL
         return RuleValidator.leftoverRoots.map {
             home.appendingPathComponent(String($0.dropFirst(2)), isDirectory: true).standardizedFileURL
@@ -33,12 +33,12 @@ extension LeftoversDetector {
     }
 }
 
-extension LeftoverCandidate {
+public extension LeftoverCandidate {
     /// The item handed to the deletion pipeline once the user selects this leftover.
     ///
     /// Trash-first (`.trash`). Protection and symlink checks are not decided here:
     /// the pipeline revalidates every item against the allowlist before moving it.
-    public var cleanItem: CleanItem {
+    var cleanItem: CleanItem {
         CleanItem(
             url: url,
             resolvedURL: url.resolvingSymlinksInPath().standardizedFileURL,
