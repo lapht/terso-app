@@ -155,9 +155,6 @@ addition to its lint, format, build, and Safety Audit checks.
 
 ## Install with Homebrew
 
-> The cask is prepared in this repository; these commands work once the
-> `lapht/homebrew-tap` repository is published.
-
 ```bash
 brew tap lapht/tap
 brew install --cask terso
