@@ -153,6 +153,23 @@ xcodebuild \
 `swift test` does not run the app tests. CI runs both test commands, in
 addition to its lint, format, build, and Safety Audit checks.
 
+## Install with Homebrew
+
+```bash
+brew tap lapht/tap
+brew install --cask terso
+```
+
+Upgrade with `brew upgrade --cask terso` and uninstall with
+`brew uninstall --cask terso` (add `--zap` to also remove the audit log in
+`~/Library/Logs/Terso`). The cask downloads the same ad-hoc signed ZIP from
+GitHub Releases and verifies its SHA-256; it installs only `Terso.app`,
+and Terso does not check for updates by itself. The build is **not notarized**
+and has no Developer ID signature, so the Gatekeeper first-launch step applies:
+Control-click `Terso.app` > **Open**, then confirm in the system dialog (or
+allow it in System Settings > Privacy & Security). Cask source:
+[packaging/homebrew](packaging/homebrew).
+
 ## Install the v0.1.0 release
 
 Download `Terso-v0.1-macOS.zip` and

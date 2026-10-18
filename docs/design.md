@@ -106,6 +106,9 @@ These are hard requirements; a PR that weakens any of them is rejected.
 - GitHub Actions on public repo: free unlimited macOS runners (arm64 + Intel).
 - Distribution: ad-hoc signed ZIP on GitHub Releases + `homebrew-tap` repo.
   Developer ID + notarization postponed (funding via GitHub Sponsors later).
+  The cask source lives in `packaging/homebrew/` (#45); it is ad-hoc signed,
+  not notarized, documents the Gatekeeper first-launch step, and installs only
+  `Terso.app` with no update checks.
 - No third-party runtime dependencies in v0.1 (SPM only if strictly needed).
 
 ## 7. Testing strategy
