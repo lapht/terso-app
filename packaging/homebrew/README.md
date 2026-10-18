@@ -26,5 +26,6 @@ brew install --cask lapht/tap/terso
   machines, to be run by the maintainer.
 
 The cask installs only `Terso.app`: no hidden components, no `postflight`,
-no `livecheck`-driven or in-app update checks. The build is ad-hoc signed and
+no `livecheck`-driven or in-app update checks (updates are brew-only, see
+`docs/design.md` §11.6). The build is ad-hoc signed and
 not notarized, so the cask must not claim otherwise or use `--no-quarantine`.
