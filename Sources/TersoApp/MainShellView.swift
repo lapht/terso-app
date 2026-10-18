@@ -73,7 +73,11 @@ struct MainShellView: View {
                 selection = .auditLogs
             }
         } else if selection == .leftovers {
-            ToolScanView(destination: .leftovers, viewModel: scanSessions.leftovers)
+            ToolScanView(
+                destination: .leftovers,
+                viewModel: scanSessions.leftovers,
+                review: scanSessions.leftoversReview
+            )
         } else if selection == .duplicates {
             DuplicatesView(viewModel: scanSessions.duplicates)
         } else if selection == .largeFiles {

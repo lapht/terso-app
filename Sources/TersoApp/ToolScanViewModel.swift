@@ -40,6 +40,8 @@ struct NotScannedArea: Equatable, Sendable {
 /// What a tool scan found, and which areas it could not cover.
 struct ToolScanOutcome: Sendable {
     var items: [CleanItem] = []
+    /// Why each item was reported (for example the removed app it belonged to), keyed by item ID.
+    var reasons: [UUID: String] = [:]
     var notScanned: [NotScannedArea] = []
 }
 
@@ -53,6 +55,7 @@ protocol ToolScanning: Sendable {
 final class ToolScanViewModel: ObservableObject {
     @Published private(set) var phase: ScanPhase = .idle
     @Published private(set) var items: [CleanItem] = []
+    @Published private(set) var reasons: [UUID: String] = [:]
     @Published private(set) var notScanned: [NotScannedArea] = []
 
     let tool: ScanTool
@@ -84,6 +87,7 @@ final class ToolScanViewModel: ObservableObject {
             return
         }
         items = []
+        reasons = [:]
         notScanned = []
         phase = .scanning
 
@@ -105,6 +109,7 @@ final class ToolScanViewModel: ObservableObject {
                 return
             }
             self.items = outcome.items
+            self.reasons = outcome.reasons
             self.notScanned = outcome.notScanned
             self.phase = result
             self.scanTask = nil
