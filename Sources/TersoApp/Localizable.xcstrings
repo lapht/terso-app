@@ -87,6 +87,12 @@
                   "state" : "translated",
                   "value" : "%lld elementi"
                 }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld di elementi"
+                }
               }
             }
           }
@@ -127,6 +133,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld elementi trovati"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld di elementi trovati"
                 }
               }
             }
@@ -342,15 +354,45 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dry run: %lld items, %@ would move to Trash. Nothing was changed."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Dry run: %lld item, %@ would move to Trash. Nothing was changed."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Dry run: %lld items, %@ would move to Trash. Nothing was changed."
+                }
+              }
+            }
           }
         },
         "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Simulazione: %lld elementi, %@ verrebbero spostati nel Cestino. Non è stato modificato nulla."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Simulazione: %lld elemento, %@ verrebbe spostato nel Cestino. Non è stato modificato nulla."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Simulazione: %lld elementi, %@ verrebbero spostati nel Cestino. Non è stato modificato nulla."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Simulazione: %lld di elementi, %@ verrebbero spostati nel Cestino. Non è stato modificato nulla."
+                }
+              }
+            }
           }
         }
       }
@@ -733,15 +775,45 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moved %lld items (%@) to Trash."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Moved %lld item (%@) to Trash."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Moved %lld items (%@) to Trash."
+                }
+              }
+            }
           }
         },
         "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spostati %lld elementi (%@) nel Cestino."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Spostato %lld elemento (%@) nel Cestino."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Spostati %lld elementi (%@) nel Cestino."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Spostati %lld di elementi (%@) nel Cestino."
+                }
+              }
+            }
           }
         }
       }
@@ -1370,7 +1442,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alcuni elementi sono stati rifiutati e lasciati intatti. Vedi il registro di controllo."
+            "value" : "Alcuni elementi sono stati rifiutati e lasciati intatti. Vedi il registro attività."
           }
         }
       }
@@ -1749,6 +1821,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Sposterà %lld elementi nel Cestino, per un totale di %@."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sposterà %lld di elementi nel Cestino, per un totale di %@."
                 }
               }
             }

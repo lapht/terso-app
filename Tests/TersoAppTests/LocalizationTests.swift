@@ -16,6 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import CoreKit
 import Foundation
 import Testing
 @testable import TersoApp
@@ -97,6 +98,47 @@ struct LocalizationTests {
         let available = Bundle.main.localizations
         let chosen = Bundle.preferredLocalizations(from: available, forPreferences: ["fr", "de"])
         #expect(chosen.first == "en")
+    }
+
+    @Test func italianSystemPreferenceResolvesToItalian() {
+        let available = Bundle.main.localizations
+        for preferences in [["it"], ["it-IT"], ["it-CH", "en"], ["fr", "it"]] {
+            let chosen = Bundle.preferredLocalizations(from: available, forPreferences: preferences)
+            #expect(chosen.first == "it", "\(preferences) should resolve to it")
+        }
+    }
+
+    private static func italianBundle() throws -> Bundle {
+        let path = try #require(Bundle.main.path(forResource: "it", ofType: "lproj"))
+        return try #require(Bundle(path: path))
+    }
+
+    @Test func italianPluralsAgreeWithTheCount() throws {
+        let bundle = try Self.italianBundle()
+        let locale = Locale(identifier: "it_IT")
+        let one = 1
+        let many = 3
+        #expect(String(localized: "\(one) items", bundle: bundle, locale: locale) == "1 elemento")
+        #expect(String(localized: "\(many) items", bundle: bundle, locale: locale) == "3 elementi")
+        #expect(String(localized: "\(one) items found", bundle: bundle, locale: locale) == "1 elemento trovato")
+        #expect(String(localized: "\(many) items found", bundle: bundle, locale: locale) == "3 elementi trovati")
+    }
+
+    @Test func italianTranslationKeepsTheSafetyMeaningOfTrashFirst() throws {
+        let bundle = try Self.italianBundle()
+        let locale = Locale(identifier: "it_IT")
+        let text = String(
+            localized: "Items are moved to the Trash, so you can put them back until you empty it.",
+            bundle: bundle,
+            locale: locale
+        )
+        #expect(text.contains("Cestino"))
+        #expect(text.contains("rimetterli a posto"))
+    }
+
+    @Test func byteSizesFollowTheSystemLocaleDecimalSeparator() {
+        let separator = Locale.current.decimalSeparator ?? "."
+        #expect(SizeCalculator.formattedByteCount(1_500_000).contains(separator))
     }
 
     @Test func missingKeyShowsEnglishTextInsteadOfATechnicalKey() {
