@@ -108,7 +108,7 @@ These are hard requirements; a PR that weakens any of them is rejected.
   Developer ID + notarization postponed (funding via GitHub Sponsors later).
   The cask source lives in `packaging/homebrew/` (#45); it is ad-hoc signed,
   not notarized, documents the Gatekeeper first-launch step, and installs only
-  `Terso.app` with no update checks.
+  `Terso.app` with no update checks. Updates are brew-only (§11.6).
 - No third-party runtime dependencies in v0.1 (SPM only if strictly needed).
 
 ## 7. Testing strategy
@@ -141,7 +141,7 @@ require human maintainer review.
   - EN/IT localization (#44, #43).
   - Audit log path privacy for exports (#103).
   - Homebrew tap (#104 spike, #45).
-  - Update-mechanism decision: self-hosted Sparkle vs brew-only (#46).
+  - Update-mechanism decision: brew-only, Sparkle deferred (#46, §11.6).
   - Release (#47).
 - **v0.3:** real app uninstall by moving the `.app` to Trash via Safety (#107),
   moving duplicates to Trash (#40, after the protected-area decision in #105),
@@ -324,14 +324,48 @@ Implemented by #33 (schema) and #34 (loader/validation); content by #101.
   `~/Library/Caches/<redacted>/<redacted>`). A path under no known root is redacted
   below the home directory (fail-closed). Timestamp, rule id and size stay readable.
 
-### 11.6 Update mechanism decision
-- #46 compares **self-hosted Sparkle** and **brew-only** updates, using at
-  least: compatibility with ad-hoc signing (no Developer ID/notarization, §6),
-  update signing and integrity, the no-network-by-default rule (§2: any update
-  check is opt-in), hosting and maintenance cost, interaction with the Homebrew
-  tap (#104, #45), and auditability.
-- The outcome is recorded in this section by #46. Issue #32 only documents the
-  decision process; it does not implement Sparkle or any update check.
+### 11.6 Update mechanism decision (#46)
+
+**Decision (v0.2): brew-only.** Terso ships no updater. Updates are delivered
+by `brew upgrade --cask terso` from the `lapht/tap` tap (#45). Self-hosted
+Sparkle is **not adopted** now and is deferred, not rejected: it is
+re-evaluated when Developer ID signing and notarization exist (§6).
+This issue implements nothing: no Sparkle code, framework, appcast endpoint
+or update check, and no new dependency or network call.
+
+**Comparison**
+
+| Criterion | Brew-only | Self-hosted Sparkle |
+|---|---|---|
+| Network surface | None added; Terso makes no network calls (§2). Homebrew does the download, user-initiated. | Adds an HTTPS client to the app, an appcast endpoint and a feed fetch; every release becomes an attack and privacy surface. |
+| Opt-in | Inherent: nothing runs unless the user runs `brew upgrade`. | Possible (`SUEnableAutomaticChecks` off, explicit user action), but it must be configured and kept off by default. |
+| Maintenance | Per release, bump `version` and `sha256` in the cask (`packaging/homebrew/`). | Adds a hosted appcast, EdDSA key custody and rotation, appcast generation in the release process, and framework upgrades. |
+| Signing / notarization | Works with the ad-hoc signed ZIP; Homebrew verifies the SHA-256. | Sparkle's EdDSA signature protects update integrity, but Sparkle documents a Developer ID-signed app as the supported setup. Replacing an ad-hoc signed bundle in place also hits Gatekeeper again, so the user-friendly flow is not guaranteed. |
+| Reliability | Depends on the user's Homebrew; no code of ours in the update path. | In-app updater code in the process that deletes files: a bug there is on our side. |
+| UX | Terminal command; no in-app prompt. Users who install the ZIP manually update manually. | In-app prompts; better for non-Homebrew users. |
+| Architecture support | Fits §2 and §6 as they stand. | Adds the first third-party runtime dependency (§6 says none), a networking path outside CoreKit, and an XPC/installer component. |
+
+**Rationale.** The hard requirement is no network by default with any update
+check opt-in (§2). Brew-only meets it with zero code. Sparkle would cost a
+dependency, a hosted endpoint and key custody for a project that is ad-hoc
+signed and unfunded, and its main benefit (smooth in-app replacement) is
+undermined without Developer ID and notarization.
+
+**Network policy.** Terso performs no update check in v0.2. Any future check
+must be (a) off by default, (b) started by an explicit user action or a
+setting the user turns on, (c) limited to a single documented HTTPS request
+with no identifiers, and (d) covered by a design update before implementation.
+
+**Homebrew impact.** The cask stays free of `livecheck`-driven or in-app
+update checks (`packaging/homebrew/README.md`). The README tells users to run
+`brew upgrade --cask terso` and states that Terso does not check for updates.
+Release notes must remind manual-ZIP users to download the new release.
+
+**Next decision.** Owner: the repository maintainer. Trigger: Developer ID
+and notarization become available; the question is reopened at the planning
+of the release that adopts them (no earlier than v0.3). No calendar date is
+set because it depends on the funding and Apple Developer Program membership
+in §6. Maintainer confirmation is expected in the PR review of #46.
 
 ## Spike #104 — Homebrew cask viability (ad-hoc signed)
 
