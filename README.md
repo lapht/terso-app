@@ -37,7 +37,7 @@ telemetry and unnecessary network access.
   are project goals, not a claim of absolute security
 - 🧰 **Native** — SwiftUI app for macOS
 
-> **Status:** Terso v0.1.0 is published and development continues. Cleanup
+> **Status:** Terso v0.2.0 is the current release and development continues. Cleanup
 > software can select an item unexpectedly: review every selection, keep
 > backups of important data, and do not treat guardrails as a guarantee against
 > data loss. See the [release page](https://github.com/lapht/terso-app/releases)
@@ -47,14 +47,40 @@ telemetry and unnecessary network access.
 
 | Status | Scope |
 |---|---|
-| **In the v0.1.0 source** | Scanning user caches and logs, Trash bins, Xcode and package-manager caches; read-only large-file scanning; Smart Scan; guarded cleanup and audit logging |
-| **Planned** | App leftovers, duplicate-file detection, menu bar extra, localization, Homebrew distribution, and a read-only security configuration audit |
+| **Available (v0.1)** | Scanning user caches and logs, Trash bins, Xcode and package-manager caches; read-only large-file scanning; Smart Scan; guarded cleanup and audit logging |
+| **Available (v0.2)** | Leftovers of apps that are no longer installed (review, then move to Trash through the Safety pipeline); read-only duplicate-file detection by content hash; menu bar extra (available space, launch Smart Scan); English and Italian interface; audit-log export with path privacy; Rule DB v2 (bundle-ID app patterns, provenance); Homebrew cask |
+| **Planned** | App uninstaller (v0.3, #107), deleting duplicates (v0.3, #40), version-conditional rule exclusions (#106), a read-only security configuration audit |
 | **Manual release checks** | Full Disk Access behavior, case-sensitive APFS, non-English locale, and cleanup candidates staying within their allowlisted roots |
 
 The feature list describes the release/source scope, not a claim that every
 feature has been manually verified on every Mac. The manual checks above are
 not run by the automated release workflow and should be completed by the
 maintainer before publishing a release.
+
+**Not included in v0.2:** removing applications (`.app` bundles are never
+removed, moved or trashed; `/Applications` and `~/Applications` are only read
+to discover installed apps), deleting duplicates (the Duplicates page is
+read-only), permanent deletion (everything goes to the Trash), an in-app
+updater (updates are `brew upgrade` only, see
+[docs/design.md](docs/design.md) §11.6), and notarization. Leftovers and
+Duplicates are separate sidebar sections and are not part of Smart Scan.
+
+## Compatibility
+
+| Environment | Status |
+|---|---|
+| macOS 13 or later (minimum deployment target) | Declared in the project |
+| Apple Silicon and Intel (the release ZIP contains `arm64` and `x86_64`) | CI runs the quality gates on both architectures |
+| Tested on | _To be filled by the maintainer with the macOS versions and hardware actually tested_ |
+| Other macOS versions / hardware | Not yet tested — beta testers welcome |
+
+## Signing and first launch
+
+Releases are **ad-hoc signed**. They are **not notarized** and have **no
+Developer ID signature**, so macOS Gatekeeper blocks the first launch. Open
+`Terso.app` with Control-click (right-click) > **Open**, then confirm in the
+system dialog (or allow it in System Settings > Privacy & Security). Only
+install a release you trust and verify its SHA-256 first.
 
 Further design details: [docs/design.md](docs/design.md).
 
@@ -170,26 +196,22 @@ Control-click `Terso.app` > **Open**, then confirm in the system dialog (or
 allow it in System Settings > Privacy & Security). Cask source:
 [packaging/homebrew](packaging/homebrew).
 
-## Install the v0.1.0 release
+## Install a release
 
-Download `Terso-v0.1-macOS.zip` and
-`Terso-v0.1-macOS.zip.sha256` from the
-[v0.1.0 GitHub release](https://github.com/lapht/terso-app/releases/tag/v0.1.0).
-The release tag is `v0.1.0`; the archive filenames are versioned `v0.1`.
-Extract the ZIP to get `Terso.app`.
+Download `Terso-vX.Y.Z-macOS.zip` and `Terso-vX.Y.Z-macOS.zip.sha256` from the
+[latest GitHub release](https://github.com/lapht/terso-app/releases/latest);
+the archive filenames carry the full release tag (for example
+`Terso-v0.2.0-macOS.zip`). Extract the ZIP to get `Terso.app`.
 
 Verify the checksum in the directory containing both downloaded files:
 
 ```bash
-shasum -a 256 -c Terso-v0.1-macOS.zip.sha256
+shasum -a 256 -c Terso-vX.Y.Z-macOS.zip.sha256
 ```
 
-The published v0.1.0 archive was checked: its checksum matches the sidecar,
-its app bundle passes `codesign` verification, and its executable contains
-both `arm64` and `x86_64`. Each future release must be checked independently;
-do not infer its architectures from this release. The packaging script
-ad-hoc signs the app and does not notarize it. Only install a release you
-trust.
+Each release must be checked independently; do not infer the architectures or
+signature of one release from another. The packaging script ad-hoc signs the
+app and does not notarize it. Only install a release you trust.
 
 On first launch, macOS may require Control-click > **Open**, followed by
 confirmation in the system dialog.
@@ -197,11 +219,12 @@ confirmation in the system dialog.
 To build and package from source on macOS with Xcode installed:
 
 ```bash
-./scripts/build-release.sh
+./scripts/build-release.sh v0.2.0
 ```
 
 The script requests both `arm64` and `x86_64` and creates
-`dist/Terso-v0.1-macOS.zip` plus its SHA-256 sidecar. Verify the resulting
+`dist/Terso-<tag>-macOS.zip` plus its SHA-256 sidecar (pass the tag, for
+example `./scripts/build-release.sh v0.2.0`). Verify the resulting
 binary's architectures before distributing a locally built archive.
 
 ## Contributing
