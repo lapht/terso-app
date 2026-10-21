@@ -1,6 +1,6 @@
 cask "terso" do
-  version "0.1.2"
-  sha256 "a80d12edd6e795c019b929b9da6421755bc6264fa2d5ec65d1cc2e897ca3659d"
+  version "0.2.0"
+  sha256 "e8e07bc58fa88e2d5dfc8ed0cc797361141ccea65ad15dfa156024e761fa3d67"
 
   # The release ZIP is a universal (arm64 + x86_64) ad-hoc signed build.
   url "https://github.com/lapht/terso-app/releases/download/v#{version}/Terso-v#{version}-macOS.zip",
