@@ -37,7 +37,7 @@ telemetry and unnecessary network access.
   are project goals, not a claim of absolute security
 - 🧰 **Native** — SwiftUI app for macOS
 
-> **Status:** Terso v0.2.0 is the current release and development continues. Cleanup
+> **Status:** Terso v0.2.1 is the current release and development continues. Cleanup
 > software can select an item unexpectedly: review every selection, keep
 > backups of important data, and do not treat guardrails as a guarantee against
 > data loss. See the [release page](https://github.com/lapht/terso-app/releases)
@@ -200,7 +200,7 @@ allow it in System Settings > Privacy & Security). Cask source:
 Download `Terso-vX.Y.Z-macOS.zip` and `Terso-vX.Y.Z-macOS.zip.sha256` from the
 [latest GitHub release](https://github.com/lapht/terso-app/releases/latest);
 the archive filenames carry the full release tag (for example
-`Terso-v0.2.0-macOS.zip`). Extract the ZIP to get `Terso.app`.
+`Terso-v0.2.1-macOS.zip`). Extract the ZIP to get `Terso.app`.
 
 Verify the checksum in the directory containing both downloaded files:
 
@@ -218,12 +218,12 @@ confirmation in the system dialog.
 To build and package from source on macOS with Xcode installed:
 
 ```bash
-./scripts/build-release.sh v0.2.0
+./scripts/build-release.sh v0.2.1
 ```
 
 The script requests both `arm64` and `x86_64` and creates
 `dist/Terso-<tag>-macOS.zip` plus its SHA-256 sidecar (pass the tag, for
-example `./scripts/build-release.sh v0.2.0`). Verify the resulting
+example `./scripts/build-release.sh v0.2.1`). Verify the resulting
 binary's architectures before distributing a locally built archive.
 
 ## Contributing
