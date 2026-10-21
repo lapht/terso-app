@@ -77,6 +77,13 @@ terso-app/
 - Rule DB v2 follows the contract in design.md §11.2; version-conditional exclusions are out of scope for v0.2 (#106).
 - Changes to `Safety/` or `Rules/` (including `Rules/*.json`) keep requiring the `[SAFETY]` flag and human review.
 
+## Release procedure
+A release needs two PRs, because the cask `sha256` only exists after the Release workflow has built the ZIP (builds are not reproducible, so it cannot be computed beforehand):
+1. **Before the release** (`chore/release-X.Y.Z`): bump `MARKETING_VERSION` in `Terso.xcodeproj/project.pbxproj` (both configurations) and update README. Do not touch the cask: it must keep pointing at the last published release until the new ZIP exists.
+2. After the maintainer merges it and says "confermo", run the Release workflow from `main` (never tag manually), verify the downloaded ZIP against its `.sha256`.
+3. **After the release** (`chore/cask-X.Y.Z`): one PR that updates `version` and `sha256` in `packaging/homebrew/Casks/terso.rb` with the value from the published `.sha256` sidecar. The same file is then copied to `lapht/homebrew-tap` (maintainer-owned) and audited there; see `packaging/homebrew/README.md`.
+Never merge, tag or run the Release workflow without the maintainer's explicit confirmation.
+
 ## Rules of engagement
 - **Absolute ban:** no file deletion logic or APIs outside `Sources/CoreKit/Safety/`. CI blocks violations: do not look for workarounds, just report.
 - Do not expand an issue's scope. If other work is needed, propose a new issue instead of implementing it here.
