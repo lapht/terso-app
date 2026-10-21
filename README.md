@@ -71,8 +71,7 @@ Duplicates are separate sidebar sections and are not part of Smart Scan.
 |---|---|
 | macOS 13 or later (minimum deployment target) | Declared in the project |
 | Apple Silicon and Intel (the release ZIP contains `arm64` and `x86_64`) | CI runs the quality gates on both architectures |
-| Tested on | _To be filled by the maintainer with the macOS versions and hardware actually tested_ |
-| Other macOS versions / hardware | Not yet tested — beta testers welcome |
+| Manual testing (VM, Full Disk Access, other macOS versions and hardware) | Not yet done — beta testers welcome. |
 
 ## Signing and first launch
 
