@@ -26,12 +26,8 @@ struct TersoApp: App {
     @StateObject private var scanCoordinator = MenuBarScanCoordinator()
 
     var body: some Scene {
-        MenuBarExtra {
-            MenuBarSpaceContent(model: menuBarSpace, scanCoordinator: scanCoordinator)
-        } label: {
-            MenuBarSpaceLabel(model: menuBarSpace)
-        }
-
+        // Declared first: SwiftUI opens the first window scene at launch, and with
+        // MenuBarExtra first the app would start with no window (#156).
         // A single window, so the menu bar action reuses it instead of opening duplicates.
         Window("Terso", id: MenuBarSpaceContent.mainWindowID) {
             ContentView(coordinator: scanCoordinator)
@@ -43,6 +39,12 @@ struct TersoApp: App {
                         application.windows.first?.makeKeyAndOrderFront(nil)
                     }
                 }
+        }
+
+        MenuBarExtra {
+            MenuBarSpaceContent(model: menuBarSpace, scanCoordinator: scanCoordinator)
+        } label: {
+            MenuBarSpaceLabel(model: menuBarSpace)
         }
     }
 }
