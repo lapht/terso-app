@@ -39,7 +39,7 @@ struct LeftoversToolScanner: ToolScanning {
     }
 
     /// The rule database shipped inside the app bundle.
-    static let bundledRulesName = "v2026.3"
+    static let bundledRulesName = "v2026.4"
 
     let loadRules: @Sendable () throws -> [CleanupRule]
     let discoverApps: @Sendable (URL) -> InstalledAppDiscoveryResult

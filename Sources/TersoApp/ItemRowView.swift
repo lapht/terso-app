@@ -46,6 +46,13 @@ struct ItemRowView: View {
                     .lineLimit(1)
                     .truncationMode(.middle)
                     .help(relativePath)
+
+                if let warning = PackageCachesModule.warning(forRuleID: item.ruleId) {
+                    Label(warning, systemImage: "exclamationmark.triangle")
+                        .font(DesignTokens.Typography.caption)
+                        .foregroundStyle(.orange)
+                        .lineLimit(2)
+                }
             }
 
             Spacer(minLength: DesignTokens.Spacing.small)

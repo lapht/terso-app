@@ -16,6 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import AppKit
 import CoreKit
 import SwiftUI
 
@@ -199,15 +200,26 @@ private struct LeftoverRowView: View {
                 .font(DesignTokens.Typography.rowFigure.weight(.medium))
                 .frame(minWidth: 72, alignment: .trailing)
 
-            Toggle("Select \(item.url.lastPathComponent)", isOn: isSelected)
-                .labelsHidden()
-                .accessibilityLabel("Select \(item.url.lastPathComponent)")
+            if LeftoversViewModel.isSelectable(item) {
+                Toggle("Select \(item.url.lastPathComponent)", isOn: isSelected)
+                    .labelsHidden()
+                    .accessibilityLabel("Select \(item.url.lastPathComponent)")
+            } else {
+                Button("Reveal in Finder", systemImage: "magnifyingglass", action: reveal)
+            }
+        }
+        .contextMenu {
+            Button("Reveal in Finder", systemImage: "magnifyingglass", action: reveal)
         }
         .padding(DesignTokens.Spacing.small)
         .background(
             isSelected.wrappedValue ? DesignTokens.Palette.brandWash : DesignTokens.Palette.rowFill,
             in: RoundedRectangle(cornerRadius: DesignTokens.Radius.row)
         )
+    }
+
+    private func reveal() {
+        NSWorkspace.shared.activateFileViewerSelecting([item.url])
     }
 
     private var displayPath: String {

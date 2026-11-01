@@ -18,13 +18,20 @@
 
 import Foundation
 
-/// Finds large regular files in the user's home directory without offering deletion.
+/// Finds large regular files in the user's home directory.
+///
+/// Files are offered for the Trash through the Safety pipeline, except those inside a package
+/// (`.photoslibrary`, `.app`, ...) or under `~/Applications`: moving one of those would corrupt
+/// its container, so they stay reveal-only. Desktop, Documents and Downloads are denied by
+/// `PathValidator`, not here; the pipeline's refusal is shown to the user.
 public struct LargeFilesModule: CleanModule {
     public static let defaultMinimumSizeBytes: Int64 = 100 * 1_024 * 1_024
 
     private static let excludedSystemRoots = ["/System", "/Library", "/private"]
 
-    public let id = "files.large"
+    public static let moduleID = "files.large"
+
+    public let id = LargeFilesModule.moduleID
     public let title = "Large Files"
     public let requiresFDA = true
 
@@ -58,7 +65,8 @@ public struct LargeFilesModule: CleanModule {
         }
 
         let resolvedHome = home.resolvingSymlinksInPath().standardizedFileURL
-        let candidates = try findCandidates(under: home, resolvedHome: resolvedHome)
+        let (candidates, packageFiles) = try findCandidates(under: home, resolvedHome: resolvedHome)
+        let applications = resolvedHome.appendingPathComponent("Applications", isDirectory: true)
         return try candidates.compactMap { fileURL in
             let size = try SizeCalculator().calculate(at: fileURL)
             guard size.errors.isEmpty else {
@@ -70,6 +78,9 @@ public struct LargeFilesModule: CleanModule {
             guard size.bytes > minimumSizeBytes else {
                 return nil
             }
+            let isRevealOnly = packageFiles.contains(fileURL.path)
+                || fileURL.path == applications.path
+                || Self.isDescendant(fileURL, of: applications)
 
             return CleanItem(
                 url: fileURL,
@@ -77,13 +88,16 @@ public struct LargeFilesModule: CleanModule {
                 sizeBytes: size.bytes,
                 moduleId: id,
                 ruleId: id,
-                isDeletable: false,
-                recommendedAction: .revealInFinder
+                isDeletable: !isRevealOnly,
+                recommendedAction: isRevealOnly ? .revealInFinder : .trash
             )
         }
     }
 
-    private func findCandidates(under home: URL, resolvedHome: URL) throws -> [URL] {
+    private func findCandidates(
+        under home: URL,
+        resolvedHome: URL
+    ) throws -> (files: [URL], packageFiles: Set<String>) {
         var enumerationErrors: [String] = []
         let enumerator = FileManager.default.enumerator(
             at: home,
@@ -99,6 +113,8 @@ public struct LargeFilesModule: CleanModule {
         }
 
         var files: [URL] = []
+        var packageFiles: Set<String> = []
+        var packageRoots: [String] = []
         while let fileURL = enumerator.nextObject() as? URL {
             let values: URLResourceValues
             do {
@@ -113,6 +129,12 @@ public struct LargeFilesModule: CleanModule {
                 enumerator.skipDescendants()
                 continue
             }
+            if values.isDirectory == true {
+                if (try? fileURL.resourceValues(forKeys: [.isPackageKey]))?.isPackage == true {
+                    packageRoots.append(fileURL.standardizedFileURL.path)
+                }
+                continue
+            }
             guard values.isRegularFile == true else {
                 continue
             }
@@ -124,12 +146,15 @@ public struct LargeFilesModule: CleanModule {
                 continue
             }
             files.append(resolvedURL)
+            if packageRoots.contains(where: { resolvedURL.path.hasPrefix($0 + "/") }) {
+                packageFiles.insert(resolvedURL.path)
+            }
         }
 
         guard enumerationErrors.isEmpty else {
             throw LargeFilesScanFailure.enumerationFailed(home.path, enumerationErrors)
         }
-        return files.sorted { $0.path < $1.path }
+        return (files.sorted { $0.path < $1.path }, packageFiles)
     }
 
     private static func isSystemPath(_ url: URL) -> Bool {

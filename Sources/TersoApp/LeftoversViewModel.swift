@@ -45,13 +45,19 @@ final class LeftoversViewModel: ObservableObject {
 
     let homeDirectory: URL
     private let pipeline: DeletionPipeline
+    private let allowedRootsByModule: [String: [URL]]
+    /// State captured by the last dry-run, so the confirmed move can detect files changed since.
+    private var snapshots: [UUID: ItemSnapshot] = [:]
 
     init(
         homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser,
-        pipeline: DeletionPipeline? = nil
+        pipeline: DeletionPipeline? = nil,
+        allowedRootsByModule: [String: [URL]]? = nil
     ) {
         self.homeDirectory = homeDirectory
         self.pipeline = pipeline ?? DeletionPipeline(homeDirectory: homeDirectory)
+        self.allowedRootsByModule = allowedRootsByModule
+            ?? [LeftoversDetector.moduleID: LeftoversDetector.allowedRoots(homeDirectory: homeDirectory)]
     }
 
     var selectedItems: [CleanItem] {
@@ -69,6 +75,7 @@ final class LeftoversViewModel: ObservableObject {
         selectedIDs = []
         rejections = []
         report = nil
+        snapshots = [:]
     }
 
     func isSelected(_ item: CleanItem) -> Bool {
@@ -80,14 +87,26 @@ final class LeftoversViewModel: ObservableObject {
             return
         }
         if isSelected {
+            guard Self.isSelectable(item) else {
+                return
+            }
             selectedIDs.insert(item.id)
         } else {
             selectedIDs.remove(item.id)
         }
+        // A dry-run describes one selection; changing it invalidates what was previewed.
+        snapshots = [:]
     }
 
     func deselectAll() {
         selectedIDs = []
+        snapshots = [:]
+    }
+
+    /// Only items the scanner offered for the Trash can be selected; reveal-only and
+    /// protected ones never reach the pipeline from here.
+    static func isSelectable(_ item: CleanItem) -> Bool {
+        item.isDeletable && !item.isProtected && item.recommendedAction == .trash
     }
 
     /// Validates the selection without changing the filesystem and reports the byte count.
@@ -109,14 +128,25 @@ final class LeftoversViewModel: ObservableObject {
         guard !selection.isEmpty else {
             return
         }
-        let allowedRoots = [LeftoversDetector.moduleID: LeftoversDetector.allowedRoots(homeDirectory: homeDirectory)]
+        var newSnapshots: [UUID: ItemSnapshot] = [:]
         var processed: [CleanItem] = []
         var newRejections: [Rejection] = []
 
         for item in selection {
             do {
-                let result = try pipeline.execute(items: [item], allowedRootsByModule: allowedRoots, dryRun: dryRun)
+                let result = try pipeline.execute(
+                    items: [item],
+                    allowedRootsByModule: allowedRootsByModule,
+                    dryRun: dryRun,
+                    snapshots: dryRun ? [:] : snapshots
+                )
                 processed.append(contentsOf: result.items.map(\.item))
+                for entry in result.items {
+                    newSnapshots[entry.item.id] = entry.snapshot
+                }
+                newRejections.append(contentsOf: result.skipped.map {
+                    Rejection(path: $0.item.url.standardizedFileURL.path, message: $0.reason)
+                })
             } catch {
                 newRejections.append(Rejection(
                     path: item.url.standardizedFileURL.path,
@@ -128,6 +158,7 @@ final class LeftoversViewModel: ObservableObject {
         rejections = newRejections
         let bytes = Self.totalBytes(of: processed)
         if dryRun {
+            snapshots = newSnapshots
             report = .dryRun(itemCount: processed.count, bytes: bytes)
             return
         }
@@ -135,6 +166,7 @@ final class LeftoversViewModel: ObservableObject {
         let processedIDs = Set(processed.map(\.id))
         items.removeAll { processedIDs.contains($0.id) }
         selectedIDs = []
+        snapshots = [:]
     }
 
     private static func message(for error: Error) -> String {

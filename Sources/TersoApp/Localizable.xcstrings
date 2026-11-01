@@ -533,19 +533,19 @@
         }
       }
     },
-    "Find large files in your home folder. This scanner is read-only: you can reveal files in Finder, but Terso does not remove them from here." : {
+    "Find large files in your home folder and move the ones you choose to the Trash. Nothing is selected by default; Desktop, Documents and Downloads are protected." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Find large files in your home folder. This scanner is read-only: you can reveal files in Finder, but Terso does not remove them from here."
+            "value" : "Find large files in your home folder and move the ones you choose to the Trash. Nothing is selected by default; Desktop, Documents and Downloads are protected."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trova i file di grandi dimensioni nella tua cartella Home. Questa scansione è in sola lettura: puoi mostrare i file nel Finder, ma Terso non li rimuove da qui."
+            "value" : "Trova i file di grandi dimensioni nella tua cartella Home e sposta nel Cestino quelli che scegli. Nulla è selezionato di default; Scrivania, Documenti e Download sono protetti."
           }
         }
       }

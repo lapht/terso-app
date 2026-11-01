@@ -30,6 +30,7 @@ struct SidebarDestinationTests {
             "Trash Bins",
             "Xcode Junk",
             "Package Caches",
+            "Mail Downloads",
             "App Container Caches",
             "Leftovers",
             "Duplicates",
@@ -63,6 +64,7 @@ struct SidebarDestinationTests {
             .trashBins: "trash.user",
             .xcodeJunk: "xcode.junk",
             .packageCaches: "caches.packages",
+            .mailDownloads: "mail.downloads",
             .containerCaches: "caches.containers"
         ]
         for destination in SidebarSection.modules.destinations {

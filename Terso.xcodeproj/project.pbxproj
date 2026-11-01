@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1000000000000000000000E5 /* LeftoversToolScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000E6 /* LeftoversToolScannerTests.swift */; };
-		1000000000000000000000E1 /* v2026.3.json in Resources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000E2 /* v2026.3.json */; };
+		1000000000000000000000E1 /* v2026.4.json in Resources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000E2 /* v2026.4.json */; };
 		1000000000000000000000E3 /* LeftoversToolScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000E4 /* LeftoversToolScanner.swift */; };
 		100000000000000000000D3B /* LeftoversViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000D3F /* LeftoversViewModelTests.swift */; };
 		100000000000000000000D2B /* LeftoversReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000D2F /* LeftoversReviewView.swift */; };
@@ -73,7 +73,7 @@
 
 /* Begin PBXFileReference section */
 		2000000000000000000000E6 /* LeftoversToolScannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversToolScannerTests.swift; sourceTree = "<group>"; };
-		2000000000000000000000E2 /* v2026.3.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = v2026.3.json; path = Rules/v2026.3.json; sourceTree = SOURCE_ROOT; };
+		2000000000000000000000E2 /* v2026.4.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = v2026.4.json; path = Rules/v2026.4.json; sourceTree = SOURCE_ROOT; };
 		2000000000000000000000E4 /* LeftoversToolScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversToolScanner.swift; sourceTree = "<group>"; };
 		200000000000000000000D3F /* LeftoversViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversViewModelTests.swift; sourceTree = "<group>"; };
 		200000000000000000000D2F /* LeftoversReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftoversReviewView.swift; sourceTree = "<group>"; };
@@ -152,7 +152,7 @@
 				400000000000000000000002 /* Sources */,
 				400000000000000000000003 /* Products */,
 				400000000000000000000005 /* Tests/TersoAppTests */,
-				2000000000000000000000E2 /* v2026.3.json */,
+				2000000000000000000000E2 /* v2026.4.json */,
 			);
 			sourceTree = "<group>";
 		};
@@ -323,7 +323,7 @@
 			files = (
 				1000000000000000000000F0 /* Assets.xcassets in Resources */,
 				1000000000000000000000D8 /* Localizable.xcstrings in Resources */,
-				1000000000000000000000E1 /* v2026.3.json in Resources */,
+				1000000000000000000000E1 /* v2026.4.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

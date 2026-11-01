@@ -25,6 +25,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     case trashBins
     case xcodeJunk
     case packageCaches
+    case mailDownloads
     case containerCaches
     case leftovers
     case duplicates
@@ -48,6 +49,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             String(localized: "Xcode Junk")
         case .packageCaches:
             String(localized: "Package Caches")
+        case .mailDownloads:
+            String(localized: "Mail Downloads")
         case .containerCaches:
             String(localized: "App Container Caches")
         case .leftovers:
@@ -77,6 +80,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "hammer"
         case .packageCaches:
             "shippingbox"
+        case .mailDownloads:
+            "envelope"
         case .containerCaches:
             "lock.square"
         case .leftovers:
@@ -115,6 +120,14 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
                 localized: """
                     Find caches of sandboxed and App Store apps. Only each app's Caches folder is touched, \
                     and apps that are open are skipped. Needs Full Disk Access.
+                    """
+            )
+        case .mailDownloads:
+            String(
+                localized: """
+                    Find the copies Mail keeps of attachments you opened. The originals remain in Mail \
+                    and are downloaded again when you reopen them. Needs Full Disk Access and is skipped \
+                    while Mail is running.
                     """
             )
         case .leftovers:
@@ -163,7 +176,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         case .scan:
             [.smartScan]
         case .modules:
-            [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches, .containerCaches]
+            [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches, .mailDownloads, .containerCaches]
         case .tools:
             [.leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs]
         }
