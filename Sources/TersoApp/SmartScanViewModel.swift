@@ -240,6 +240,12 @@ final class SmartScanViewModel: ObservableObject {
             "xcode.junk": [
                 developer.appendingPathComponent("Xcode/DerivedData", isDirectory: true),
                 developer.appendingPathComponent("Xcode/Archives", isDirectory: true),
+                developer.appendingPathComponent("Xcode/iOS DeviceSupport", isDirectory: true),
+                developer.appendingPathComponent("Xcode/watchOS DeviceSupport", isDirectory: true),
+                developer.appendingPathComponent("Xcode/tvOS DeviceSupport", isDirectory: true),
+                developer.appendingPathComponent("Xcode/visionOS DeviceSupport", isDirectory: true),
+                developer.appendingPathComponent("Xcode/iOS Device Logs", isDirectory: true),
+                developer.appendingPathComponent("Xcode/DocumentationCache", isDirectory: true),
                 developer.appendingPathComponent("CoreSimulator/Caches", isDirectory: true)
             ],
             "mail.downloads": [

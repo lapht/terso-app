@@ -209,7 +209,7 @@ struct PackageCachesModuleTests {
         let v3Rules = try RuleValidator.decode(v3Data).rules
         #expect(Array(database.rules.prefix(v3Rules.count)) == v3Rules)
 
-        let developerRules = database.rules.dropFirst(v3Rules.count)
+        let developerRules = database.rules.dropFirst(v3Rules.count).filter { $0.module == "packages" }
         #expect(Set(developerRules.map(\.id)) == Set(Self.developerCaches.map(\.ruleID)))
         for rule in developerRules {
             let provenance = try #require(rule.provenance, "\(rule.id) has no provenance")

@@ -60,6 +60,13 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
     /// when the scanner could resolve one. Display only: never used for safety decisions.
     public let ownerName: String?
 
+    /// Whether review screens should select this item by default. It stays selectable by hand.
+    public let isPreselected: Bool
+
+    /// A short user-facing note explaining something about this item (for example why it is
+    /// not preselected). Informational only.
+    public let note: String?
+
     public init(
         id: UUID = UUID(),
         url: URL,
@@ -70,7 +77,9 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         isProtected: Bool = false,
         isDeletable: Bool = true,
         recommendedAction: CleanAction = .trash,
-        ownerName: String? = nil
+        ownerName: String? = nil,
+        isPreselected: Bool = true,
+        note: String? = nil
     ) {
         self.id = id
         self.url = url
@@ -82,6 +91,8 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         self.isDeletable = isDeletable
         self.recommendedAction = recommendedAction
         self.ownerName = ownerName
+        self.isPreselected = isPreselected
+        self.note = note
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -95,6 +106,8 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         case isDeletable
         case recommendedAction
         case ownerName
+        case isPreselected
+        case note
     }
 
     public init(from decoder: Decoder) throws {
@@ -109,5 +122,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         isDeletable = try container.decodeIfPresent(Bool.self, forKey: .isDeletable) ?? true
         recommendedAction = try container.decode(CleanAction.self, forKey: .recommendedAction)
         ownerName = try container.decodeIfPresent(String.self, forKey: .ownerName)
+        isPreselected = try container.decodeIfPresent(Bool.self, forKey: .isPreselected) ?? true
+        note = try container.decodeIfPresent(String.self, forKey: .note)
     }
 }

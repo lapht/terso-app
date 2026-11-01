@@ -44,14 +44,61 @@ public struct SkippedCache: Sendable, Equatable, Identifiable {
     }
 }
 
+/// Guidance about something Terso found but deliberately does not clean itself.
+///
+/// It is informational only: it is never a ``CleanItem``, and Terso never runs `command`.
+public struct ModuleAdvisory: Sendable, Equatable, Identifiable {
+    /// Identifier of the module that produced the advisory.
+    public let moduleID: String
+
+    /// Stable identifier of the advisory within its module.
+    public let advisoryID: String
+
+    /// Short user-facing title.
+    public let title: String
+
+    /// User-facing explanation.
+    public let detail: String
+
+    /// A command the user can run themselves in Terminal.
+    public let command: String
+
+    /// Estimated size of what the command would affect, if known.
+    public let estimatedBytes: Int64
+
+    public var id: String { "\(moduleID):\(advisoryID)" }
+
+    public init(
+        moduleID: String,
+        advisoryID: String,
+        title: String,
+        detail: String,
+        command: String,
+        estimatedBytes: Int64
+    ) {
+        self.moduleID = moduleID
+        self.advisoryID = advisoryID
+        self.title = title
+        self.detail = detail
+        self.command = command
+        self.estimatedBytes = estimatedBytes
+    }
+}
+
 /// The items a module found plus what it deliberately left out.
 public struct ModuleScanReport: Sendable, Equatable {
     public let items: [CleanItem]
     public let skippedCaches: [SkippedCache]
+    public let advisories: [ModuleAdvisory]
 
-    public init(items: [CleanItem], skippedCaches: [SkippedCache] = []) {
+    public init(
+        items: [CleanItem],
+        skippedCaches: [SkippedCache] = [],
+        advisories: [ModuleAdvisory] = []
+    ) {
         self.items = items
         self.skippedCaches = skippedCaches
+        self.advisories = advisories
     }
 }
 
