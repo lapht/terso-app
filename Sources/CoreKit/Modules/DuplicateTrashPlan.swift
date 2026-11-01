@@ -87,6 +87,7 @@ public enum DuplicateTrashPlan {
     ///   - groups: All groups of the last scan.
     ///   - selectedPaths: Standardized paths of the copies the user selected. Empty means an empty plan.
     /// - Throws: ``DuplicateTrashPlanError`` when a group would lose every copy or a path is unknown.
+    @discardableResult
     public static func make(groups: [DuplicateTrashGroup], selectedPaths: Set<String>) throws -> Plan {
         let known = Set(groups.flatMap { $0.copies.map { $0.url.standardizedFileURL.path } })
         if let unknown = selectedPaths.subtracting(known).sorted().first {

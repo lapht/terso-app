@@ -84,6 +84,7 @@ private final class GrantFixture {
         )
     }
 
+    @discardableResult
     func run(
         _ item: CleanItem,
         roots: [URL],
@@ -123,7 +124,7 @@ struct ProtectedAreaGrantTests {
         for folder in [fixture.homeURL, fixture.homeURL.deletingLastPathComponent(), URL(fileURLWithPath: "/"),
                        URL(fileURLWithPath: "/System/Library"), URL(fileURLWithPath: "/Applications")] {
             #expect(throws: SafetyError.self, "\(folder.path)") {
-                try ProtectedAreaGrant(folder: folder, homeDirectory: fixture.homeURL)
+                _ = try ProtectedAreaGrant(folder: folder, homeDirectory: fixture.homeURL)
             }
         }
     }
@@ -137,7 +138,7 @@ struct ProtectedAreaGrantTests {
 
         for folder in [fixture.documentsURL.appendingPathComponent("nope"), file, link, traversal] {
             #expect(throws: SafetyError.self, "\(folder.path)") {
-                try ProtectedAreaGrant(folder: folder, homeDirectory: fixture.homeURL)
+                _ = try ProtectedAreaGrant(folder: folder, homeDirectory: fixture.homeURL)
             }
         }
     }
