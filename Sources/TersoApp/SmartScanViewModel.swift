@@ -242,6 +242,9 @@ final class SmartScanViewModel: ObservableObject {
                 developer.appendingPathComponent("Xcode/Archives", isDirectory: true),
                 developer.appendingPathComponent("CoreSimulator/Caches", isDirectory: true)
             ],
+            "mail.downloads": [
+                home.appendingPathComponent(MailDownloadsModule.relativeRoot, isDirectory: true)
+            ],
             "caches.packages": [
                 home.appendingPathComponent(".npm", isDirectory: true),
                 library.appendingPathComponent("Caches", isDirectory: true),
@@ -270,7 +273,8 @@ final class SmartScanViewModel: ObservableObject {
         UserLogsModule(),
         TrashBinsModule(),
         XcodeJunkModule(),
-        PackageCachesModule()
+        PackageCachesModule(),
+        MailDownloadsModule()
     ]
 
     private static func makeScanContext(tccManager: TCCManager) -> ScanContext {
