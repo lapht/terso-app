@@ -458,3 +458,120 @@ membership is obtained.
 - https://workbrew.com/blog/what-homebrew-5-0-0-means-for-your-mac-fleet
 - https://feedbagel.com/post/homebrew-to-remove-no-quarantine-flag-support-for-macos-security-compliance
 - https://github.com/ivoronin/TomatoBar/issues/102
+
+## Spike #113 — Old-file signals on macOS 13+
+
+**Date:** 2026-11-01
+**Outcome:** a usable detection strategy, with one safety conflict to resolve
+before any implementation (see "Open decision").
+
+**Method and limits.** Probes were run on macOS 26.6.2 (Apple Silicon) with
+`mdls`, `ls -lO` and `defaults`. macOS 13 was **not** available, and the test
+machine has no iCloud Drive, so the macOS 13 behavior and the dataless-file
+behavior below are taken from Apple documentation and must be re-checked on a
+real macOS 13 and an iCloud-enabled account before the feature ships.
+Items are marked **[verified]** (observed here) or **[documented]**.
+
+### 1. Last-used date
+- `kMDItemLastUsedDate` is written by Launch Services/Finder when a user opens
+  a file; it is **absent** for files never opened through them. **[verified]**
+  A camera-roll JPEG on the Desktop had `kMDItemLastUsedDate = (null)` while
+  `kMDItemContentModificationDate` was set.
+- It is **not** set by `cat`, backup tools, scripts or sync clients, so absence
+  means "no recorded user open", not "never touched".
+- Screenshots get `kMDItemLastUsedDate` = capture time (use count 1). **[verified]**
+  A screenshot therefore never looks "used" by that signal alone.
+- Spotlight metadata is missing when indexing is off (`mdutil -i off`), the
+  volume is excluded in Spotlight privacy settings, the volume is not indexed
+  (many external/network volumes), or the file is newer than the indexer.
+  **[documented]**
+- `kMDItemDateAdded`, `kMDItemUseCount` exist but are Spotlight-only and share
+  the same gaps; do not rely on them.
+
+**Strategy.** Read dates with `URLResourceValues`/`NSMetadataItem` only as a
+hint, never as the sole proof:
+`lastActivity = max(lastUsedDate ?? .distantPast, contentModificationDate,
+creationDate)`. If Spotlight returns no attribute, silently falling back to
+modification date is allowed **only if the UI states which signal was used**
+(invariant 7: never scan less than displayed). Volumes where `mdutil -s` is
+disabled are reported as "dates are approximate", not skipped silently.
+
+### 2. Screenshots and screen recordings
+- `kMDItemIsScreenCapture = 1` and `kMDItemScreenCaptureType = "selection"`
+  are set on screenshots. **[verified]** Recordings carry the same flag
+  **[documented]**.
+- The save location is `defaults read com.apple.screencapture location`; if the
+  key is missing the default is `~/Desktop`. **[verified]** (key absent here).
+  Read it with `UserDefaults(suiteName: "com.apple.screencapture")`.
+- The filename is localized (here `Screenshot … alle …`, English `Screenshot …
+  at …`, other locales differ), and the `name` default can rename the prefix.
+  Filename matching is a **last resort**, accepted only for `.png`/`.mov` files
+  directly inside the configured screenshot folder.
+- Order: `kMDItemIsScreenCapture` → (flag missing **and** file inside the
+  configured location) localized-prefix match → otherwise not a screenshot.
+
+### 3. Photo exclusion (rule: when in doubt, it is a photo)
+An image/video is treated as a photo and **excluded** if any of these holds:
+- it is inside a `.photoslibrary` bundle (never descend into the bundle at
+  all; it is a package and must stay opaque);
+- `kMDItemAcquisitionMake`/`Model` or EXIF Make/Model (read via ImageIO
+  `CGImageSourceCopyPropertiesAtIndex`, header only, no full decode) is present;
+- the type is HEIC/HEIF/`public.heic` or a `.mov` Live Photo companion;
+- the metadata cannot be read.
+
+Counter-example **[verified]**: a camera-style `IMG_5543.jpg` had **no** Make
+or Model (metadata stripped by messaging apps/export). EXIF-absent therefore
+does not mean "not a photo". Only screenshots proven by section 2 are eligible
+as images; every other image is excluded by default.
+
+### 4. iCloud dataless files
+- A dataless (evicted) file reports `SF_DATALESS` (`0x40000000`) in `st_flags`
+  from `stat`/`lstat`, and `URLResourceValues.ubiquitousItemDownloadingStatus
+  == .notDownloaded` for iCloud items. Both are metadata reads and do not start
+  a download. **[documented]**
+- Opening, reading or hashing the content, or `Data(contentsOf:)`, materializes
+  the file. **Never** read content of a file before its flags are checked.
+- `st_size` of a dataless file is the logical size but frees **0 bytes** locally;
+  use `totalFileAllocatedSize`/`st_blocks` for reclaimable space.
+- Policy: dataless files are listed as "in iCloud, 0 B on disk" and never
+  counted toward reclaimable bytes, never opened, never selected.
+- Cloud providers under `~/Library/CloudStorage` (e.g. SynologyDrive present
+  here) are File Provider roots with the same flag; treat them as out of scope
+  unless the allowlist names them.
+
+### 5. TCC prompts and the existing flow (#77)
+- First access to `~/Desktop`, `~/Documents`, `~/Downloads` (and removable or
+  network volumes) by a non-Full-Disk-Access app raises a per-folder prompt;
+  a refusal surfaces as `EACCES`/`EPERM` on enumeration. **[documented]**
+  Granting Full Disk Access removes the prompts.
+- The current flow does not cover this: `SystemTCCAccessChecker` deliberately
+  avoids probes in those folders (see its doc comment) and `TCCManager` only
+  reasons about Full Disk Access.
+- Recommendation: the old-files module sets `requiresFDA = true` for the
+  first version (the UX already exists: `.requiresPermission` + onboarding)
+  rather than introducing per-folder prompt handling; if a folder is still
+  unreadable the module must report `.requiresPermission`, not a smaller list.
+
+### Recommended detection strategy
+1. Enumerate only inside allowlisted old-files roots, never into packages.
+2. Skip dataless files via `st_flags` before any content access.
+3. Classify screenshots per section 2; exclude everything photo-like per
+   section 3; other image types are excluded by default.
+4. Compute `lastActivity` per section 1 and show the signal used.
+5. Apply an age threshold (default proposal: 90 days, user-adjustable) to
+   `lastActivity` only.
+6. Everything goes through the existing trash-first pipeline.
+
+### Open decision (blocks the implementation issue)
+Invariant 3 hard-denies the user's Desktop/Documents/Downloads roots, but
+screenshots live on the Desktop by default and Downloads is the main source of
+old files. As written, `PathValidator` would refuse to trash them. Resolving
+this needs a maintainer decision and a `[SAFETY]` change (e.g. an explicit,
+narrow exception for files matching the screenshot/old-download criteria
+rather than the roots). This spike does not change `Safety/`.
+
+### References
+- Apple: `NSMetadataItem` / `MDItem` attribute keys (`kMDItemLastUsedDate`,
+  `kMDItemIsScreenCapture`, `kMDItemAcquisitionMake`).
+- Apple: `URLResourceKey.ubiquitousItemDownloadingStatusKey`, `<sys/stat.h>`
+  `SF_DATALESS`.
