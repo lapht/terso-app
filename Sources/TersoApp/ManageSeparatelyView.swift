@@ -84,7 +84,7 @@ extension ManagedItemKind {
     var removalGuidance: String {
         switch self {
         case .ollamaModels:
-            String(localized: "Run “ollama rm <model>” in Terminal.")
+            String(localized: "Run “ollama rm” with the model name in Terminal.")
         case .huggingFaceCache:
             String(localized: "Run “hf cache rm” (or “huggingface-cli delete-cache”) in Terminal.")
         case .lmStudioModels:

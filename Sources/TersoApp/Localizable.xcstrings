@@ -958,19 +958,19 @@
         }
       }
     },
-    "Run “ollama rm <model>” in Terminal." : {
+    "Run “ollama rm” with the model name in Terminal." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Run “ollama rm <model>” in Terminal."
+            "value" : "Run “ollama rm” with the model name in Terminal."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esegui “ollama rm <modello>” nel Terminale."
+            "value" : "Esegui “ollama rm” con il nome del modello nel Terminale."
           }
         }
       }
