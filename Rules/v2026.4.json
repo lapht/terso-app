@@ -138,57 +138,6 @@
       "isTrashSafe": true
     },
     {
-      "id": "xcode.device-support",
-      "module": "xcode.junk",
-      "category": "Xcode",
-      "name": "Xcode DeviceSupport",
-      "description": "Finds per-OS-build device support files for iOS, watchOS, tvOS and visionOS; the newest per platform is never preselected.",
-      "allowlistRoots": [
-        "~/Library/Developer/Xcode/iOS DeviceSupport",
-        "~/Library/Developer/Xcode/watchOS DeviceSupport",
-        "~/Library/Developer/Xcode/tvOS DeviceSupport",
-        "~/Library/Developer/Xcode/visionOS DeviceSupport"
-      ],
-      "paths": [],
-      "patterns": [
-        "*"
-      ],
-      "exclusions": [],
-      "isTrashSafe": true
-    },
-    {
-      "id": "xcode.device-logs",
-      "module": "xcode.junk",
-      "category": "Xcode",
-      "name": "iOS Device Logs",
-      "description": "Finds old device logs collected by Xcode.",
-      "allowlistRoots": [
-        "~/Library/Developer/Xcode/iOS Device Logs"
-      ],
-      "paths": [],
-      "patterns": [
-        "**/*"
-      ],
-      "exclusions": [],
-      "isTrashSafe": true
-    },
-    {
-      "id": "xcode.documentation-cache",
-      "module": "xcode.junk",
-      "category": "Xcode",
-      "name": "Xcode documentation cache",
-      "description": "Finds the rebuildable Xcode documentation cache.",
-      "allowlistRoots": [
-        "~/Library/Developer/Xcode/DocumentationCache"
-      ],
-      "paths": [],
-      "patterns": [
-        "**/*"
-      ],
-      "exclusions": [],
-      "isTrashSafe": true
-    },
-    {
       "id": "packages.homebrew",
       "module": "packages",
       "category": "Package caches",
@@ -1695,6 +1644,57 @@
         "date": "2026-11-01",
         "rationale": "conda keeps downloaded tarballs and extracted packages in pkgs and re-downloads them when needed. Only pkgs folders are listed: environments (envs) are never proposed."
       }
+    },
+    {
+      "id": "xcode.device-support",
+      "module": "xcode.junk",
+      "category": "Xcode",
+      "name": "Xcode DeviceSupport",
+      "description": "Finds per-OS-build device support files for iOS, watchOS, tvOS and visionOS; the newest per platform is never preselected.",
+      "allowlistRoots": [
+        "~/Library/Developer/Xcode/iOS DeviceSupport",
+        "~/Library/Developer/Xcode/watchOS DeviceSupport",
+        "~/Library/Developer/Xcode/tvOS DeviceSupport",
+        "~/Library/Developer/Xcode/visionOS DeviceSupport"
+      ],
+      "paths": [],
+      "patterns": [
+        "*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "xcode.device-logs",
+      "module": "xcode.junk",
+      "category": "Xcode",
+      "name": "iOS Device Logs",
+      "description": "Finds old device logs collected by Xcode.",
+      "allowlistRoots": [
+        "~/Library/Developer/Xcode/iOS Device Logs"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
+    },
+    {
+      "id": "xcode.documentation-cache",
+      "module": "xcode.junk",
+      "category": "Xcode",
+      "name": "Xcode documentation cache",
+      "description": "Finds the rebuildable Xcode documentation cache.",
+      "allowlistRoots": [
+        "~/Library/Developer/Xcode/DocumentationCache"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true
     }
   ]
 }
