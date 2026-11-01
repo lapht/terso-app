@@ -27,7 +27,7 @@ struct LargeFilesModuleTests {
         let outside: URL
     }
 
-    @Test func discoversOnlyFilesLargerThanConfiguredThresholdAsReadOnly() async throws {
+    @Test func discoversOnlyFilesLargerThanConfiguredThresholdAsTrashable() async throws {
         let fixture = try makeFixture()
         defer { try? FileManager.default.removeItem(at: fixture.root) }
 
@@ -51,8 +51,30 @@ struct LargeFilesModuleTests {
         #expect(result.map(\.sizeBytes) == [expectedLargeSize])
         #expect(result.map(\.moduleId) == ["files.large"])
         #expect(result.map(\.ruleId) == ["files.large"])
-        #expect(result.allSatisfy { !$0.isDeletable })
-        #expect(result.allSatisfy { $0.recommendedAction == .revealInFinder })
+        #expect(result.allSatisfy { $0.isDeletable && !$0.isProtected })
+        #expect(result.allSatisfy { $0.recommendedAction == .trash })
+    }
+
+    @Test func filesInsidePackagesAndUserApplicationsStayRevealOnly() async throws {
+        let fixture = try makeFixture()
+        defer { try? FileManager.default.removeItem(at: fixture.root) }
+
+        let plain = fixture.home.appendingPathComponent("Movies/plain.dat")
+        let inPackage = fixture.home.appendingPathComponent("Pictures/Photos.photoslibrary/originals/a.dat")
+        let inApplications = fixture.home.appendingPathComponent("Applications/Tool/data.dat")
+        for url in [plain, inPackage, inApplications] {
+            try createFile(at: url, byteCount: 4_096)
+        }
+
+        let result = try await LargeFilesModule(minimumSizeBytes: 0).scan(
+            context: ScanContext(homeDirectory: fixture.home)
+        )
+
+        let trashable = result.filter(\.isDeletable).map(\.url)
+        let revealOnly = result.filter { !$0.isDeletable }
+        #expect(trashable == [plain])
+        #expect(Set(revealOnly.map(\.url)) == [inPackage, inApplications])
+        #expect(revealOnly.allSatisfy { $0.recommendedAction == .revealInFinder })
     }
 
     @Test func defaultThresholdIsOneHundredMiB() {
