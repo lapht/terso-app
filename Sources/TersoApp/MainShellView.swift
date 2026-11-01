@@ -82,6 +82,8 @@ struct MainShellView: View {
             DuplicatesView(viewModel: scanSessions.duplicates)
         } else if selection == .largeFiles {
             LargeFilesView(viewModel: scanSessions.largeFiles)
+        } else if selection == .manageSeparately {
+            ManageSeparatelyView(viewModel: scanSessions.manageSeparately)
         } else if selection == .auditLogs {
             AuditLogView()
         } else if let selection,

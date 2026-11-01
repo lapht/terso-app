@@ -33,7 +33,7 @@ extension SidebarDestination {
             XcodeJunkModule()
         case .packageCaches:
             PackageCachesModule()
-        case .smartScan, .leftovers, .duplicates, .largeFiles, .auditLogs:
+        case .smartScan, .leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs:
             nil
         }
     }
