@@ -14,6 +14,9 @@ if [[ ! -d "$source_root" ]]; then
 fi
 
 forbidden_pattern='(removeItem|trashItem|unlink(at)?|rmdir)[[:space:]]*\(|(^|[^.[:alnum:]_])remove[[:space:]]*\(|(system|popen|execl|execv|posix_spawn)[[:space:]]*\([^)]*(/bin/)?rm|(^|[^[:alnum:]_])rm("|[[:space:],]|$)'
+# APIs that move, replace or truncate files bypass Trash-first just as removal does.
+move_pattern='(^|[^[:alnum:]_])(moveItem|replaceItem(At)?|exchangedata|renamex_np|renameatx_np|rename(at)?|truncate|ftruncate|recycle)[[:space:]]*\(|(system|popen|execl|execv|posix_spawn)[[:space:]]*\([^)]*(/bin/)?mv|(^|[^[:alnum:]_])mv("|[[:space:],]|$)'
+forbidden_pattern="$forbidden_pattern|$move_pattern"
 violations=0
 
 while IFS= read -r -d '' file; do
@@ -39,8 +42,8 @@ while IFS= read -r -d '' file; do
 done < <(find "$source_root" -type f -name '*.swift' -print0)
 
 if [[ "$violations" -ne 0 ]]; then
-    printf 'safety audit: file-deletion calls are only permitted in Sources/CoreKit/Safety/.\n' >&2
+    printf 'safety audit: file-deletion and file-move calls are only permitted in Sources/CoreKit/Safety/.\n' >&2
     exit 1
 fi
 
-printf 'safety audit: no forbidden file-deletion calls found outside Sources/CoreKit/Safety/.\n'
+printf 'safety audit: no forbidden file-deletion or file-move calls found outside Sources/CoreKit/Safety/.\n'
