@@ -89,6 +89,10 @@ struct DuplicateFileReader: Sendable {
     ///
     /// Throws `CancellationError` when the surrounding task is cancelled.
     func hash(of url: URL, expected: DuplicateFileStatus, limit: Int64?) throws -> String {
+        // Checked before open(): opening a dataless placeholder can start an iCloud download.
+        guard try !status(url).isDataless else {
+            throw DuplicateReadError(message: "The file is not downloaded from iCloud and was not read.")
+        }
         let descriptor = open(url.path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC)
         guard descriptor >= 0 else {
             throw DuplicateReadError.posix("open", errno)

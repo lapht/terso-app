@@ -155,9 +155,11 @@ public struct SymlinkValidator: Sendable {
 
             // Check if current path is a symbolic link
             guard let destination = try? fileManager.destinationOfSymbolicLink(atPath: currentPath) else {
-                // Not a symlink (or destination couldn't be read).
-                // If it was already identified as symlink or it's a regular file:
-                return (currentURL, didTraverseSymlink)
+                // The final component is not a symlink, but a parent directory may be one.
+                // Canonicalize so a symlinked parent is resolved and checked like a symlinked leaf.
+                let canonicalURL = currentURL.resolvingSymlinksInPath().standardizedFileURL
+                let parentWasSymlink = canonicalURL.path != currentURL.path
+                return (parentWasSymlink ? canonicalURL : currentURL, didTraverseSymlink || parentWasSymlink)
             }
 
             didTraverseSymlink = true
