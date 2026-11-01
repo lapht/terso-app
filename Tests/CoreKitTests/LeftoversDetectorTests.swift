@@ -333,7 +333,7 @@ struct LeftoversDetectorTests {
         defer { fixture.remove() }
         let repositoryRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-        let databaseURL = repositoryRoot.appendingPathComponent("Rules/v2026.2.json")
+        let databaseURL = repositoryRoot.appendingPathComponent("Rules/v2026.3.json")
         let database = try RuleValidator.decode(Data(contentsOf: databaseURL))
 
         let result = try fixture.detector().scan(

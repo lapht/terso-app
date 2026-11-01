@@ -20,47 +20,8 @@
 import Foundation
 import Testing
 
-/// Seed leftover rules shipped in `Rules/v2026.2.json` (#101).
+/// Seed leftover rules shipped in `Rules/v2026.3.json` (#101, #147).
 struct LeftoverRulesTests {
-    /// Every leftover rule with the exact paths it must match, in app pattern order.
-    private static let expectedMatches: [String: (bundleID: String, paths: [String])] = [
-        "leftovers.google.chrome": ("com.google.Chrome", [
-            "Library/Application Support/Google/Chrome",
-            "Library/Caches/Google/Chrome",
-            "Library/Caches/com.google.Chrome",
-            "Library/Preferences/com.google.Chrome.plist",
-            "Library/Saved Application State/com.google.Chrome.savedState",
-            "Library/HTTPStorages/com.google.Chrome",
-            "Library/WebKit/com.google.Chrome"
-        ]),
-        "leftovers.microsoft.vscode": ("com.microsoft.VSCode", [
-            "Library/Application Support/Code",
-            "Library/Caches/com.microsoft.VSCode.ShipIt",
-            "Library/Caches/com.microsoft.VSCode",
-            "Library/Preferences/com.microsoft.VSCode.plist",
-            "Library/Saved Application State/com.microsoft.VSCode.savedState",
-            "Library/HTTPStorages/com.microsoft.VSCode",
-            "Library/WebKit/com.microsoft.VSCode"
-        ]),
-        "leftovers.spotify.client": ("com.spotify.client", [
-            "Library/Application Support/Spotify",
-            "Library/Caches/com.spotify.client",
-            "Library/Preferences/com.spotify.client.plist",
-            "Library/Saved Application State/com.spotify.client.savedState",
-            "Library/HTTPStorages/com.spotify.client",
-            "Library/WebKit/com.spotify.client"
-        ]),
-        "leftovers.bitwarden.desktop": ("com.bitwarden.desktop", [
-            "Library/Containers/com.bitwarden.desktop",
-            "Library/Containers/com.bitwarden.desktop.loginhelper",
-            "Library/Containers/com.bitwarden.desktop.safari",
-            "Library/Group Containers/LTZ2PFU5D6.com.bitwarden.desktop"
-        ]),
-        "leftovers.c3.theunarchiver": ("cx.c3.theunarchiver", [
-            "Library/Containers/cx.c3.theunarchiver"
-        ])
-    ]
-
     /// Data of other apps, shared vendor folders and near-miss names that no rule may match.
     private static let decoyPaths = [
         "Library/Application Support/Google",
@@ -87,20 +48,25 @@ struct LeftoverRulesTests {
 
     // MARK: - Database
 
-    @Test func v2026Point2DatabaseMatchesSnapshotAndKeepsV1Rules() throws {
-        let databaseData = try Data(contentsOf: Self.repositoryRoot.appendingPathComponent("Rules/v2026.2.json"))
+    @Test func v2026Point3DatabaseMatchesSnapshotAndKeepsV1Rules() throws {
+        let databaseData = try Data(contentsOf: Self.repositoryRoot.appendingPathComponent("Rules/v2026.3.json"))
         let snapshotURL = try #require(
-            Bundle.module.url(forResource: "rules-v2026.2.snapshot", withExtension: "json")
+            Bundle.module.url(forResource: "rules-v2026.3.snapshot", withExtension: "json")
         )
         #expect(databaseData == (try Data(contentsOf: snapshotURL)))
 
         let database = try RuleValidator.decode(databaseData)
-        #expect(database.version == "2026.2")
+        #expect(database.version == "2026.3")
         #expect(database.schemaVersion == 2)
 
         let v1Data = try Data(contentsOf: Self.repositoryRoot.appendingPathComponent("Rules/v2026.1.json"))
         let v1Rules = try RuleValidator.decode(v1Data).rules
         #expect(Array(database.rules.prefix(v1Rules.count)) == v1Rules)
+
+        let v2Data = try Data(contentsOf: Self.repositoryRoot.appendingPathComponent("Rules/v2026.2.json"))
+        let v2Rules = try RuleValidator.decode(v2Data).rules
+        #expect(Array(database.rules.prefix(v2Rules.count)) == v2Rules)
+        #expect(Set(database.rules.flatMap { $0.appPatterns ?? [] }.map(\.bundleID)).count >= 30)
         #expect(database.rules.dropFirst(v1Rules.count).allSatisfy { $0.module == "leftovers" })
     }
 
@@ -226,7 +192,7 @@ struct LeftoverRulesTests {
         .deletingLastPathComponent()
 
     private static func leftoverRules() throws -> [CleanupRule] {
-        let data = try Data(contentsOf: repositoryRoot.appendingPathComponent("Rules/v2026.2.json"))
+        let data = try Data(contentsOf: repositoryRoot.appendingPathComponent("Rules/v2026.3.json"))
         return try RuleValidator.decode(data).rules.filter { $0.module == "leftovers" }
     }
 }
