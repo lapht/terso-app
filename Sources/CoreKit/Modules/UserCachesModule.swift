@@ -20,7 +20,7 @@ import AppKit
 import Foundation
 
 /// Finds user cache directories, excluding caches for running applications.
-public struct UserCachesModule: CleanModule {
+public struct UserCachesModule: SkippedCacheReporting {
     public let id = "caches.user"
     public let title = "User Caches"
     public let requiresFDA = false
@@ -40,6 +40,10 @@ public struct UserCachesModule: CleanModule {
     }
 
     public func scan(context: ScanContext) async throws -> [CleanItem] {
+        try await scanReport(context: context).items
+    }
+
+    public func scanReport(context: ScanContext) async throws -> ModuleScanReport {
         let cachesRoot = context.homeDirectory
             .appendingPathComponent("Library/Caches", isDirectory: true)
             .standardizedFileURL
@@ -47,7 +51,7 @@ public struct UserCachesModule: CleanModule {
         guard rootValues.isDirectory == true,
               rootValues.isSymbolicLink != true,
               cachesRoot.resolvingSymlinksInPath().standardizedFileURL.path == cachesRoot.path else {
-            return []
+            return ModuleScanReport(items: [])
         }
 
         let runningIDs = await runningBundleIdentifiers()
@@ -57,24 +61,31 @@ public struct UserCachesModule: CleanModule {
             options: []
         )
 
-        return try cacheDirectories.sorted { $0.lastPathComponent < $1.lastPathComponent }.compactMap { cacheURL in
-            guard !runningIDs.contains(cacheURL.lastPathComponent) else {
-                return nil
-            }
-
+        var items: [CleanItem] = []
+        var skipped: [SkippedCache] = []
+        for cacheURL in cacheDirectories.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
             let values = try cacheURL.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
             guard values.isDirectory == true,
                   values.isSymbolicLink != true else {
-                return nil
+                continue
             }
 
             let resolvedURL = cacheURL.resolvingSymlinksInPath().standardizedFileURL
             guard resolvedURL.path == cacheURL.standardizedFileURL.path,
                   resolvedURL.deletingLastPathComponent().path == cachesRoot.path else {
-                return nil
+                continue
             }
 
             let size = try SizeCalculator().calculate(at: resolvedURL)
+            if runningIDs.contains(cacheURL.lastPathComponent) {
+                // Read-only estimate: skipped caches are reported, never offered for cleanup.
+                skipped.append(SkippedCache(
+                    moduleID: id,
+                    bundleIdentifier: cacheURL.lastPathComponent,
+                    estimatedBytes: size.bytes
+                ))
+                continue
+            }
             guard size.errors.isEmpty else {
                 throw UserCachesScanFailure.incompleteSize(
                     path: resolvedURL.path,
@@ -82,14 +93,15 @@ public struct UserCachesModule: CleanModule {
                 )
             }
 
-            return CleanItem(
+            items.append(CleanItem(
                 url: cacheURL,
                 resolvedURL: resolvedURL,
                 sizeBytes: size.bytes,
                 moduleId: id,
                 ruleId: id
-            )
+            ))
         }
+        return ModuleScanReport(items: items, skippedCaches: skipped)
     }
 }
 

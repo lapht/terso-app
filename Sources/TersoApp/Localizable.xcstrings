@@ -1736,6 +1736,57 @@
         }
       }
     },
+    "Skipped because the app is open" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped because the app is open"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saltate perché l'app è aperta"
+          }
+        }
+      }
+    },
+    "Quit these apps yourself, then rescan to include their caches." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quit these apps yourself, then rescan to include their caches."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi tu queste app, poi scansiona di nuovo per includere le loro cache."
+          }
+        }
+      }
+    },
+    "Rescan After Quitting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rescan After Quitting"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansiona di nuovo dopo la chiusura"
+          }
+        }
+      }
+    },
     "Scan Again" : {
       "extractionState" : "manual",
       "localizations" : {

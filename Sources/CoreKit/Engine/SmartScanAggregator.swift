@@ -112,6 +112,9 @@ public struct SmartScanResult: Sendable, Equatable {
     /// All discovered items, ordered by module registration and scan order.
     public let items: [CleanItem]
 
+    /// Caches left out because their app is running; informational, never deletable.
+    public let skippedCaches: [SkippedCache]
+
     /// Failures from modules that did not complete successfully.
     public let errors: [SmartScanModuleError]
 
@@ -131,7 +134,7 @@ public struct SmartScanResult: Sendable, Equatable {
 /// Runs registered cleanup modules concurrently and aggregates their read-only scan results.
 public struct SmartScanAggregator: Sendable {
     private enum ModuleOutcome: Sendable {
-        case completed([CleanItem])
+        case completed(ModuleScanReport)
         case requiresPermission(String)
         case failed(String)
     }
@@ -168,9 +171,9 @@ public struct SmartScanAggregator: Sendable {
         mutating func record(_ outcome: IndexedOutcome) -> SmartScanModuleStatus {
             completedModules += 1
             switch outcome.outcome {
-            case let .completed(items):
-                itemsFound += items.count
-                bytesFound += items.reduce(into: Int64.zero) { $0 += $1.sizeBytes }
+            case let .completed(report):
+                itemsFound += report.items.count
+                bytesFound += report.items.reduce(into: Int64.zero) { $0 += $1.sizeBytes }
                 return .completed
             case let .requiresPermission(message):
                 return .requiresPermission(message: message)
@@ -255,13 +258,13 @@ public struct SmartScanAggregator: Sendable {
     ) async throws -> IndexedOutcome {
         do {
             try Task.checkCancellation()
-            switch try await tccManager.scan(module: module, context: context) {
-            case let .completed(items):
+            switch try await tccManager.scanReport(module: module, context: context) {
+            case let .completed(report):
                 return IndexedOutcome(
                     index: index,
                     moduleID: module.id,
                     moduleTitle: module.title,
-                    outcome: .completed(items)
+                    outcome: .completed(report)
                 )
             case let .requiresPermission(message):
                 return IndexedOutcome(
@@ -288,13 +291,15 @@ public struct SmartScanAggregator: Sendable {
         totalModules: Int
     ) -> SmartScanResult {
         var items: [CleanItem] = []
+        var skippedCaches: [SkippedCache] = []
         var errors: [SmartScanModuleError] = []
         var permissionRequirements: [SmartScanPermissionRequirement] = []
 
         for outcome in outcomes.sorted(by: { $0.index < $1.index }) {
             switch outcome.outcome {
-            case let .completed(moduleItems):
-                items.append(contentsOf: moduleItems)
+            case let .completed(report):
+                items.append(contentsOf: report.items)
+                skippedCaches.append(contentsOf: report.skippedCaches)
             case let .requiresPermission(message):
                 permissionRequirements.append(
                     SmartScanPermissionRequirement(
@@ -316,6 +321,7 @@ public struct SmartScanAggregator: Sendable {
 
         return SmartScanResult(
             items: items,
+            skippedCaches: skippedCaches,
             errors: errors,
             permissionRequirements: permissionRequirements,
             completedModules: outcomes.count,

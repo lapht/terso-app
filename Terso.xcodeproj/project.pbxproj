@@ -32,6 +32,7 @@
 		100000000000000000000008 /* ModuleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000008 /* ModuleDetailView.swift */; };
 		100000000000000000000009 /* ModuleSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000009 /* ModuleSelectionViewModel.swift */; };
 		10000000000000000000000A /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000A /* SidebarView.swift */; };
+		1000000000000000000F0139 /* SkippedCachesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000F0139 /* SkippedCachesView.swift */; };
 		10000000000000000000000B /* SmartScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000B /* SmartScanView.swift */; };
 		10000000000000000000000C /* SmartScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000C /* SmartScanViewModel.swift */; };
 		1000000000000000000000FF /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001E /* DesignTokens.swift */; };
@@ -96,6 +97,7 @@
 		200000000000000000000008 /* ModuleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleDetailView.swift; sourceTree = "<group>"; };
 		200000000000000000000009 /* ModuleSelectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleSelectionViewModel.swift; sourceTree = "<group>"; };
 		20000000000000000000000A /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		2000000000000000000F0139 /* SkippedCachesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkippedCachesView.swift; sourceTree = "<group>"; };
 		20000000000000000000000B /* SmartScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanView.swift; sourceTree = "<group>"; };
 		20000000000000000000000C /* SmartScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanViewModel.swift; sourceTree = "<group>"; };
 		20000000000000000000001E /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
@@ -198,6 +200,7 @@
 				200000000000000000000008 /* ModuleDetailView.swift */,
 				200000000000000000000009 /* ModuleSelectionViewModel.swift */,
 				20000000000000000000000A /* SidebarView.swift */,
+				2000000000000000000F0139 /* SkippedCachesView.swift */,
 				20000000000000000000000B /* SmartScanView.swift */,
 				20000000000000000000000C /* SmartScanViewModel.swift */,
 				20000000000000000000000D /* TCCBannerView.swift */,
@@ -355,6 +358,7 @@
 				100000000000000000000008 /* ModuleDetailView.swift in Sources */,
 				100000000000000000000009 /* ModuleSelectionViewModel.swift in Sources */,
 				10000000000000000000000A /* SidebarView.swift in Sources */,
+				1000000000000000000F0139 /* SkippedCachesView.swift in Sources */,
 				10000000000000000000000B /* SmartScanView.swift in Sources */,
 				10000000000000000000000C /* SmartScanViewModel.swift in Sources */,
 				10000000000000000000000D /* TCCBannerView.swift in Sources */,

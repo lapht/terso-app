@@ -52,6 +52,65 @@ struct UserCachesModuleTests {
         #expect(result.first?.isProtected == false)
     }
 
+    @Test func reportsRunningApplicationCachesAsSkippedWithSizeAndNeverAsItems() async throws {
+        let fixture = try makeFixture()
+        defer { try? FileManager.default.removeItem(at: fixture.home) }
+        defer { try? FileManager.default.removeItem(at: fixture.outside) }
+
+        let openFile = fixture.caches.appendingPathComponent("com.example.Open/cache.data")
+        try createFile(at: openFile, contents: "running cache contents")
+        try createFile(
+            at: fixture.caches.appendingPathComponent("com.example.Closed/cache.data"),
+            contents: "closed"
+        )
+        // A symlinked cache of a running app must not be reported or followed.
+        let outsideCache = fixture.outside.appendingPathComponent("com.example.Linked", isDirectory: true)
+        try createFile(at: outsideCache.appendingPathComponent("cache.data"), contents: "outside")
+        try FileManager.default.createSymbolicLink(
+            at: fixture.caches.appendingPathComponent("com.example.Linked", isDirectory: true),
+            withDestinationURL: outsideCache
+        )
+
+        let module = UserCachesModule { ["com.example.Open", "com.example.Linked"] }
+        let report = try await module.scanReport(context: ScanContext(homeDirectory: fixture.home))
+
+        #expect(report.skippedCaches == [
+            SkippedCache(
+                moduleID: "caches.user",
+                bundleIdentifier: "com.example.Open",
+                estimatedBytes: try allocatedSize(of: openFile)
+            )
+        ])
+        #expect(report.items.map(\.url.lastPathComponent) == ["com.example.Closed"])
+    }
+
+    @Test func aggregatorExposesSkippedCaches() async throws {
+        let fixture = try makeFixture()
+        defer { try? FileManager.default.removeItem(at: fixture.home) }
+        try createFile(
+            at: fixture.caches.appendingPathComponent("com.example.Open/cache.data"),
+            contents: "running"
+        )
+
+        let aggregator = SmartScanAggregator(
+            tccManager: TCCManager(accessChecker: GrantedAccessChecker())
+        )
+        let result = try await aggregator.scan(
+            modules: [UserCachesModule { ["com.example.Open"] }],
+            context: ScanContext(homeDirectory: fixture.home)
+        )
+
+        #expect(result.items.isEmpty)
+        #expect(result.skippedCaches.map(\.bundleIdentifier) == ["com.example.Open"])
+        #expect(result.bytesFound == 0)
+    }
+
+    private struct GrantedAccessChecker: TCCAccessChecking {
+        func fullDiskAccessStatus() -> TCCStatus {
+            .granted
+        }
+    }
+
     @Test func ignoresSymlinkedCacheDirectoriesOutsideTheAllowlist() async throws {
         let fixture = try makeFixture()
         defer { try? FileManager.default.removeItem(at: fixture.home) }

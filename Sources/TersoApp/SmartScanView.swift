@@ -260,6 +260,13 @@ struct SmartScanView: View {
                 )
             }
 
+            if let skipped = viewModel.result?.skippedCaches, !skipped.isEmpty {
+                SkippedCachesView(skippedCaches: skipped) {
+                    selectedModuleID = nil
+                    viewModel.startScan()
+                }
+            }
+
             LazyVGrid(
                 columns: [
                     GridItem(
