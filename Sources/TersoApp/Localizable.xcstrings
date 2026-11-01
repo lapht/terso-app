@@ -414,19 +414,19 @@
         }
       }
     },
-    "Estimated size of the items moved to Trash. Empty Trash to reclaim disk space." : {
+    "Estimated space freed once you empty the Trash. Files that share storage (hard links, APFS clones) are not counted, so the actual amount may differ." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estimated size of the items moved to Trash. Empty Trash to reclaim disk space."
+            "value" : "Estimated space freed once you empty the Trash. Files that share storage (hard links, APFS clones) are not counted, so the actual amount may differ."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dimensione stimata degli elementi spostati nel Cestino. Svuota il Cestino per recuperare spazio su disco."
+            "value" : "Spazio stimato liberato dopo aver svuotato il Cestino. I file che condividono lo spazio (hard link, cloni APFS) non sono conteggiati, quindi la quantità effettiva può variare."
           }
         }
       }
