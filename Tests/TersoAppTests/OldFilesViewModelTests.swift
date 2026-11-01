@@ -101,8 +101,19 @@ struct OldFilesViewModelTests {
 }
 
 private struct StubMetadata: OldFileMetadataReading {
-    func isDataless(_ url: URL) -> Bool { false }
-    func lastUsedDate(of url: URL) -> Date? { nil }
-    func isScreenCapture(_ url: URL) -> Bool? { nil }
-    func imageOrigin(of url: URL) -> OldFileImageOrigin { .unreadable }
+    func isDataless(_ url: URL) -> Bool {
+        false
+    }
+
+    func lastUsedDate(of url: URL) -> Date? {
+        nil
+    }
+
+    func isScreenCapture(_ url: URL) -> Bool? {
+        nil
+    }
+
+    func imageOrigin(of url: URL) -> OldFileImageOrigin {
+        .unreadable
+    }
 }
