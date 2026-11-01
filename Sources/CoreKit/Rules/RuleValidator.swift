@@ -27,6 +27,7 @@ public enum RuleValidationError: Error, CustomStringConvertible, Equatable, Send
     case genericAllowlistRoot(ruleID: String, root: String)
     case duplicateRuleID(String)
     case invalidGlobPattern(ruleID: String, field: String, pattern: String, reason: String)
+    case pathEscapesRoot(ruleID: String, field: String, value: String)
     case schemaV2FieldInV1Database(ruleID: String, field: String)
     case invalidAppPattern(ruleID: String, field: String, value: String, reason: String)
     case missingProvenance(ruleID: String)
@@ -50,6 +51,8 @@ public enum RuleValidationError: Error, CustomStringConvertible, Equatable, Send
             "Duplicate rule id '\(id)'"
         case let .invalidGlobPattern(ruleID, field, pattern, reason):
             "Rule '\(ruleID)' has an invalid glob in '\(field)': '\(pattern)' (\(reason))"
+        case let .pathEscapesRoot(ruleID, field, value):
+            "Rule '\(ruleID)' has a '..' component in '\(field)': '\(value)' (it could escape its allowlist root)"
         case let .schemaV2FieldInV1Database(ruleID, field):
             "Rule '\(ruleID)' uses schema v2 field '\(field)' in a schemaVersion 1 database"
         case let .invalidAppPattern(ruleID, field, value, reason):
@@ -91,6 +94,7 @@ public enum RuleValidator {
                 throw RuleValidationError.duplicateRuleID(rule.id)
             }
             try validate(allowlistRoots: rule.allowlistRoots, ruleID: rule.id)
+            try rejectParentComponents(in: rule)
             try validate(patterns: rule.patterns, field: "patterns", ruleID: rule.id)
             try validate(patterns: rule.exclusions, field: "exclusions", ruleID: rule.id)
             if database.schemaVersion == 1 {
@@ -115,6 +119,21 @@ public enum RuleValidator {
             let normalizedRoot = normalizeAllowlistRoot(trimmedRoot)
             if normalizedRoot == "/" || normalizedRoot == "~" || isSystemRoot(normalizedRoot) {
                 throw RuleValidationError.genericAllowlistRoot(ruleID: ruleID, root: root)
+            }
+        }
+    }
+
+    /// Rejects `..` components anywhere a rule names a path, so no rule can climb out of its root.
+    private static func rejectParentComponents(in rule: CleanupRule) throws {
+        let fields: [(String, [String])] = [
+            ("allowlistRoots", rule.allowlistRoots),
+            ("paths", rule.paths),
+            ("patterns", rule.patterns),
+            ("exclusions", rule.exclusions)
+        ]
+        for (field, values) in fields {
+            for value in values where value.split(separator: "/", omittingEmptySubsequences: true).contains("..") {
+                throw RuleValidationError.pathEscapesRoot(ruleID: rule.id, field: field, value: value)
             }
         }
     }
