@@ -59,7 +59,11 @@ struct CleanResultView: View {
                     .font(DesignTokens.Typography.metadata)
                     .foregroundStyle(.secondary)
                 }
-                Text("Estimated size of the items moved to Trash. Empty Trash to reclaim disk space.")
+                Text("""
+                    Estimated space freed once you empty the Trash. \
+                    Files that share storage (hard links, APFS clones) are not counted, \
+                    so the actual amount may differ.
+                    """)
                     .font(DesignTokens.Typography.metadata)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

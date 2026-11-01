@@ -25,6 +25,18 @@ public struct DeletionItemResult: Sendable, Hashable {
 
     /// The URL returned by macOS after moving the item to Trash; `nil` in dry-run mode.
     public let resultingItemURL: URL?
+
+    /// The item's filesystem state captured by the dry-run; `nil` in trash mode.
+    public let snapshot: ItemSnapshot?
+}
+
+/// An item that passed validation but was not moved because it changed after the preview.
+public struct DeletionSkippedItem: Sendable, Hashable {
+    /// The item that was left untouched.
+    public let item: CleanItem
+
+    /// Why the item was skipped, for display and bug reports.
+    public let reason: String
 }
 
 /// The outcome of a deletion pipeline run.
@@ -32,8 +44,15 @@ public struct DeletionResult: Sendable, Hashable {
     /// Items successfully considered or moved to Trash.
     public let items: [DeletionItemResult]
 
-    /// The sum of the scanned item sizes, used as an estimate for the operation.
+    /// Items skipped because they changed or disappeared since the dry-run snapshot.
+    public let skipped: [DeletionSkippedItem]
+
+    /// Bytes expected to be freed. Hard links and APFS clones are never double counted,
+    /// and storage shared with files outside the batch is excluded (see ``sharedBytes``).
     public let estimatedBytes: Int64
+
+    /// Bytes of items that share storage with other files and may not be freed by this operation.
+    public let sharedBytes: Int64
 
     /// Whether this result was produced without changing the filesystem.
     public let isDryRun: Bool
@@ -73,12 +92,24 @@ public final class DeletionPipeline {
     private let pathValidator: PathValidator
     private let symlinkValidator: SymlinkValidator
     private let auditLogger: AuditLogger
+    private let inspect: @Sendable (URL) -> ItemSnapshot?
 
     /// Creates a pipeline configured for the current user's home directory.
-    public init(homeDirectory: URL, auditLogger: AuditLogger = AuditLogger()) {
+    public convenience init(homeDirectory: URL, auditLogger: AuditLogger = AuditLogger()) {
+        self.init(homeDirectory: homeDirectory, auditLogger: auditLogger, inspect: ItemSnapshot.capture)
+    }
+
+    /// Creates a pipeline with a custom file inspector; tests use it to simulate states,
+    /// such as dataless placeholders, that cannot be created on a real filesystem.
+    init(
+        homeDirectory: URL,
+        auditLogger: AuditLogger,
+        inspect: @escaping @Sendable (URL) -> ItemSnapshot?
+    ) {
         self.pathValidator = PathValidator(homeDirectory: homeDirectory)
         self.symlinkValidator = SymlinkValidator(homeDirectory: homeDirectory, pathValidator: pathValidator)
         self.auditLogger = auditLogger
+        self.inspect = inspect
     }
 
     /// Validates and, unless `dryRun` is true, moves items to the system Trash.
@@ -89,19 +120,28 @@ public final class DeletionPipeline {
     /// The whole batch is validated before any item is moved. Every item is then
     /// revalidated immediately before it is passed to `FileManager.trashItem`.
     ///
+    /// When `snapshots` carries the state captured by the dry-run, each item is also
+    /// compared against it right before the move. An item whose identity, size or
+    /// modification date changed, or that disappeared, is skipped, logged and reported
+    /// in ``DeletionResult/skipped``; it is never moved. Items without a snapshot are
+    /// not compared.
+    ///
     /// - Parameters:
     ///   - items: Items selected for cleanup.
     ///   - allowedRootsByModule: Allowlisted roots keyed by each item's module ID.
     ///   - dryRun: When true, return the validated items and estimated byte count without mutation.
+    ///   - snapshots: Dry-run snapshots keyed by ``CleanItem/id``, from ``DeletionItemResult/snapshot``.
     /// - Returns: The items processed and their estimated combined size.
     /// - Throws: A safety or filesystem error when an item cannot be safely processed.
     public func execute(
         items: [CleanItem],
         allowedRootsByModule: [String: [URL]],
-        dryRun: Bool
+        dryRun: Bool,
+        snapshots: [UUID: ItemSnapshot] = [:]
     ) throws -> DeletionResult {
-        let (candidates, estimatedBytes) = try prepareCandidates(
-            items: items,
+        let (presentItems, vanished) = try separateUnavailableItems(items, dryRun: dryRun, snapshots: snapshots)
+        let (candidates, estimate) = try prepareCandidates(
+            items: presentItems,
             allowedRootsByModule: allowedRootsByModule,
             action: dryRun ? .dryRun : .trash
         )
@@ -109,24 +149,65 @@ public final class DeletionPipeline {
         if dryRun {
             try recordDryRun(candidates)
             return DeletionResult(
-                items: candidates.map { DeletionItemResult(item: $0.item, resultingItemURL: nil) },
-                estimatedBytes: estimatedBytes,
+                items: candidates.map {
+                    DeletionItemResult(
+                        item: $0.item,
+                        resultingItemURL: nil,
+                        snapshot: inspect($0.item.url)
+                    )
+                },
+                skipped: vanished,
+                estimatedBytes: estimate.reclaimableBytes,
+                sharedBytes: estimate.sharedBytes,
                 isDryRun: true
             )
         }
 
+        let (moved, skipped) = try trash(candidates, snapshots: snapshots)
         return DeletionResult(
-            items: try trash(candidates),
-            estimatedBytes: estimatedBytes,
+            items: moved,
+            skipped: vanished + skipped,
+            estimatedBytes: estimate.reclaimableBytes,
+            sharedBytes: estimate.sharedBytes,
             isDryRun: false
         )
+    }
+
+    /// Splits off items that must be reported and skipped instead of processed, so one such
+    /// item never aborts the whole batch.
+    ///
+    /// - Dataless iCloud placeholders are skipped in every mode. They are inspected with
+    ///   `lstat` only, so nothing is read or downloaded; moving one would free no local
+    ///   space and would propagate the deletion to the cloud copy.
+    /// - Items with a dry-run snapshot that no longer exist are skipped when executing.
+    private func separateUnavailableItems(
+        _ items: [CleanItem],
+        dryRun: Bool,
+        snapshots: [UUID: ItemSnapshot]
+    ) throws -> (present: [CleanItem], skipped: [DeletionSkippedItem]) {
+        let action: AuditAction = dryRun ? .dryRun : .trash
+        var present: [CleanItem] = []
+        var skipped: [DeletionSkippedItem] = []
+        for item in items {
+            let current = inspect(item.url)
+            if current?.isDataless == true {
+                try auditLogger.record(action: action, item: item, result: .failure, errorCode: "datalessSkipped")
+                skipped.append(DeletionSkippedItem(item: item, reason: "not downloaded from iCloud; left untouched"))
+            } else if !dryRun, current == nil, snapshots[item.id] != nil {
+                try auditLogger.record(action: action, item: item, result: .failure, errorCode: "itemNotFound")
+                skipped.append(DeletionSkippedItem(item: item, reason: "item no longer exists"))
+            } else {
+                present.append(item)
+            }
+        }
+        return (present, skipped)
     }
 
     private func prepareCandidates(
         items: [CleanItem],
         allowedRootsByModule: [String: [URL]],
         action: AuditAction
-    ) throws -> (candidates: [Candidate], estimatedBytes: Int64) {
+    ) throws -> (candidates: [Candidate], estimate: SpaceEstimate) {
         var candidates: [Candidate] = []
         var estimatedBytes: Int64 = 0
 
@@ -182,7 +263,7 @@ public final class DeletionPipeline {
             }
         }
 
-        return (candidates, estimatedBytes)
+        return (candidates, try SpaceEstimate.make(for: candidates.map(\.item)))
     }
 
     private func validate(item: CleanItem, allowedRoots: [URL]) throws {
@@ -207,12 +288,43 @@ public final class DeletionPipeline {
         }
     }
 
-    private func trash(_ candidates: [Candidate]) throws -> [DeletionItemResult] {
-        var results: [DeletionItemResult] = []
+    private func trash(
+        _ candidates: [Candidate],
+        snapshots: [UUID: ItemSnapshot]
+    ) throws -> (moved: [DeletionItemResult], skipped: [DeletionSkippedItem]) {
+        var moved: [DeletionItemResult] = []
+        var skipped: [DeletionSkippedItem] = []
         for candidate in candidates {
-            results.append(try trash(candidate))
+            if let reason = try changeSincePreview(candidate, snapshot: snapshots[candidate.item.id]) {
+                skipped.append(DeletionSkippedItem(item: candidate.item, reason: reason))
+                continue
+            }
+            moved.append(try trash(candidate))
         }
-        return results
+        return (moved, skipped)
+    }
+
+    /// Compares the item with its dry-run snapshot and logs a failure when it no longer matches.
+    ///
+    /// - Returns: The reason the item must be skipped, or `nil` when it may proceed.
+    private func changeSincePreview(_ candidate: Candidate, snapshot: ItemSnapshot?) throws -> String? {
+        guard let snapshot else {
+            return nil
+        }
+        let reason: String
+        let errorCode: String
+        if let current = inspect(candidate.item.url) {
+            guard let difference = snapshot.difference(from: current) else {
+                return nil
+            }
+            reason = difference
+            errorCode = "changedSincePreview"
+        } else {
+            reason = "item no longer exists"
+            errorCode = "itemNotFound"
+        }
+        try auditLogger.record(action: .trash, item: candidate.item, result: .failure, errorCode: errorCode)
+        return reason
     }
 
     private func trash(_ candidate: Candidate) throws -> DeletionItemResult {
@@ -238,7 +350,7 @@ public final class DeletionPipeline {
         }
 
         try auditLogger.record(action: .trash, item: item, result: .success)
-        return DeletionItemResult(item: item, resultingItemURL: resultingItemURL as URL?)
+        return DeletionItemResult(item: item, resultingItemURL: resultingItemURL as URL?, snapshot: nil)
     }
 
     private static func errorCode(for error: Error) -> String {
