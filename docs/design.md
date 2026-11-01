@@ -367,6 +367,71 @@ of the release that adopts them (no earlier than v0.3). No calendar date is
 set because it depends on the funding and Apple Developer Program membership
 in §6. Maintainer confirmation is expected in the PR review of #46.
 
+### 11.7 Protected-area semantics for Desktop, Documents and Downloads (#105)
+
+**Status: proposed — pending maintainer approval.** This issue changes no code
+and no test; `PathValidator` is unchanged. The decision below takes effect only
+after the maintainer approves it in the review of this PR, and the later
+implementation (#40) needs its own `[SAFETY]` issue and review.
+
+**Current behavior (v0.1/v0.2).** Invariant 3 says "the user's
+Desktop/Documents/Downloads *roots*", but `PathValidator.checkProtectedPaths`
+denies the **whole subtree**: for `~/Desktop`, `~/Documents` and `~/Downloads`
+it uses the same `isContained` check as the system prefixes, so the root itself
+and every descendant at any depth (e.g. `~/Documents/a/b/file.txt`) throw
+`SafetyError.protectedPath`. The check is case-insensitive, runs before the
+allowlist, and cannot be overridden by a module's `allowedRoots`: adding
+`~/Documents` to an allowlist still fails. `DeletionPipeline` goes through the
+same validator, and `..` components are rejected beforehand
+(`PathValidatorTests` covers root, file and traversal cases). No other code in
+`Safety/` mentions these folders.
+
+**Why it matters.** Duplicates (#40) mostly live exactly in these folders, so
+with the current rule they could never be moved to Trash. Options must not
+weaken invariants 1–4 and 8.
+
+**Options**
+
+| | A. Keep full deny | B. Per-operation allowlist of user-selected folders | C. Files only, never folders |
+|---|---|---|---|
+| What changes | Nothing. Duplicates stay read-only (Reveal in Finder). | A folder the user explicitly picks (open panel) becomes a temporary allowed root for that one operation only. | Files inside the protected areas may be trashed; directories (including roots) never. |
+| Invariant 1 | Intact. | Intact if the allowlist is built from the user's pick and discarded after the operation; a persisted or rule-defined root would break it. | Needs a root anyway, so alone it does not satisfy it. |
+| Invariant 3 | Intact, strictly. | Becomes "deny by default, narrow user-granted exception". Needs a precise written wording. | Same exception, narrower. |
+| Main risk | Feature #40 is blocked. | Picking `~`, `~/Documents` itself or a parent of many projects widens the blast radius; a bug in scoping leaks the exception to later operations; symlinks inside the chosen folder can point outside it. | Folder deny alone does not stop trashing many important files one by one; a package/bundle (`.pages`, `.photoslibrary`) is a directory that looks like a file. |
+| Recovery | n/a | Trash-first (invariant 4) keeps items recoverable. | Same. |
+
+**Proposed decision (to approve).** Keep **A** for everything that is not a
+user-confirmed duplicate operation, and implement **B restricted by C** for
+#40:
+1. The exception applies only to the duplicates flow, only to **regular files**
+   (never directories, packages/bundles or the three roots themselves), and only
+   under a folder the user picked in that session. It is held in memory, bound
+   to one operation, and never stored, shared with other modules or defined in
+   `Rules/*.json`.
+2. A picked folder that is `~`, a protected root's parent, or a system path is
+   rejected. Picking a protected root (e.g. `~/Documents`) is allowed because
+   it is the main use case, but the recap names the folder explicitly.
+3. Invariant 2 applies in full: every path is resolved and its target must stay
+   inside the picked folder; symlinks are never followed or trashed through.
+4. Trash-first only (no permanent delete, see the note after §5); the UI shows
+   total size and item count before executing, and a dry-run is available
+   (invariants 5 and 6).
+5. The audit log (§11.5b) records each item, noting that the protected-area
+   exception was used (invariant 8).
+6. Always at least one copy per group is kept; the keeper selection and the
+   exception scoping are covered by fixture tests, including symlink-attack and
+   package cases.
+7. The wording of invariant 3 is amended in §5 when #40 is implemented,
+   in the same `[SAFETY]` PR as the code.
+
+**Not decided here.** Any change to `PathValidator`, any other module touching
+these folders, and the `.app`/`/Applications` denials, which stay unchanged
+(§11.1).
+
+**Owner and confirmation.** The repository maintainer. Approval is expected as
+an explicit review comment on this PR; until then v0.2 and #40 behave as in
+option A.
+
 ## Spike #104 — Homebrew cask viability (ad-hoc signed)
 
 **Date:** 2026-10-18
