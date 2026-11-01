@@ -1695,6 +1695,131 @@
       ],
       "exclusions": [],
       "isTrashSafe": true
+    },
+    {
+      "id": "caches.electron.slack",
+      "module": "caches.electron",
+      "category": "Caches",
+      "name": "Slack cache",
+      "description": "Finds recreatable cache folders of Slack in Application Support.",
+      "allowlistRoots": [
+        "~/Library/Application Support/Slack/Cache",
+        "~/Library/Application Support/Slack/Code Cache",
+        "~/Library/Application Support/Slack/GPUCache",
+        "~/Library/Application Support/Slack/Service Worker/CacheStorage"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "provenance": {
+        "source": "Chromium disk cache layout (https://www.chromium.org/developers/design-documents/network-stack/disk-cache/) and Electron app data paths (https://www.electronjs.org/docs/latest/api/app#appgetpathname)",
+        "author": "lapht",
+        "date": "2026-11-01",
+        "rationale": "Only the listed Chromium cache subfolders are matched, each as its own allowlist root. The app folder itself, profiles, Local Storage, IndexedDB, cookies and settings are never matched."
+      }
+    },
+    {
+      "id": "caches.electron.discord",
+      "module": "caches.electron",
+      "category": "Caches",
+      "name": "Discord cache",
+      "description": "Finds recreatable cache folders of Discord in Application Support.",
+      "allowlistRoots": [
+        "~/Library/Application Support/discord/Cache",
+        "~/Library/Application Support/discord/Code Cache",
+        "~/Library/Application Support/discord/GPUCache"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "provenance": {
+        "source": "Chromium disk cache layout (https://www.chromium.org/developers/design-documents/network-stack/disk-cache/) and Electron app data paths (https://www.electronjs.org/docs/latest/api/app#appgetpathname)",
+        "author": "lapht",
+        "date": "2026-11-01",
+        "rationale": "Only the listed Chromium cache subfolders are matched, each as its own allowlist root. The app folder itself, profiles, Local Storage, IndexedDB, cookies and settings are never matched."
+      }
+    },
+    {
+      "id": "caches.electron.teams",
+      "module": "caches.electron",
+      "category": "Caches",
+      "name": "Microsoft Teams cache",
+      "description": "Finds recreatable cache folders of Microsoft Teams in Application Support.",
+      "allowlistRoots": [
+        "~/Library/Application Support/Microsoft/Teams/Cache",
+        "~/Library/Application Support/Microsoft/Teams/Code Cache",
+        "~/Library/Application Support/Microsoft/Teams/GPUCache",
+        "~/Library/Application Support/Microsoft/Teams/Service Worker/CacheStorage"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "provenance": {
+        "source": "Chromium disk cache layout (https://www.chromium.org/developers/design-documents/network-stack/disk-cache/) and Electron app data paths (https://www.electronjs.org/docs/latest/api/app#appgetpathname)",
+        "author": "lapht",
+        "date": "2026-11-01",
+        "rationale": "Only the listed Chromium cache subfolders are matched, each as its own allowlist root. The app folder itself, profiles, Local Storage, IndexedDB, cookies and settings are never matched. Covers the classic Teams app folder; the new Teams stores its data in a sandbox container."
+      }
+    },
+    {
+      "id": "caches.electron.spotify",
+      "module": "caches.electron",
+      "category": "Caches",
+      "name": "Spotify cache",
+      "description": "Finds recreatable cache folders of Spotify in Application Support.",
+      "allowlistRoots": [
+        "~/Library/Application Support/Spotify/Cache",
+        "~/Library/Application Support/Spotify/Code Cache",
+        "~/Library/Application Support/Spotify/GPUCache"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "provenance": {
+        "source": "Chromium disk cache layout (https://www.chromium.org/developers/design-documents/network-stack/disk-cache/) and Electron app data paths (https://www.electronjs.org/docs/latest/api/app#appgetpathname)",
+        "author": "lapht",
+        "date": "2026-11-01",
+        "rationale": "Only the listed Chromium cache subfolders are matched, each as its own allowlist root. The app folder itself, profiles, Local Storage, IndexedDB, cookies and settings are never matched. Spotify's offline downloads and PersistentCache are not listed: they are not rebuildable without re-downloading."
+      }
+    },
+    {
+      "id": "caches.electron.vscode",
+      "module": "caches.electron",
+      "category": "Caches",
+      "name": "Visual Studio Code cache",
+      "description": "Finds recreatable cache folders of Visual Studio Code in Application Support.",
+      "allowlistRoots": [
+        "~/Library/Application Support/Code/Cache",
+        "~/Library/Application Support/Code/Code Cache",
+        "~/Library/Application Support/Code/GPUCache",
+        "~/Library/Application Support/Code/CachedData",
+        "~/Library/Application Support/Code/CachedExtensionVSIXs",
+        "~/Library/Application Support/Code/Service Worker/CacheStorage"
+      ],
+      "paths": [],
+      "patterns": [
+        "**/*"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "provenance": {
+        "source": "Chromium disk cache layout (https://www.chromium.org/developers/design-documents/network-stack/disk-cache/) and Electron app data paths (https://www.electronjs.org/docs/latest/api/app#appgetpathname)",
+        "author": "lapht",
+        "date": "2026-11-01",
+        "rationale": "Only the listed Chromium cache subfolders are matched, each as its own allowlist root. The app folder itself, profiles, Local Storage, IndexedDB, cookies and settings are never matched. CachedData and CachedExtensionVSIXs hold compiled code and downloaded extension packages that VS Code recreates; installed extensions and User settings are never matched."
+      }
     }
   ]
 }

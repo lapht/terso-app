@@ -68,6 +68,36 @@ xcodebuild \
 Run tests relevant to your change and report precisely what you ran. The
 automated CI also builds the app with Xcode for both architectures.
 
+## Add an Electron or Chromium app to the cache rules
+
+Electron and Chromium apps keep large caches in `~/Library/Application Support/<App>`. Adding an
+app is a small PR (one issue = one PR), with three changes:
+
+1. **Module table.** Append an `ElectronApp` entry to `ElectronCachesModule.apps` in
+   `Sources/CoreKit/Modules/ElectronCachesModule.swift`: the rule ID (`caches.electron.<app>`),
+   the folder name in Application Support, the bundle identifier(s) (used to skip the app while it
+   is running) and the cache subfolders.
+2. **Rule.** Append the matching rule to the newest `Rules/vYYYY.N.json`, with the same rule ID,
+   `"module": "caches.electron"`, one `allowlistRoots` entry per cache subfolder
+   (`~/Library/Application Support/<App>/<Cache>`), `"patterns": ["**/*"]` and a `provenance`
+   block (source, author, date, rationale). Copy the generated snapshot to
+   `Tests/CoreKitTests/Fixtures/rules-vYYYY.N.snapshot.json`.
+3. **Test.** Nothing to add for a standard app: `ElectronCachesModuleTests` builds a fixture for
+   every entry in the table, with cache folders next to user-data folders, and checks that only the
+   cache folders are matched and that the rule and the table agree.
+
+Rules for what may be listed:
+
+- **Only known cache folders:** `Cache`, `Code Cache`, `GPUCache`, `Service Worker/CacheStorage`,
+  `CachedData`, `CachedExtensionVSIXs` and their equivalents, which the app recreates on its own.
+- **Never** a profile, `Local Storage`, `IndexedDB`, `Session Storage`, cookies, settings, offline
+  downloads or anything you cannot show is rebuildable. When unsure, leave it out and say so in the PR.
+- No `..` components and no pattern that leaves the app folder: the rule validator rejects them.
+- State in the provenance how you verified the folders (for example, an observed install and macOS
+  version).
+
+Changes to `Rules/` and `Safety/` need the `[SAFETY]` flag in the PR description and human review.
+
 ## Add user-visible strings
 
 All UI text lives in the String Catalog `Sources/TersoApp/Localizable.xcstrings`.

@@ -32,6 +32,7 @@ struct SidebarDestinationTests {
             "Package Caches",
             "Mail Downloads",
             "App Container Caches",
+            "Electron App Caches",
             "Leftovers",
             "Duplicates",
             "Large Files",
@@ -65,7 +66,8 @@ struct SidebarDestinationTests {
             .xcodeJunk: "xcode.junk",
             .packageCaches: "caches.packages",
             .mailDownloads: "mail.downloads",
-            .containerCaches: "caches.containers"
+            .containerCaches: "caches.containers",
+            .electronCaches: "caches.electron"
         ]
         for destination in SidebarSection.modules.destinations {
             let module = destination.cleanModule
