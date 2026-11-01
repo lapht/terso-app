@@ -106,7 +106,9 @@ struct UserCachesModuleTests {
     }
 
     private struct GrantedAccessChecker: TCCAccessChecking {
-        func fullDiskAccessStatus() -> TCCStatus { .granted }
+        func fullDiskAccessStatus() -> TCCStatus {
+            .granted
+        }
     }
 
     @Test func ignoresSymlinkedCacheDirectoriesOutsideTheAllowlist() async throws {
