@@ -91,13 +91,28 @@ struct ModuleSelectionViewModelTests {
         #expect(readOnlyViewModel.selectedItems.isEmpty)
     }
 
+    @MainActor
+    @Test func notPreselectedItemsStartUnselectedButCanBeSelectedByHand() {
+        let older = Self.item(name: "16.0", size: 10)
+        let newest = Self.item(name: "17.2", size: 20, isPreselected: false)
+        let viewModel = ModuleSelectionViewModel(items: [older, newest])
+
+        #expect(viewModel.isSelected(older))
+        #expect(!viewModel.isSelected(newest))
+        #expect(viewModel.selectedBytes == 10)
+
+        viewModel.toggleSelection(for: newest)
+        #expect(viewModel.isSelected(newest))
+    }
+
     private static func item(
         name: String,
         size: Int64,
         isProtected: Bool = false,
         isDeletable: Bool = true,
         action: CleanAction = .trash,
-        ruleID: String = "test.rule"
+        ruleID: String = "test.rule",
+        isPreselected: Bool = true
     ) -> CleanItem {
         let url = URL(fileURLWithPath: "/Users/test/Library/Caches/\(name)")
         return CleanItem(
@@ -108,7 +123,8 @@ struct ModuleSelectionViewModelTests {
             ruleId: ruleID,
             isProtected: isProtected,
             isDeletable: isDeletable,
-            recommendedAction: action
+            recommendedAction: action,
+            isPreselected: isPreselected
         )
     }
 }

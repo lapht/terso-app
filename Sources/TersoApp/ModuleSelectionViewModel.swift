@@ -81,6 +81,7 @@ final class ModuleSelectionViewModel: ObservableObject {
         isSelectable(item)
             && item.recommendedAction == .trash
             && PackageCachesModule.isPreselected(ruleID: item.ruleId)
+            && item.isPreselected
     }
 
     private static func isSelectable(_ item: CleanItem) -> Bool {

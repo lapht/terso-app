@@ -56,6 +56,13 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
     /// Defaults to `.trash` per Invariant §4 (trash-first).
     public let recommendedAction: CleanAction
 
+    /// Whether review screens should select this item by default. It stays selectable by hand.
+    public let isPreselected: Bool
+
+    /// A short user-facing note explaining something about this item (for example why it is
+    /// not preselected). Informational only.
+    public let note: String?
+
     public init(
         id: UUID = UUID(),
         url: URL,
@@ -65,7 +72,9 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         ruleId: String,
         isProtected: Bool = false,
         isDeletable: Bool = true,
-        recommendedAction: CleanAction = .trash
+        recommendedAction: CleanAction = .trash,
+        isPreselected: Bool = true,
+        note: String? = nil
     ) {
         self.id = id
         self.url = url
@@ -76,6 +85,8 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         self.isProtected = isProtected
         self.isDeletable = isDeletable
         self.recommendedAction = recommendedAction
+        self.isPreselected = isPreselected
+        self.note = note
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -88,6 +99,8 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         case isProtected
         case isDeletable
         case recommendedAction
+        case isPreselected
+        case note
     }
 
     public init(from decoder: Decoder) throws {
@@ -101,5 +114,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         isProtected = try container.decode(Bool.self, forKey: .isProtected)
         isDeletable = try container.decodeIfPresent(Bool.self, forKey: .isDeletable) ?? true
         recommendedAction = try container.decode(CleanAction.self, forKey: .recommendedAction)
+        isPreselected = try container.decodeIfPresent(Bool.self, forKey: .isPreselected) ?? true
+        note = try container.decodeIfPresent(String.self, forKey: .note)
     }
 }

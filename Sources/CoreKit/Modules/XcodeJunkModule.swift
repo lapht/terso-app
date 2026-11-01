@@ -20,7 +20,7 @@ import AppKit
 import Foundation
 
 /// Finds rebuildable Xcode and CoreSimulator data without deleting files.
-public struct XcodeJunkModule: CleanModule {
+public struct XcodeJunkModule: SkippedCacheReporting {
     public static let minimumArchiveAgeSeconds: TimeInterval = 90 * 24 * 60 * 60
 
     public let id = "xcode.junk"
@@ -51,23 +51,61 @@ public struct XcodeJunkModule: CleanModule {
         self.now = now
     }
 
+    public static let xcodeBundleIdentifier = "com.apple.dt.Xcode"
+    public static let unavailableSimulatorsCommand = "xcrun simctl delete unavailable"
+
+    /// Platform folders under `~/Library/Developer/Xcode` that hold one folder per device OS build.
+    static let deviceSupportFolders = [
+        "iOS DeviceSupport",
+        "watchOS DeviceSupport",
+        "tvOS DeviceSupport",
+        "visionOS DeviceSupport"
+    ]
+
     public func scan(context: ScanContext) async throws -> [CleanItem] {
+        try await scanReport(context: context).items
+    }
+
+    public func scanReport(context: ScanContext) async throws -> ModuleScanReport {
         let developerDirectory = context.homeDirectory
             .appendingPathComponent("Library/Developer", isDirectory: true)
             .standardizedFileURL
+        let xcodeDirectory = developerDirectory.appendingPathComponent("Xcode", isDirectory: true)
         var items: [CleanItem] = []
 
-        if !(await isXcodeRunning()) {
-            let derivedData = developerDirectory
-                .appendingPathComponent("Xcode/DerivedData", isDirectory: true)
-            items.append(contentsOf: try scanGroupedDirectory(
-                derivedData,
-                ruleID: "xcode.derived-data"
+        // Data Xcode may be using right now: left alone, with a visible reason, while it runs.
+        var activeItems = try scanGroupedDirectory(
+            xcodeDirectory.appendingPathComponent("DerivedData", isDirectory: true),
+            ruleID: "xcode.derived-data"
+        )
+        for folder in Self.deviceSupportFolders {
+            activeItems.append(contentsOf: try scanDeviceSupport(
+                xcodeDirectory.appendingPathComponent(folder, isDirectory: true)
             ))
         }
+        activeItems.append(contentsOf: try scanGroupedDirectory(
+            xcodeDirectory.appendingPathComponent("iOS Device Logs", isDirectory: true),
+            ruleID: "xcode.device-logs"
+        ))
+        activeItems.append(contentsOf: try scanGroupedDirectory(
+            xcodeDirectory.appendingPathComponent("DocumentationCache", isDirectory: true),
+            ruleID: "xcode.documentation-cache"
+        ))
 
-        let archives = developerDirectory
-            .appendingPathComponent("Xcode/Archives", isDirectory: true)
+        var skipped: [SkippedCache] = []
+        if await isXcodeRunning() {
+            if !activeItems.isEmpty {
+                skipped.append(SkippedCache(
+                    moduleID: id,
+                    bundleIdentifier: Self.xcodeBundleIdentifier,
+                    estimatedBytes: activeItems.reduce(into: Int64.zero) { $0 &+= $1.sizeBytes }
+                ))
+            }
+        } else {
+            items.append(contentsOf: activeItems)
+        }
+
+        let archives = xcodeDirectory.appendingPathComponent("Archives", isDirectory: true)
         items.append(contentsOf: try scanOldArchives(under: archives))
 
         let simulatorCaches = developerDirectory
@@ -77,7 +115,66 @@ public struct XcodeJunkModule: CleanModule {
             ruleID: "xcode.simulator-caches"
         ))
 
-        return items.sorted { $0.url.path < $1.url.path }
+        return ModuleScanReport(
+            items: items.sorted { $0.url.path < $1.url.path },
+            skippedCaches: skipped,
+            advisories: try simulatorAdvisories(
+                devices: developerDirectory.appendingPathComponent("CoreSimulator/Devices", isDirectory: true)
+            )
+        )
+    }
+
+    /// Lists device OS builds. The newest per platform is kept out of the default selection
+    /// because it is the one a connected device is most likely to need again.
+    private func scanDeviceSupport(_ root: URL) throws -> [CleanItem] {
+        guard try isSafeDirectory(root) else {
+            return []
+        }
+        let entries = try FileManager.default.contentsOfDirectory(
+            at: root,
+            includingPropertiesForKeys: Self.resourceKeys,
+            options: []
+        ).filter { entry in
+            guard try isSafeEntry(entry, under: root) else {
+                return false
+            }
+            return try entry.resourceValues(forKeys: Self.resourceKeySet).isDirectory == true
+        }
+        let newest = entries.max {
+            $0.lastPathComponent.compare($1.lastPathComponent, options: .numeric) == .orderedAscending
+        }
+        return try entries.sorted { $0.path < $1.path }.map { entry in
+            let isNewest = entry == newest
+            return try makeItem(
+                at: entry,
+                ruleID: "xcode.device-support",
+                isPreselected: !isNewest,
+                note: isNewest
+                    ? "Newest version for this platform: kept unselected because a connected device may still need it."
+                    : nil
+            )
+        }
+    }
+
+    /// Terso cannot tell unavailable simulators apart without `simctl`, so it only points to the
+    /// command and never runs it.
+    private func simulatorAdvisories(devices: URL) throws -> [ModuleAdvisory] {
+        guard try isSafeDirectory(devices) else {
+            return []
+        }
+        let size = try SizeCalculator().calculate(at: devices)
+        guard size.bytes > 0 else {
+            return []
+        }
+        return [ModuleAdvisory(
+            moduleID: id,
+            advisoryID: "unavailable-simulators",
+            title: "Unavailable simulators",
+            detail: "Simulators for removed runtimes can take a lot of space. Terso does not delete "
+                + "them: run this command yourself in Terminal. Size shown is all simulator devices.",
+            command: Self.unavailableSimulatorsCommand,
+            estimatedBytes: size.bytes
+        )]
     }
 
     private func scanGroupedDirectory(_ root: URL, ruleID: String) throws -> [CleanItem] {
@@ -162,7 +259,12 @@ public struct XcodeJunkModule: CleanModule {
         return latestDate
     }
 
-    private func makeItem(at url: URL, ruleID: String) throws -> CleanItem {
+    private func makeItem(
+        at url: URL,
+        ruleID: String,
+        isPreselected: Bool = true,
+        note: String? = nil
+    ) throws -> CleanItem {
         let size = try SizeCalculator().calculate(at: url)
         guard size.errors.isEmpty else {
             throw XcodeJunkScanFailure.incompleteSize(
@@ -177,7 +279,9 @@ public struct XcodeJunkModule: CleanModule {
             resolvedURL: resolvedURL,
             sizeBytes: size.bytes,
             moduleId: id,
-            ruleId: ruleID
+            ruleId: ruleID,
+            isPreselected: isPreselected,
+            note: note
         )
     }
 

@@ -53,6 +53,14 @@ struct ItemRowView: View {
                         .foregroundStyle(.orange)
                         .lineLimit(2)
                 }
+
+                if let note = item.note {
+                    Text(note)
+                        .font(DesignTokens.Typography.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("item-row-note")
+                }
             }
 
             Spacer(minLength: DesignTokens.Spacing.small)
