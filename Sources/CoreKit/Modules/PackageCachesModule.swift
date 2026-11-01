@@ -29,7 +29,25 @@ public struct PackageCachesModule: CleanModule {
     public let title = "Package Caches"
     public let requiresFDA = false
 
+    /// Rule whose items are never preselected because they may not be re-downloadable.
+    public static let mavenRuleID = "packages.maven"
+
+    private static let mavenRepositoryPath = ".m2/repository"
+
     public init() {}
+
+    /// Whether items matched by `ruleID` may be preselected in a clean action.
+    public static func isPreselected(ruleID: String) -> Bool {
+        ruleID != mavenRuleID
+    }
+
+    /// A caution to show next to items matched by `ruleID`, or `nil` when none applies.
+    public static func warning(forRuleID ruleID: String) -> String? {
+        guard ruleID == mavenRuleID else {
+            return nil
+        }
+        return "Artifacts installed locally with mvn install may not be re-downloadable."
+    }
 
     public func scan(context: ScanContext) async throws -> [CleanItem] {
         let locations = [
@@ -37,7 +55,19 @@ public struct PackageCachesModule: CleanModule {
             CacheLocation(relativePath: ".npm/_cacache", ruleID: "packages.npm"),
             CacheLocation(relativePath: "Library/Caches/Yarn", ruleID: "packages.yarn"),
             CacheLocation(relativePath: ".cache/yarn", ruleID: "packages.yarn"),
-            CacheLocation(relativePath: "Library/Caches/pnpm", ruleID: "packages.pnpm")
+            CacheLocation(relativePath: "Library/Caches/pnpm", ruleID: "packages.pnpm"),
+            CacheLocation(relativePath: ".gradle/caches", ruleID: "packages.gradle"),
+            CacheLocation(relativePath: Self.mavenRepositoryPath, ruleID: Self.mavenRuleID),
+            CacheLocation(relativePath: ".cargo/registry/cache", ruleID: "packages.cargo"),
+            CacheLocation(relativePath: ".cargo/registry/src", ruleID: "packages.cargo"),
+            CacheLocation(relativePath: "go/pkg/mod", ruleID: "packages.go-modules"),
+            CacheLocation(relativePath: ".bun/install/cache", ruleID: "packages.bun"),
+            CacheLocation(relativePath: ".cache/uv", ruleID: "packages.uv"),
+            CacheLocation(relativePath: "miniconda3/pkgs", ruleID: "packages.conda"),
+            CacheLocation(relativePath: "anaconda3/pkgs", ruleID: "packages.conda"),
+            CacheLocation(relativePath: "miniforge3/pkgs", ruleID: "packages.conda"),
+            CacheLocation(relativePath: "mambaforge/pkgs", ruleID: "packages.conda"),
+            CacheLocation(relativePath: ".conda/pkgs", ruleID: "packages.conda")
         ]
 
         return try locations.compactMap { location in
