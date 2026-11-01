@@ -87,6 +87,10 @@ public final class DeletionPipeline {
     private struct Candidate {
         let item: CleanItem
         let roots: [URL]
+        /// Grants this item may use; empty for every module except duplicates.
+        let grants: [ProtectedAreaGrant]
+        /// Whether the item is only acceptable thanks to a protected-area grant (audit marker).
+        let usesProtectedAreaException: Bool
     }
 
     private let pathValidator: PathValidator
@@ -131,18 +135,24 @@ public final class DeletionPipeline {
     ///   - allowedRootsByModule: Allowlisted roots keyed by each item's module ID.
     ///   - dryRun: When true, return the validated items and estimated byte count without mutation.
     ///   - snapshots: Dry-run snapshots keyed by ``CleanItem/id``, from ``DeletionItemResult/snapshot``.
+    ///   - protectedAreaGrants: Folders the user picked for this one operation (design.md §11.7).
+    ///     Only items of ``ProtectedAreaGrant/duplicatesModuleID`` can use them; they allow regular
+    ///     files below the folder to leave Desktop/Documents/Downloads, never the protected roots,
+    ///     directories, packages or symlinks. Held for this call only.
     /// - Returns: The items processed and their estimated combined size.
     /// - Throws: A safety or filesystem error when an item cannot be safely processed.
     public func execute(
         items: [CleanItem],
         allowedRootsByModule: [String: [URL]],
         dryRun: Bool,
-        snapshots: [UUID: ItemSnapshot] = [:]
+        snapshots: [UUID: ItemSnapshot] = [:],
+        protectedAreaGrants: [ProtectedAreaGrant] = []
     ) throws -> DeletionResult {
         let (presentItems, vanished) = try separateUnavailableItems(items, dryRun: dryRun, snapshots: snapshots)
         let (candidates, estimate) = try prepareCandidates(
             items: presentItems,
             allowedRootsByModule: allowedRootsByModule,
+            protectedAreaGrants: protectedAreaGrants,
             action: dryRun ? .dryRun : .trash
         )
 
@@ -206,6 +216,7 @@ public final class DeletionPipeline {
     private func prepareCandidates(
         items: [CleanItem],
         allowedRootsByModule: [String: [URL]],
+        protectedAreaGrants: [ProtectedAreaGrant],
         action: AuditAction
     ) throws -> (candidates: [Candidate], estimate: SpaceEstimate) {
         var candidates: [Candidate] = []
@@ -235,7 +246,9 @@ public final class DeletionPipeline {
                 }
 
                 let roots = allowedRootsByModule[item.moduleId] ?? []
-                try validate(item: item, allowedRoots: roots)
+                // Grants are honored for the duplicates module only; for any other module they are dropped.
+                let grants = item.moduleId == ProtectedAreaGrant.duplicatesModuleID ? protectedAreaGrants : []
+                let usesException = try validate(item: item, allowedRoots: roots, grants: grants)
                 guard FileManager.default.fileExists(atPath: item.url.path) else {
                     throw DeletionPipelineError.itemNotFound(path: item.url.standardizedFileURL.path)
                 }
@@ -251,7 +264,12 @@ public final class DeletionPipeline {
                     throw DeletionPipelineError.sizeOverflow
                 }
                 estimatedBytes = newTotal
-                candidates.append(Candidate(item: item, roots: roots))
+                candidates.append(Candidate(
+                    item: item,
+                    roots: roots,
+                    grants: grants,
+                    usesProtectedAreaException: usesException
+                ))
             } catch {
                 try auditLogger.record(
                     action: action,
@@ -266,25 +284,41 @@ public final class DeletionPipeline {
         return (candidates, try SpaceEstimate.make(for: candidates.map(\.item)))
     }
 
-    private func validate(item: CleanItem, allowedRoots: [URL]) throws {
+    /// - Returns: `true` when the item is only acceptable because a protected-area grant covers it.
+    @discardableResult
+    private func validate(item: CleanItem, allowedRoots: [URL], grants: [ProtectedAreaGrant]) throws -> Bool {
         let path = item.url.standardizedFileURL.path
         guard !item.isProtected else {
             throw SafetyError.protectedPath(path: path, reason: "item marked protected by scanner")
         }
 
-        try pathValidator.validate(path: item.url, allowedRoots: allowedRoots)
+        try pathValidator.validate(path: item.url, allowedRoots: allowedRoots, protectedAreaGrants: grants)
         let resolvedURL = try symlinkValidator.resolveAndValidate(
             path: item.url,
-            allowedRoots: allowedRoots
+            allowedRoots: allowedRoots,
+            protectedAreaGrants: grants
         )
         guard resolvedURL.standardizedFileURL == item.resolvedURL.standardizedFileURL else {
             throw DeletionPipelineError.staleItem(path: path)
         }
+
+        let grant = pathValidator.protectedAreaGrant(covering: item.url, in: grants)
+            ?? pathValidator.protectedAreaGrant(covering: resolvedURL, in: grants)
+        guard let grant else {
+            return false
+        }
+        try requireRegularFileOutsidePackages(item.url, grant: grant)
+        return true
     }
 
     private func recordDryRun(_ candidates: [Candidate]) throws {
         for candidate in candidates {
-            try auditLogger.record(action: .dryRun, item: candidate.item, result: .success)
+            try auditLogger.record(
+                action: .dryRun,
+                item: candidate.item,
+                result: .success,
+                protectedAreaException: candidate.usesProtectedAreaException
+            )
         }
     }
 
@@ -331,7 +365,7 @@ public final class DeletionPipeline {
         let item = candidate.item
         let resultingItemURL: NSURL?
         do {
-            try validate(item: item, allowedRoots: candidate.roots)
+            try validate(item: item, allowedRoots: candidate.roots, grants: candidate.grants)
             guard FileManager.default.fileExists(atPath: item.url.path) else {
                 throw DeletionPipelineError.itemNotFound(path: item.url.standardizedFileURL.path)
             }
@@ -349,7 +383,12 @@ public final class DeletionPipeline {
             throw error
         }
 
-        try auditLogger.record(action: .trash, item: item, result: .success)
+        try auditLogger.record(
+            action: .trash,
+            item: item,
+            result: .success,
+            protectedAreaException: candidate.usesProtectedAreaException
+        )
         return DeletionItemResult(item: item, resultingItemURL: resultingItemURL as URL?, snapshot: nil)
     }
 
@@ -395,6 +434,43 @@ public final class DeletionPipeline {
             return "invalidSize"
         case .sizeOverflow:
             return "sizeOverflow"
+        }
+    }
+}
+
+// MARK: - Protected-area exception checks (design.md §11.7)
+
+extension DeletionPipeline {
+    /// Package/bundle folder names whose contents are never moved out one by one, in addition to
+    /// whatever the system reports as a package.
+    private static let packageSuffixes = [
+        ".app", ".framework", ".kext", ".plugin", ".appex", ".bundle", ".photoslibrary", ".musiclibrary",
+        ".tvlibrary", ".fcpbundle", ".logicx", ".band", ".pages", ".numbers", ".key", ".rtfd", ".xcodeproj",
+        ".xcworkspace", ".playground", ".sparsebundle", ".sparseimage"
+    ]
+
+    /// Extra rules for the protected-area exception: only a regular file (never a directory, a
+    /// symlink or a special file), and none of its parent folders may be a package or bundle.
+    private func requireRegularFileOutsidePackages(_ url: URL, grant: ProtectedAreaGrant) throws {
+        let path = url.standardizedFileURL.path
+        let type = (try? FileManager.default.attributesOfItem(atPath: path))?[.type] as? FileAttributeType
+        guard type == .typeRegular else {
+            throw SafetyError.protectedPath(
+                path: path,
+                reason: "only regular files can leave a protected folder; directories and symlinks stay put"
+            )
+        }
+        var folder = url.standardizedFileURL.deletingLastPathComponent()
+        while folder.path != "/" {
+            let name = folder.lastPathComponent.lowercased()
+            let isPackage = (try? folder.resourceValues(forKeys: [.isPackageKey]))?.isPackage == true
+            if isPackage || Self.packageSuffixes.contains(where: { name.hasSuffix($0) }) {
+                throw SafetyError.protectedPath(
+                    path: path,
+                    reason: "file is inside a package or bundle (\(folder.lastPathComponent))"
+                )
+            }
+            folder = folder.deletingLastPathComponent()
         }
     }
 }

@@ -67,6 +67,8 @@ final class CleanupConfirmationViewModel: ObservableObject {
 struct ConfirmationSheetView: View {
     let itemCount: Int
     let totalBytes: Int64
+    /// Picked folders inside Desktop, Documents or Downloads the files come from, named explicitly.
+    var protectedFolders: [String] = []
     let onCancel: () -> Void
     let onConfirm: () -> Void
 
@@ -83,6 +85,17 @@ struct ConfirmationSheetView: View {
             .font(DesignTokens.Typography.body)
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier("cleanup-confirmation-summary")
+
+            if !protectedFolders.isEmpty {
+                let folders = protectedFolders.joined(separator: ", ")
+                Text("""
+                    Files will be moved out of folders you chose in a protected area: \(folders). \
+                    Only the files you ticked are moved.
+                    """)
+                    .font(DesignTokens.Typography.metadata)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("cleanup-confirmation-protected-folders")
+            }
 
             Text("Items are moved to the Trash, so you can put them back until you empty it.")
                 .font(DesignTokens.Typography.metadata)

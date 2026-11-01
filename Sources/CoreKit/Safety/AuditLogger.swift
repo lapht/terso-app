@@ -42,12 +42,17 @@ public struct AuditRecord: Codable, Sendable, Equatable {
     public let result: AuditResult
     public let errorCode: String?
 
+    /// `true` when the item was only accepted through the duplicates protected-area exception
+    /// (design.md §11.7). Absent from the record otherwise, so existing logs stay valid.
+    public let protectedAreaException: Bool?
+
     init(
         timestamp: Date,
         action: AuditAction,
         item: CleanItem,
         result: AuditResult,
-        errorCode: String?
+        errorCode: String?,
+        protectedAreaException: Bool = false
     ) {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -62,6 +67,7 @@ public struct AuditRecord: Codable, Sendable, Equatable {
         self.sizeBytes = item.sizeBytes
         self.result = result
         self.errorCode = errorCode
+        self.protectedAreaException = protectedAreaException ? true : nil
     }
 }
 
@@ -174,6 +180,7 @@ public final class AuditLogger: @unchecked Sendable {
         item: CleanItem,
         result: AuditResult,
         errorCode: String? = nil,
+        protectedAreaException: Bool = false,
         timestamp: Date = Date()
     ) throws {
         guard (result == .failure) == (errorCode != nil) else {
@@ -185,7 +192,8 @@ public final class AuditLogger: @unchecked Sendable {
             action: action,
             item: item,
             result: result,
-            errorCode: errorCode
+            errorCode: errorCode,
+            protectedAreaException: protectedAreaException
         )
 
         lock.lock()
@@ -308,6 +316,9 @@ public final class AuditLogger: @unchecked Sendable {
             """
             if let errorCode = record.errorCode {
                 report += "\n  Error code: \(errorCode)"
+            }
+            if record.protectedAreaException == true {
+                report += "\n  Protected-area exception: used (user-picked folder, regular file)"
             }
             report += "\n"
         }

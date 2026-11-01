@@ -482,6 +482,23 @@
         }
       }
     },
+    "Files will be moved out of folders you chose in a protected area: %@. Only the files you ticked are moved." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files will be moved out of folders you chose in a protected area: %@. Only the files you ticked are moved."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I file verranno spostati da cartelle che hai scelto in un'area protetta: %@. Vengono spostati solo i file che hai selezionato."
+          }
+        }
+      }
+    },
     "Find files left behind by apps that are no longer installed. Scans only when you start it." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -499,19 +516,19 @@
         }
       }
     },
-    "Find identical files in folders you choose. Read-only, and scans only when you start it." : {
+    "Find identical files in folders you choose and move the copies you pick to the Trash. Scans only when you start it." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Find identical files in folders you choose. Read-only, and scans only when you start it."
+            "value" : "Find identical files in folders you choose and move the copies you pick to the Trash. Scans only when you start it."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trova file identici nelle cartelle che scegli. Sola lettura; la scansione parte solo quando la avvii."
+            "value" : "Trova file identici nelle cartelle che scegli e sposta nel Cestino le copie che selezioni. La scansione parte solo quando la avvii."
           }
         }
       }

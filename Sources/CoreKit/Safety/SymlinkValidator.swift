@@ -67,19 +67,29 @@ public struct SymlinkValidator: Sendable {
     /// - Parameters:
     ///   - path: The URL to validate and resolve.
     ///   - allowedRoots: Allowed root URLs for the calling module.
+    ///   - protectedAreaGrants: Folders picked by the user for the duplicates flow; see
+    ///     ``PathValidator/validate(path:allowedRoots:protectedAreaGrants:)``.
     /// - Returns: The fully resolved `URL` conforming to all safety invariants.
     /// - Throws: ``SafetyError`` if the symlink is cyclic, broken, escapes allowlisted roots,
     ///   or points to a protected system/user directory.
-    public func resolveAndValidate(path: URL, allowedRoots: [URL]) throws -> URL {
+    public func resolveAndValidate(
+        path: URL,
+        allowedRoots: [URL],
+        protectedAreaGrants: [ProtectedAreaGrant] = []
+    ) throws -> URL {
         // Step 1: Pre-validate original path format & structure
-        try pathValidator.validate(path: path, allowedRoots: allowedRoots)
+        try pathValidator.validate(path: path, allowedRoots: allowedRoots, protectedAreaGrants: protectedAreaGrants)
 
         // Step 2: Iteratively resolve symlinks
         let (resolvedURL, isSymlink) = try fullyResolve(path: path)
 
         // Step 3: Validate resolved target against protected paths and allowlist
         do {
-            try pathValidator.validate(path: resolvedURL, allowedRoots: allowedRoots)
+            try pathValidator.validate(
+                path: resolvedURL,
+                allowedRoots: allowedRoots,
+                protectedAreaGrants: protectedAreaGrants
+            )
         } catch {
             if isSymlink {
                 throw SafetyError.symlinkEscape(

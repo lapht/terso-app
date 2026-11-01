@@ -60,7 +60,7 @@ terso-app/
 ## Le 8 invarianti di sicurezza (NON negoziabili — verbatim da docs/design.md §5)
 1. **Allowlist-only roots.** Deletion may only target paths under allowlisted roots defined per module (e.g. `~/Library/Caches`). Everything else = refusal.
 2. **Symlink discipline.** Resolve every path; verify the resolved target is still inside the allowlist root; never follow symlinks into unknown locations.
-3. **Protected paths.** Hard deny: SIP-protected volumes, `/System`, `/private/var/db`, the user's Desktop/Documents/Downloads roots, and any active application bundle.
+3. **Protected paths.** Hard deny: SIP-protected volumes, `/System`, `/private/var/db`, the user's Desktop/Documents/Downloads roots, and any active application bundle. The Desktop/Documents/Downloads subtrees are denied by default; the only exception is the duplicates flow, which may move *regular files* (never directories, packages or the roots themselves) from below a folder the user explicitly picked for that single operation (§11.7).
 4. **Trash-first.** Default destructive op is `FileManager.trashItem` (real Trash, recoverable). Permanent delete requires an explicit per-item opt-in checkbox, off by default.
 5. **Dry-run everywhere.** First run of "Smart Scan" never deletes; every clean action has a dry-run mode reporting byte counts.
 6. **Confirmation + recap.** GUI must show total size and item count before executing; admin escalation (sandboxed helper) is separate and logged.

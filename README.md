@@ -49,7 +49,7 @@ telemetry and unnecessary network access.
 |---|---|
 | **Available (v0.1)** | Scanning user caches and logs, Trash bins, Xcode and package-manager caches; read-only large-file scanning; Smart Scan; guarded cleanup and audit logging |
 | **Available (v0.2)** | Leftovers of apps that are no longer installed (review, then move to Trash through the Safety pipeline); read-only duplicate-file detection by content hash; menu bar extra (available space, launch Smart Scan); English and Italian interface; audit-log export with path privacy; Rule DB v2 (bundle-ID app patterns, provenance); Homebrew cask |
-| **Planned** | App uninstaller (v0.3, #107), deleting duplicates (v0.3, #40), version-conditional rule exclusions (#106), a read-only security configuration audit |
+| **Planned** | App uninstaller (v0.3, #107), version-conditional rule exclusions (#106), a read-only security configuration audit |
 | **Manual release checks** | Full Disk Access behavior, case-sensitive APFS, non-English locale, and cleanup candidates staying within their allowlisted roots |
 
 The feature list describes the release/source scope, not a claim that every
@@ -59,8 +59,8 @@ maintainer before publishing a release.
 
 **Not included in v0.2:** removing applications (`.app` bundles are never
 removed, moved or trashed; `/Applications` and `~/Applications` are only read
-to discover installed apps), deleting duplicates (the Duplicates page is
-read-only), permanent deletion (everything goes to the Trash), an in-app
+to discover installed apps), moving duplicates to the Trash (the v0.2 Duplicates
+page is read-only; #40 adds it after v0.2), permanent deletion (everything goes to the Trash), an in-app
 updater (updates are `brew upgrade` only, see
 [docs/design.md](docs/design.md) §11.6), and notarization. Leftovers and
 Duplicates are separate sidebar sections and are not part of Smart Scan.

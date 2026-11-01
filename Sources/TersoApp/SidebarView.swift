@@ -136,7 +136,10 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             )
         case .duplicates:
             String(
-                localized: "Find identical files in folders you choose. Read-only, and scans only when you start it."
+                localized: """
+                    Find identical files in folders you choose and move the copies you pick to the Trash. \
+                    Scans only when you start it.
+                    """
             )
         case .largeFiles:
             String(localized: "Find large files in your home folder. This scanner is read-only.")
