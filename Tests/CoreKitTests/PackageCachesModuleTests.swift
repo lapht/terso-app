@@ -112,6 +112,125 @@ struct PackageCachesModuleTests {
         #expect(result.isEmpty)
     }
 
+    private static let developerCaches: [(path: String, ruleID: String)] = [
+        (".gradle/caches", "packages.gradle"),
+        (".m2/repository", "packages.maven"),
+        (".cargo/registry/cache", "packages.cargo"),
+        (".cargo/registry/src", "packages.cargo"),
+        ("go/pkg/mod", "packages.go-modules"),
+        (".bun/install/cache", "packages.bun"),
+        (".cache/uv", "packages.uv"),
+        ("miniconda3/pkgs", "packages.conda"),
+        ("anaconda3/pkgs", "packages.conda"),
+        ("miniforge3/pkgs", "packages.conda"),
+        ("mambaforge/pkgs", "packages.conda"),
+        (".conda/pkgs", "packages.conda")
+    ]
+
+    @Test func discoversEachDeveloperCacheAndNothingAroundIt() async throws {
+        let fixture = try makeFixture()
+        defer { try? FileManager.default.removeItem(at: fixture.root) }
+
+        for (index, cache) in Self.developerCaches.enumerated() {
+            try createFile(
+                at: fixture.home.appendingPathComponent(cache.path).appendingPathComponent("content.data"),
+                contents: "cache \(index)"
+            )
+        }
+        let siblings = [
+            ".gradle/gradle.properties",
+            ".gradle/wrapper/dists/gradle.zip",
+            ".m2/settings.xml",
+            ".cargo/bin/cargo",
+            ".cargo/registry/index/config.json",
+            ".cargo/credentials.toml",
+            "go/bin/tool",
+            "go/src/main.go",
+            ".bun/bin/bun",
+            "miniconda3/envs/base/bin/python",
+            "Library/Caches/pip/http/data",
+            "Library/Caches/CocoaPods/Pods/data",
+            "Library/Caches/pypoetry/cache.data",
+            "Library/Caches/go-build/aa/data"
+        ]
+        for sibling in siblings {
+            try createFile(at: fixture.home.appendingPathComponent(sibling), contents: "keep")
+        }
+
+        let result = try await PackageCachesModule().scan(context: ScanContext(homeDirectory: fixture.home))
+
+        let expected = Self.developerCaches
+            .map { (fixture.home.appendingPathComponent($0.path).path, $0.ruleID) }
+            .sorted { $0.0 < $1.0 }
+        #expect(result.map(\.url.path) == expected.map(\.0))
+        #expect(result.map(\.ruleId) == expected.map(\.1))
+        #expect(result.allSatisfy { $0.sizeBytes > 0 && $0.recommendedAction == .trash })
+        for sibling in siblings {
+            #expect(FileManager.default.fileExists(atPath: fixture.home.appendingPathComponent(sibling).path))
+        }
+    }
+
+    @Test func ignoresDeveloperCacheSymlinksThatEscapeTheHome() async throws {
+        let fixture = try makeFixture()
+        defer { try? FileManager.default.removeItem(at: fixture.root) }
+
+        for (index, cache) in Self.developerCaches.enumerated() {
+            let target = fixture.outside.appendingPathComponent("target-\(index)", isDirectory: true)
+            try createFile(at: target.appendingPathComponent("cache.data"), contents: "outside")
+            let link = fixture.home.appendingPathComponent(cache.path)
+            try FileManager.default.createDirectory(
+                at: link.deletingLastPathComponent(),
+                withIntermediateDirectories: true
+            )
+            try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
+        }
+
+        let result = try await PackageCachesModule().scan(context: ScanContext(homeDirectory: fixture.home))
+
+        #expect(result.isEmpty)
+    }
+
+    @Test func mavenIsNeverPreselectedAndWarns() {
+        #expect(!PackageCachesModule.isPreselected(ruleID: "packages.maven"))
+        #expect(PackageCachesModule.warning(forRuleID: "packages.maven")?.contains("mvn install") == true)
+        for ruleID in Set(Self.developerCaches.map(\.ruleID)).subtracting(["packages.maven"]) {
+            #expect(PackageCachesModule.isPreselected(ruleID: ruleID))
+            #expect(PackageCachesModule.warning(forRuleID: ruleID) == nil)
+        }
+    }
+
+    @Test func rulesInDatabaseMatchModuleLocations() throws {
+        let repositoryRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let data = try Data(contentsOf: repositoryRoot.appendingPathComponent("Rules/v2026.4.json"))
+        let database = try RuleValidator.decode(data)
+        #expect(database.version == "2026.4")
+        let v3Data = try Data(contentsOf: repositoryRoot.appendingPathComponent("Rules/v2026.3.json"))
+        let v3Rules = try RuleValidator.decode(v3Data).rules
+        #expect(Array(database.rules.prefix(v3Rules.count)) == v3Rules)
+
+        let developerRules = database.rules.dropFirst(v3Rules.count)
+        #expect(Set(developerRules.map(\.id)) == Set(Self.developerCaches.map(\.ruleID)))
+        for rule in developerRules {
+            let provenance = try #require(rule.provenance, "\(rule.id) has no provenance")
+            #expect(!provenance.source.isEmpty && !provenance.rationale.isEmpty)
+            #expect(rule.isTrashSafe && rule.module == "packages")
+            let expectedRoots = Self.developerCaches.filter { $0.ruleID == rule.id }.map { "~/" + $0.path }
+            #expect(Set(rule.allowlistRoots) == Set(expectedRoots), "\(rule.id) roots differ from the module")
+            #expect(rule.allowlistRoots.allSatisfy { !$0.contains("Library/Caches") })
+        }
+    }
+
+    @Test func v2026Point4DatabaseMatchesSnapshot() throws {
+        let repositoryRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let databaseData = try Data(contentsOf: repositoryRoot.appendingPathComponent("Rules/v2026.4.json"))
+        let snapshotURL = try #require(
+            Bundle.module.url(forResource: "rules-v2026.4.snapshot", withExtension: "json")
+        )
+        #expect(databaseData == (try Data(contentsOf: snapshotURL)))
+    }
+
     private func makeFixture() throws -> Fixture {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("terso-package-caches-\(UUID().uuidString)", isDirectory: true)

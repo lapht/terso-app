@@ -47,6 +47,19 @@ struct ModuleSelectionViewModelTests {
     }
 
     @MainActor
+    @Test func mavenRepositoryIsNeverPreselectedButCanBeSelectedManually() {
+        let gradle = Self.item(name: "gradle", size: 10, ruleID: "packages.gradle")
+        let maven = Self.item(name: "maven", size: 20, ruleID: "packages.maven")
+        let viewModel = ModuleSelectionViewModel(items: [gradle, maven])
+
+        #expect(viewModel.isSelected(gradle))
+        #expect(!viewModel.isSelected(maven))
+
+        viewModel.toggleSelection(for: maven)
+        #expect(viewModel.isSelected(maven))
+    }
+
+    @MainActor
     @Test func selectAllAndDeselectAllRecalculateSelectedBytes() {
         let first = Self.item(name: "first", size: 10)
         let second = Self.item(name: "second", size: 25)
@@ -83,7 +96,8 @@ struct ModuleSelectionViewModelTests {
         size: Int64,
         isProtected: Bool = false,
         isDeletable: Bool = true,
-        action: CleanAction = .trash
+        action: CleanAction = .trash,
+        ruleID: String = "test.rule"
     ) -> CleanItem {
         let url = URL(fileURLWithPath: "/Users/test/Library/Caches/\(name)")
         return CleanItem(
@@ -91,7 +105,7 @@ struct ModuleSelectionViewModelTests {
             resolvedURL: url,
             sizeBytes: size,
             moduleId: "test.module",
-            ruleId: "test.rule",
+            ruleId: ruleID,
             isProtected: isProtected,
             isDeletable: isDeletable,
             recommendedAction: action
