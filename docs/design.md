@@ -12,6 +12,7 @@ macOS cleanup utility. You should not have to trust it — you can read it.
 - No promise to free APFS purgeable space — impossible for third parties.
 - No telemetry, no network calls by default (update check is opt-in).
 - No permanent deletion as default. Ever.
+- Never-clean list: see §12.
 
 ## 3. Architecture
 Single repo, one Swift Package (`CoreKit`) containing all logic, consumed by:
@@ -431,6 +432,26 @@ these folders, and the `.app`/`/Applications` denials, which stay unchanged
 **Owner and confirmation.** The repository maintainer. Approval is expected as
 an explicit review comment on this PR; until then v0.2 and #40 behave as in
 option A.
+
+## 12. Never-clean list (#143)
+Things Terso will never clean, so that contributors do not propose them. A rule
+proposal or module touching any item below is declined without further review;
+reopening an item requires amending this section in a reviewed PR.
+
+| Item | Why Terso never touches it |
+|---|---|
+| Language files (`*.lproj`) and universal-binary thinning | Modifying files inside an app bundle breaks its code signature (Gatekeeper and TCC may then reject the app), and the files return on the next app update. Also conflicts with the v0.2 rule of never modifying `.app` bundles (§11.1). |
+| Document versions (`.DocumentRevisions-V100`) | Part of the user's document history, not a cache; removal is unrecoverable data loss and the store is protected by the system. |
+| Swap and sleep image (`/private/var/vm`) | Managed by the kernel; under `/private/var`, outside every allowlisted root. Deleting it can crash or destabilize a running system. |
+| APFS purgeable space | The system reclaims it on demand; a third party cannot free it (see §2). Any "cleaned purgeable GB" claim would be misleading. |
+| Messages database (`~/Library/Messages`) | User conversations and attachments, not a cache; deletion is unrecoverable and cannot be justified as cleanup. |
+| Anything under `/System` | Signed System Volume, SIP-protected; hard-denied by invariant 3. |
+| Built-in Apple apps on the Signed System Volume (Tips, Stocks, Chess, etc.) | Cannot be removed safely: workarounds need SIP or authenticated-root changes, can break boot, and are undone by system updates. Removable Apple apps in `/Applications` (Pages, Numbers, Keynote, GarageBand, iMovie) are handled by the uninstaller (#107), not by cleanup rules. |
+| Apple Intelligence models (`AssetsV2`) and the Spotlight index | Managed by the system; can only be removed through System Settings. Terso may at most point the user there. |
+
+This list is a product decision on top of the invariants in §5, which remain
+the technical enforcement. It is linked from `AGENTS.md` and from the
+[contribution guide](./CONTRIBUTING.md).
 
 ## Spike #104 — Homebrew cask viability (ad-hoc signed)
 

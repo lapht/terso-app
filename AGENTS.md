@@ -69,6 +69,9 @@ terso-app/
 
 > **v0.1/v0.2 note (not an invariant).** Permanent delete is not offered in v0.1 or v0.2, even though invariant 4 allows an explicit per-item opt-in. Every destructive action is trash-first through `Sources/CoreKit/Safety/`.
 
+## Never-clean list
+Things Terso never cleans are listed in [docs/design.md §12](docs/design.md#12-never-clean-list-143). Do not propose or implement rules or modules for them.
+
 ## v0.2 boundaries (from docs/design.md §11)
 - v0.2 never removes `.app` bundles and never modifies, moves or trashes anything in `/Applications` or `~/Applications`; the only access is read-only installed-app discovery. The current Safety denials (`PathValidator`) stay unchanged. Real uninstall is v0.3 (#107).
 - Leftovers are reported only for apps that are no longer installed (bundle ID absent from a complete discovery), only under the `~/Library` roots listed in design.md §11.4, and acted on only through the existing Safety pipeline, trash-first.
