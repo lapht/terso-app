@@ -27,6 +27,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     case packageCaches
     case mailDownloads
     case containerCaches
+    case electronCaches
     case leftovers
     case duplicates
     case largeFiles
@@ -53,6 +54,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             String(localized: "Mail Downloads")
         case .containerCaches:
             String(localized: "App Container Caches")
+        case .electronCaches:
+            String(localized: "Electron App Caches")
         case .leftovers:
             String(localized: "Leftovers")
         case .duplicates:
@@ -84,6 +87,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "envelope"
         case .containerCaches:
             "lock.square"
+        case .electronCaches:
+            "bolt.horizontal"
         case .leftovers:
             "tray.full"
         case .duplicates:
@@ -120,6 +125,14 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
                 localized: """
                     Find caches of sandboxed and App Store apps. Only each app's Caches folder is touched, \
                     and apps that are open are skipped. Needs Full Disk Access.
+                    """
+            )
+        case .electronCaches:
+            String(
+                localized: """
+                    Find the caches of Electron apps such as Slack, Discord, Teams, Spotify and VS Code. \
+                    Only known cache folders are touched, never profiles or settings, and apps that are \
+                    open are skipped.
                     """
             )
         case .mailDownloads:
@@ -176,7 +189,10 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         case .scan:
             [.smartScan]
         case .modules:
-            [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches, .mailDownloads, .containerCaches]
+            [
+                .userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches, .mailDownloads, .containerCaches,
+                .electronCaches
+            ]
         case .tools:
             [.leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs]
         }
