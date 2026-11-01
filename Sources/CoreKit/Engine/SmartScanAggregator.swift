@@ -115,6 +115,9 @@ public struct SmartScanResult: Sendable, Equatable {
     /// Caches left out because their app is running; informational, never deletable.
     public let skippedCaches: [SkippedCache]
 
+    /// Guidance for things Terso found but leaves to the user; never deletable.
+    public let advisories: [ModuleAdvisory]
+
     /// Failures from modules that did not complete successfully.
     public let errors: [SmartScanModuleError]
 
@@ -292,6 +295,7 @@ public struct SmartScanAggregator: Sendable {
     ) -> SmartScanResult {
         var items: [CleanItem] = []
         var skippedCaches: [SkippedCache] = []
+        var advisories: [ModuleAdvisory] = []
         var errors: [SmartScanModuleError] = []
         var permissionRequirements: [SmartScanPermissionRequirement] = []
 
@@ -300,6 +304,7 @@ public struct SmartScanAggregator: Sendable {
             case let .completed(report):
                 items.append(contentsOf: report.items)
                 skippedCaches.append(contentsOf: report.skippedCaches)
+                advisories.append(contentsOf: report.advisories)
             case let .requiresPermission(message):
                 permissionRequirements.append(
                     SmartScanPermissionRequirement(
@@ -322,6 +327,7 @@ public struct SmartScanAggregator: Sendable {
         return SmartScanResult(
             items: items,
             skippedCaches: skippedCaches,
+            advisories: advisories,
             errors: errors,
             permissionRequirements: permissionRequirements,
             completedModules: outcomes.count,

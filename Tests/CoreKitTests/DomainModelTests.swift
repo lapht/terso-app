@@ -123,7 +123,7 @@ struct CleanItemTests {
         )
         let expectedKeys: Set<String> = [
             "id", "url", "resolvedURL", "sizeBytes",
-            "moduleId", "ruleId", "isProtected", "isDeletable", "recommendedAction"
+            "moduleId", "ruleId", "isProtected", "isDeletable", "recommendedAction", "isPreselected"
         ]
         #expect(Set(json.keys) == expectedKeys)
     }

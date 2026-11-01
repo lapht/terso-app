@@ -267,6 +267,10 @@ struct SmartScanView: View {
                 }
             }
 
+            if let advisories = viewModel.result?.advisories, !advisories.isEmpty {
+                ModuleAdvisoriesView(advisories: advisories)
+            }
+
             LazyVGrid(
                 columns: [
                     GridItem(
