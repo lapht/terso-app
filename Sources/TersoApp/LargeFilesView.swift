@@ -35,8 +35,8 @@ struct LargeFilesView: View {
             systemImage: "doc.text.magnifyingglass",
             description: String(
                 localized: """
-                    Find large files in your home folder. This scanner is read-only: \
-                    you can reveal files in Finder, but Terso does not remove them from here.
+                    Find large files in your home folder and move the ones you choose to the Trash. \
+                    Nothing is selected by default; Desktop, Documents and Downloads are protected.
                     """
             ),
             phase: viewModel.phase,
@@ -44,13 +44,10 @@ struct LargeFilesView: View {
             onScan: viewModel.startScan,
             onCancel: viewModel.cancelScan
         ) {
-            ModuleDetailView(
+            LeftoversReviewView(
                 title: SidebarDestination.largeFiles.title,
                 systemImage: SidebarDestination.largeFiles.symbol,
-                items: viewModel.items,
-                homeDirectory: viewModel.homeDirectory,
-                allowsSelection: false,
-                onMoveToTrash: { _ in }
+                viewModel: viewModel.review
             )
         }
     }

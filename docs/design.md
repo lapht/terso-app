@@ -64,7 +64,7 @@ code review. Engine validates schema; snapshot tests catch regressions.
 | Trash Bins | all volumes, per-user |
 | Xcode Junk | DerivedData, Archives cache, simulator caches |
 | Package caches | Homebrew cleanup, npm/yarn/pnpm caches |
-| Large files | read-only scanner + reveal in Finder (no delete) |
+| Large files | scanner + selected files to Trash via Safety (#117); Reveal in Finder for packages |
 | Smart Scan | aggregator running modules in parallel |
 
 Post-MVP: see the roadmap in §9 and the v0.2 decisions in §11. The CLI

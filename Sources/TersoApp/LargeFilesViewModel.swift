@@ -25,6 +25,10 @@ final class LargeFilesViewModel: ObservableObject {
     @Published private(set) var phase: ScanPhase = .idle
     @Published private(set) var items: [CleanItem] = []
 
+    /// Selection, dry-run, recap and trash flow for the scanned files; every move goes through
+    /// the Safety pipeline, which also refuses protected paths (Desktop/Documents/Downloads).
+    let review: LeftoversViewModel
+
     let homeDirectory: URL
     private let module: any CleanModule
     private let tccManager: TCCManager
@@ -33,8 +37,14 @@ final class LargeFilesViewModel: ObservableObject {
     init(
         module: any CleanModule = LargeFilesModule(),
         tccManager: TCCManager = TCCManager(),
-        homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser
+        homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser,
+        pipeline: DeletionPipeline? = nil
     ) {
+        review = LeftoversViewModel(
+            homeDirectory: homeDirectory,
+            pipeline: pipeline,
+            allowedRootsByModule: [LargeFilesModule.moduleID: [homeDirectory]]
+        )
         self.module = module
         self.tccManager = tccManager
         self.homeDirectory = homeDirectory
@@ -47,6 +57,7 @@ final class LargeFilesViewModel: ObservableObject {
             return
         }
         items = []
+        review.load(items: [])
         phase = .scanning
 
         let module = self.module
@@ -72,6 +83,7 @@ final class LargeFilesViewModel: ObservableObject {
                 return
             }
             self.items = found
+            self.review.load(items: found)
             self.phase = outcome
             self.scanTask = nil
         }

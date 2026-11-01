@@ -93,7 +93,7 @@ Further design details: [docs/design.md](docs/design.md).
 | **Trash Bins** | Shows what your Trash bins (home and mounted volumes) contain and how much space they use | — see beta test T-07 |
 | **Xcode Junk** | Lists DerivedData, simulator caches and Xcode archives older than 90 days | Leaves recent archives alone |
 | **Package caches** | Lists Homebrew, npm, yarn and pnpm caches | Runs no package-manager commands |
-| **Large Files** | Lists the biggest files, with **Reveal in Finder** | Read-only: no delete button |
+| **Large Files** | Lists the biggest files; you pick which to move to the Trash (dry-run first, nothing preselected) | Trash-first via Safety; Desktop/Documents/Downloads are refused, files in packages and `~/Applications` are reveal-only |
 | **Cleanup** | Selection → recap (item count + total size) → confirmation → move to Trash → result screen | No permanent deletion in v0.1: items always go to the Trash |
 | **Audit log** | Records every cleanup locally (time, rule, size) and lets you export it | Sends nothing anywhere |
 | **Permissions** | Banner when Full Disk Access is missing; only the modules that need it are disabled | Does not require Full Disk Access to open the app |
@@ -121,7 +121,7 @@ system language. Launch `Terso.app` from Finder, not from Xcode.
 | T-08 | Select a few cache items and press clean | Recap shows item count and total size **before** anything happens; Cancel changes nothing |
 | T-09 | Confirm the cleanup | Items appear in the Finder Trash and can be put back; result screen matches the recap |
 | T-10 | Open the audit log and export it | Each cleaned item is listed with time, rule and size; export produces a readable file |
-| T-11 | **Large Files**: scan and press **Reveal in Finder** | Finder opens on the file; no delete option exists |
+| T-11 | **Large Files**: scan, select a file outside Desktop/Documents/Downloads, Dry Run, then Move to Trash | Recap shows count and size; the file lands in the Trash; a file in Documents is refused and listed |
 | T-12 | Xcode users: check **Xcode Junk** | DerivedData listed; archives younger than 90 days not listed |
 | T-13 | Resize the window to its minimum, try light and dark mode | Sidebar stays fixed and top-aligned; one scroll area; text readable |
 | T-14 | Non-English system language or case-sensitive APFS volume (if you have one) | Scans complete without errors |
