@@ -14,6 +14,8 @@ all merges.
 3. Read the [design document](./design.md), especially its safety invariants.
    Changes to `Sources/CoreKit/Safety/` or `Rules/` require particular human
    review by the maintainer.
+4. Check the [never-clean list](./design.md#12-never-clean-list-143) before
+   proposing a rule or module: items on it are declined.
 
 Use the GitHub issue forms for [bugs](../.github/ISSUE_TEMPLATE/bug_report.yml),
 [feature requests](../.github/ISSUE_TEMPLATE/feature_request.yml), and
