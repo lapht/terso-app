@@ -1396,6 +1396,40 @@
         }
       }
     },
+    "App Container Caches" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Container Caches"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cache dei container delle app"
+          }
+        }
+      }
+    },
+    "Find caches of sandboxed and App Store apps. Only each app's Caches folder is touched, and apps that are open are skipped. Needs Full Disk Access." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find caches of sandboxed and App Store apps. Only each app's Caches folder is touched, and apps that are open are skipped. Needs Full Disk Access."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trova le cache delle app sandbox e dell'App Store. Viene toccata solo la cartella Caches di ogni app e le app aperte vengono saltate. Richiede l'Accesso completo al disco."
+          }
+        }
+      }
+    },
     "Package Caches" : {
       "extractionState" : "manual",
       "localizations" : {

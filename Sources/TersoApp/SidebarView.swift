@@ -26,6 +26,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     case xcodeJunk
     case packageCaches
     case mailDownloads
+    case containerCaches
     case leftovers
     case duplicates
     case largeFiles
@@ -50,6 +51,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             String(localized: "Package Caches")
         case .mailDownloads:
             String(localized: "Mail Downloads")
+        case .containerCaches:
+            String(localized: "App Container Caches")
         case .leftovers:
             String(localized: "Leftovers")
         case .duplicates:
@@ -79,6 +82,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "shippingbox"
         case .mailDownloads:
             "envelope"
+        case .containerCaches:
+            "lock.square"
         case .leftovers:
             "tray.full"
         case .duplicates:
@@ -110,6 +115,13 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             String(localized: "Find rebuildable Xcode and simulator data.")
         case .packageCaches:
             String(localized: "Review known Homebrew, npm, Yarn, and pnpm download caches.")
+        case .containerCaches:
+            String(
+                localized: """
+                    Find caches of sandboxed and App Store apps. Only each app's Caches folder is touched, \
+                    and apps that are open are skipped. Needs Full Disk Access.
+                    """
+            )
         case .mailDownloads:
             String(
                 localized: """
@@ -164,7 +176,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         case .scan:
             [.smartScan]
         case .modules:
-            [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches, .mailDownloads]
+            [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches, .mailDownloads, .containerCaches]
         case .tools:
             [.leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs]
         }

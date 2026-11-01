@@ -56,6 +56,10 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
     /// Defaults to `.trash` per Invariant §4 (trash-first).
     public let recommendedAction: CleanAction
 
+    /// Human-readable owner of the item (for example the app a container cache belongs to),
+    /// when the scanner could resolve one. Display only: never used for safety decisions.
+    public let ownerName: String?
+
     /// Whether review screens should select this item by default. It stays selectable by hand.
     public let isPreselected: Bool
 
@@ -73,6 +77,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         isProtected: Bool = false,
         isDeletable: Bool = true,
         recommendedAction: CleanAction = .trash,
+        ownerName: String? = nil,
         isPreselected: Bool = true,
         note: String? = nil
     ) {
@@ -85,6 +90,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         self.isProtected = isProtected
         self.isDeletable = isDeletable
         self.recommendedAction = recommendedAction
+        self.ownerName = ownerName
         self.isPreselected = isPreselected
         self.note = note
     }
@@ -99,6 +105,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         case isProtected
         case isDeletable
         case recommendedAction
+        case ownerName
         case isPreselected
         case note
     }
@@ -114,6 +121,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         isProtected = try container.decode(Bool.self, forKey: .isProtected)
         isDeletable = try container.decodeIfPresent(Bool.self, forKey: .isDeletable) ?? true
         recommendedAction = try container.decode(CleanAction.self, forKey: .recommendedAction)
+        ownerName = try container.decodeIfPresent(String.self, forKey: .ownerName)
         isPreselected = try container.decodeIfPresent(Bool.self, forKey: .isPreselected) ?? true
         note = try container.decodeIfPresent(String.self, forKey: .note)
     }

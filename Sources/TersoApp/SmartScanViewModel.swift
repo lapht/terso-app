@@ -255,7 +255,9 @@ final class SmartScanViewModel: ObservableObject {
                 home.appendingPathComponent(".npm", isDirectory: true),
                 library.appendingPathComponent("Caches", isDirectory: true),
                 home.appendingPathComponent(".cache", isDirectory: true)
-            ]
+            ],
+            // Each container's Caches folder is its own root, so Safety refuses the rest of a container.
+            ContainerCachesModule.moduleID: ContainerCachesModule.allowedRoots(homeDirectory: home)
         ]
 
         let userID = String(getuid())
@@ -280,7 +282,8 @@ final class SmartScanViewModel: ObservableObject {
         TrashBinsModule(),
         XcodeJunkModule(),
         PackageCachesModule(),
-        MailDownloadsModule()
+        MailDownloadsModule(),
+        ContainerCachesModule()
     ]
 
     private static func makeScanContext(tccManager: TCCManager) -> ScanContext {

@@ -35,6 +35,8 @@ extension SidebarDestination {
             PackageCachesModule()
         case .mailDownloads:
             MailDownloadsModule()
+        case .containerCaches:
+            ContainerCachesModule()
         case .smartScan, .leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs:
             nil
         }
@@ -55,6 +57,8 @@ extension SidebarDestination {
             self = .packageCaches
         case "mail.downloads":
             self = .mailDownloads
+        case ContainerCachesModule.moduleID:
+            self = .containerCaches
         case "files.large":
             self = .largeFiles
         default:
