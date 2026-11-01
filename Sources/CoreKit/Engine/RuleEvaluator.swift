@@ -82,14 +82,11 @@ public struct RuleEvaluator: Sendable {
                 allowedRoots: allowedRoots
             )
 
-            guard let relativePath = relativePath(of: candidate, under: allowedRoots) else {
-                continue
-            }
-
-            guard positiveMatchers.contains(where: { $0.matches(path: relativePath) }) else {
-                continue
-            }
-            guard !exclusionMatchers.contains(where: { $0.matches(path: relativePath) }) else {
+            guard
+                let relativePath = relativePath(of: candidate, under: allowedRoots),
+                positiveMatchers.contains(where: { $0.matches(path: relativePath) }),
+                !exclusionMatchers.contains(where: { $0.matches(path: relativePath) })
+            else {
                 continue
             }
 
