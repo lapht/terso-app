@@ -686,6 +686,465 @@
         }
       }
     },
+    "Manage Separately" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Separately"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestisci a parte"
+          }
+        }
+      }
+    },
+    "Review large items that Terso never removes for you: AI models, device backups, virtual machines, Docker and macOS installers. Read-only, and scans only when you start it." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review large items that Terso never removes for you: AI models, device backups, virtual machines, Docker and macOS installers. Read-only, and scans only when you start it."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controlla gli elementi grandi che Terso non rimuove mai per te: modelli AI, backup dei dispositivi, macchine virtuali, Docker e installer di macOS. Sola lettura, e la scansione parte solo quando la avvii."
+          }
+        }
+      }
+    },
+    "Ollama models" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama models"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelli Ollama"
+          }
+        }
+      }
+    },
+    "Hugging Face cache" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hugging Face cache"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cache di Hugging Face"
+          }
+        }
+      }
+    },
+    "LM Studio models" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LM Studio models"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelli LM Studio"
+          }
+        }
+      }
+    },
+    "iPhone or iPad backup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone or iPad backup"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup di iPhone o iPad"
+          }
+        }
+      }
+    },
+    "Virtual machine" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual machine"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Macchina virtuale"
+          }
+        }
+      }
+    },
+    "Docker Desktop disk" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Docker Desktop disk"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disco di Docker Desktop"
+          }
+        }
+      }
+    },
+    "macOS installer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS installer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installer di macOS"
+          }
+        }
+      }
+    },
+    "Downloaded models are removed. You can download them again with ollama pull." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded models are removed. You can download them again with ollama pull."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I modelli scaricati vengono rimossi. Puoi scaricarli di nuovo con ollama pull."
+          }
+        }
+      }
+    },
+    "Cached models and datasets are removed. They are downloaded again when a tool needs them." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cached models and datasets are removed. They are downloaded again when a tool needs them."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I modelli e i dataset in cache vengono rimossi. Vengono scaricati di nuovo quando uno strumento ne ha bisogno."
+          }
+        }
+      }
+    },
+    "Downloaded models are removed. You can download them again from LM Studio." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded models are removed. You can download them again from LM Studio."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I modelli scaricati vengono rimossi. Puoi scaricarli di nuovo da LM Studio."
+          }
+        }
+      }
+    },
+    "This backup cannot be recreated if the device is lost or erased. It is not re-downloadable." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This backup cannot be recreated if the device is lost or erased. It is not re-downloadable."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo backup non può essere ricreato se il dispositivo viene perso o cancellato. Non è riscaricabile."
+          }
+        }
+      }
+    },
+    "The virtual machine and everything installed inside it is lost. It is not re-downloadable." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The virtual machine and everything installed inside it is lost. It is not re-downloadable."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La macchina virtuale e tutto ciò che contiene vanno persi. Non è riscaricabile."
+          }
+        }
+      }
+    },
+    "All Docker images, containers and volumes are lost. Volumes cannot be re-downloaded." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Docker images, containers and volumes are lost. Volumes cannot be re-downloaded."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le immagini, i container e i volumi Docker vanno persi. I volumi non sono riscaricabili."
+          }
+        }
+      }
+    },
+    "The installer is removed. You can download it again from the App Store or Software Update." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The installer is removed. You can download it again from the App Store or Software Update."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'installer viene rimosso. Puoi scaricarlo di nuovo dall'App Store o da Aggiornamento Software."
+          }
+        }
+      }
+    },
+    "Run “ollama rm <model>” in Terminal." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run “ollama rm <model>” in Terminal."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esegui “ollama rm <modello>” nel Terminale."
+          }
+        }
+      }
+    },
+    "Run “hf cache rm” (or “huggingface-cli delete-cache”) in Terminal." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run “hf cache rm” (or “huggingface-cli delete-cache”) in Terminal."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esegui “hf cache rm” (o “huggingface-cli delete-cache”) nel Terminale."
+          }
+        }
+      }
+    },
+    "In LM Studio, open My Models and delete the model." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In LM Studio, open My Models and delete the model."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In LM Studio, apri My Models ed elimina il modello."
+          }
+        }
+      }
+    },
+    "In Finder, select your device, then choose Manage Backups." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Finder, select your device, then choose Manage Backups."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nel Finder, seleziona il dispositivo e scegli Gestisci backup."
+          }
+        }
+      }
+    },
+    "Delete it from the virtual machine app that created it (UTM, Parallels or VMware)." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete it from the virtual machine app that created it (UTM, Parallels or VMware)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminala dall'app di macchine virtuali che l'ha creata (UTM, Parallels o VMware)."
+          }
+        }
+      }
+    },
+    "Run “docker system prune” or use Docker Desktop > Troubleshoot > Clean / Purge data." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run “docker system prune” or use Docker Desktop > Troubleshoot > Clean / Purge data."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esegui “docker system prune” oppure usa Docker Desktop > Troubleshoot > Clean / Purge data."
+          }
+        }
+      }
+    },
+    "Quit the installer, then drag it to the Trash in Finder." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quit the installer, then drag it to the Trash in Finder."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi l'installer, poi trascinalo nel Cestino dal Finder."
+          }
+        }
+      }
+    },
+    "Nothing to manage separately was found." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to manage separately was found."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è stato trovato nulla da gestire a parte."
+          }
+        }
+      }
+    },
+    "Not scanned" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not scanned"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non scansionato"
+          }
+        }
+      }
+    },
+    "Items found: %lld (%@)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Items found: %lld (%@)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elementi trovati: %lld (%@)"
+          }
+        }
+      }
+    },
+    "Last modified %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last modified %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultima modifica: %@"
+          }
+        }
+      }
+    },
     "Large Files" : {
       "extractionState" : "manual",
       "localizations" : {

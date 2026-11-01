@@ -28,6 +28,7 @@ final class ScanSessionStore: ObservableObject {
     let leftovers: ToolScanViewModel
     let leftoversReview: LeftoversViewModel
     let duplicates: DuplicatesViewModel
+    let manageSeparately: ManageSeparatelyViewModel
 
     private let tccManager: TCCManager
     private var moduleScans: [SidebarDestination: SmartScanViewModel] = [:]
@@ -39,6 +40,7 @@ final class ScanSessionStore: ObservableObject {
         leftovers = ToolScanViewModel(tool: .leftovers, scanner: LeftoversToolScanner(), tccManager: tccManager)
         leftoversReview = LeftoversViewModel()
         duplicates = DuplicatesViewModel()
+        manageSeparately = ManageSeparatelyViewModel()
     }
 
     /// The view model for a single module's page, created on first visit and reused afterwards.

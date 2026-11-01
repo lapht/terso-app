@@ -33,6 +33,7 @@ struct SidebarDestinationTests {
             "Leftovers",
             "Duplicates",
             "Large Files",
+            "Manage Separately",
             "Audit Log"
         ])
     }
@@ -72,7 +73,10 @@ struct SidebarDestinationTests {
 
     @MainActor @Test func nonModuleDestinationsHaveNoModuleScanPage() {
         let scanSessions = ScanSessionStore()
-        for destination in [SidebarDestination.smartScan, .leftovers, .duplicates, .largeFiles, .auditLogs] {
+        let nonModules: [SidebarDestination] = [
+            .smartScan, .leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs
+        ]
+        for destination in nonModules {
             #expect(destination.cleanModule == nil)
             #expect(ModuleScanView(destination: destination, scanSessions: scanSessions) == nil)
         }

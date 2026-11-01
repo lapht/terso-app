@@ -28,6 +28,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     case leftovers
     case duplicates
     case largeFiles
+    case manageSeparately
     case auditLogs
 
     var id: Self { self }
@@ -52,6 +53,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             String(localized: "Duplicates")
         case .largeFiles:
             String(localized: "Large Files")
+        case .manageSeparately:
+            String(localized: "Manage Separately")
         case .auditLogs:
             String(localized: "Audit Log")
         }
@@ -77,6 +80,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "square.on.square"
         case .largeFiles:
             "doc.text.magnifyingglass"
+        case .manageSeparately:
+            "externaldrive.badge.questionmark"
         case .auditLogs:
             "list.bullet.rectangle"
         }
@@ -110,6 +115,13 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             )
         case .largeFiles:
             String(localized: "Find large files in your home folder. This scanner is read-only.")
+        case .manageSeparately:
+            String(
+                localized: """
+                    Review large items that Terso never removes for you: AI models, device backups, \
+                    virtual machines, Docker and macOS installers. Read-only, and scans only when you start it.
+                    """
+            )
         case .auditLogs:
             String(localized: "Review local records of cleanup activity.")
         }
@@ -141,7 +153,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         case .modules:
             [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches]
         case .tools:
-            [.leftovers, .duplicates, .largeFiles, .auditLogs]
+            [.leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs]
         }
     }
 }
