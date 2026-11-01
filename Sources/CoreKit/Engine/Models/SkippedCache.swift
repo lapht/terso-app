@@ -31,12 +31,16 @@ public struct SkippedCache: Sendable, Equatable, Identifiable {
     /// Estimated size of the skipped cache directory (may be partial if some files were unreadable).
     public let estimatedBytes: Int64
 
+    /// Resolved app name when the module found one; callers fall back to the identifier.
+    public let displayName: String?
+
     public var id: String { "\(moduleID):\(bundleIdentifier)" }
 
-    public init(moduleID: String, bundleIdentifier: String, estimatedBytes: Int64) {
+    public init(moduleID: String, bundleIdentifier: String, estimatedBytes: Int64, displayName: String? = nil) {
         self.moduleID = moduleID
         self.bundleIdentifier = bundleIdentifier
         self.estimatedBytes = estimatedBytes
+        self.displayName = displayName
     }
 }
 

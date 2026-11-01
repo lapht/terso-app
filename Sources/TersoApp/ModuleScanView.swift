@@ -33,6 +33,8 @@ extension SidebarDestination {
             XcodeJunkModule()
         case .packageCaches:
             PackageCachesModule()
+        case .containerCaches:
+            ContainerCachesModule()
         case .smartScan, .leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs:
             nil
         }
@@ -51,6 +53,8 @@ extension SidebarDestination {
             self = .xcodeJunk
         case "caches.packages":
             self = .packageCaches
+        case ContainerCachesModule.moduleID:
+            self = .containerCaches
         case "files.large":
             self = .largeFiles
         default:

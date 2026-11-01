@@ -35,7 +35,7 @@ struct SkippedCachesView: View {
                 .foregroundStyle(.secondary)
             ForEach(skippedCaches) { cache in
                 HStack {
-                    Text(Self.appName(for: cache.bundleIdentifier))
+                    Text(cache.displayName ?? Self.appName(for: cache.bundleIdentifier))
                     Spacer(minLength: 0)
                     Text(SizeCalculator.formattedByteCount(cache.estimatedBytes))
                         .monospacedDigit()

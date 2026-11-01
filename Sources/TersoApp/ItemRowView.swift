@@ -34,11 +34,11 @@ struct ItemRowView: View {
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxSmall) {
-                Text(item.url.lastPathComponent)
+                Text(title)
                     .font(DesignTokens.Typography.body.weight(.medium))
                     .lineLimit(1)
                     .truncationMode(.middle)
-                    .help(item.url.lastPathComponent)
+                    .help(title)
 
                 Text(relativePath)
                     .font(DesignTokens.Typography.caption)
@@ -77,6 +77,11 @@ struct ItemRowView: View {
                 revealInFinder()
             }
         }
+    }
+
+    /// The owning app when the module resolved one (every container cache is named `Caches`).
+    private var title: String {
+        item.ownerName ?? item.url.lastPathComponent
     }
 
     private var isRowSelected: Bool {

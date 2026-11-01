@@ -56,6 +56,10 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
     /// Defaults to `.trash` per Invariant §4 (trash-first).
     public let recommendedAction: CleanAction
 
+    /// Human-readable owner of the item (for example the app a container cache belongs to),
+    /// when the scanner could resolve one. Display only: never used for safety decisions.
+    public let ownerName: String?
+
     public init(
         id: UUID = UUID(),
         url: URL,
@@ -65,7 +69,8 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         ruleId: String,
         isProtected: Bool = false,
         isDeletable: Bool = true,
-        recommendedAction: CleanAction = .trash
+        recommendedAction: CleanAction = .trash,
+        ownerName: String? = nil
     ) {
         self.id = id
         self.url = url
@@ -76,6 +81,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         self.isProtected = isProtected
         self.isDeletable = isDeletable
         self.recommendedAction = recommendedAction
+        self.ownerName = ownerName
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -88,6 +94,7 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         case isProtected
         case isDeletable
         case recommendedAction
+        case ownerName
     }
 
     public init(from decoder: Decoder) throws {
@@ -101,5 +108,6 @@ public struct CleanItem: Sendable, Identifiable, Hashable, Codable {
         isProtected = try container.decode(Bool.self, forKey: .isProtected)
         isDeletable = try container.decodeIfPresent(Bool.self, forKey: .isDeletable) ?? true
         recommendedAction = try container.decode(CleanAction.self, forKey: .recommendedAction)
+        ownerName = try container.decodeIfPresent(String.self, forKey: .ownerName)
     }
 }

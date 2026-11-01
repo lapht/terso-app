@@ -25,6 +25,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     case trashBins
     case xcodeJunk
     case packageCaches
+    case containerCaches
     case leftovers
     case duplicates
     case largeFiles
@@ -47,6 +48,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             String(localized: "Xcode Junk")
         case .packageCaches:
             String(localized: "Package Caches")
+        case .containerCaches:
+            String(localized: "App Container Caches")
         case .leftovers:
             String(localized: "Leftovers")
         case .duplicates:
@@ -74,6 +77,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "hammer"
         case .packageCaches:
             "shippingbox"
+        case .containerCaches:
+            "lock.square"
         case .leftovers:
             "tray.full"
         case .duplicates:
@@ -105,6 +110,13 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             String(localized: "Find rebuildable Xcode and simulator data.")
         case .packageCaches:
             String(localized: "Review known Homebrew, npm, Yarn, and pnpm download caches.")
+        case .containerCaches:
+            String(
+                localized: """
+                    Find caches of sandboxed and App Store apps. Only each app's Caches folder is touched, \
+                    and apps that are open are skipped. Needs Full Disk Access.
+                    """
+            )
         case .leftovers:
             String(
                 localized: "Find files left behind by apps that are no longer installed. Scans only when you start it."
@@ -151,7 +163,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         case .scan:
             [.smartScan]
         case .modules:
-            [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches]
+            [.userCaches, .userLogs, .trashBins, .xcodeJunk, .packageCaches, .containerCaches]
         case .tools:
             [.leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs]
         }
