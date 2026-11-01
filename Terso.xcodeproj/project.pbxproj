@@ -56,6 +56,9 @@
 		1000000000000000000000FA /* LargeFilesViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000019 /* LargeFilesViewModelTests.swift */; };
 		100000000000000000140A01 /* ManageSeparatelyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000140A01 /* ManageSeparatelyViewModel.swift */; };
 		100000000000000000140A02 /* ManageSeparatelyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000140A02 /* ManageSeparatelyView.swift */; };
+		100000000000000000115001 /* OldFilesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000115001 /* OldFilesViewModel.swift */; };
+		100000000000000000115002 /* OldFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000115002 /* OldFilesView.swift */; };
+		100000000000000000115003 /* OldFilesViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000115003 /* OldFilesViewModelTests.swift */; };
 		100000000000000000140A03 /* ManageSeparatelyViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000140A03 /* ManageSeparatelyViewModelTests.swift */; };
 		1000000000000000000000B3 /* ToolScanViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000C3 /* ToolScanViewModelTests.swift */; };
 		1000000000000000000000D3 /* DuplicatesViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2000000000000000000000D3 /* DuplicatesViewModelTests.swift */; };
@@ -120,6 +123,9 @@
 		200000000000000000000019 /* LargeFilesViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeFilesViewModelTests.swift; sourceTree = "<group>"; };
 		200000000000000000140A01 /* ManageSeparatelyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageSeparatelyViewModel.swift; sourceTree = "<group>"; };
 		200000000000000000140A02 /* ManageSeparatelyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageSeparatelyView.swift; sourceTree = "<group>"; };
+		200000000000000000115001 /* OldFilesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldFilesViewModel.swift; sourceTree = "<group>"; };
+		200000000000000000115002 /* OldFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldFilesView.swift; sourceTree = "<group>"; };
+		200000000000000000115003 /* OldFilesViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldFilesViewModelTests.swift; sourceTree = "<group>"; };
 		200000000000000000140A03 /* ManageSeparatelyViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageSeparatelyViewModelTests.swift; sourceTree = "<group>"; };
 		2000000000000000000000C3 /* ToolScanViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolScanViewModelTests.swift; sourceTree = "<group>"; };
 		2000000000000000000000D3 /* DuplicatesViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicatesViewModelTests.swift; sourceTree = "<group>"; };
@@ -190,6 +196,8 @@
 				20000000000000000000001B /* ModuleScanView.swift */,
 				20000000000000000000001C /* ScanSessionStore.swift */,
 				200000000000000000000017 /* LargeFilesViewModel.swift */,
+				200000000000000000115001 /* OldFilesViewModel.swift */,
+				200000000000000000115002 /* OldFilesView.swift */,
 				200000000000000000140A02 /* ManageSeparatelyView.swift */,
 				200000000000000000140A01 /* ManageSeparatelyViewModel.swift */,
 				2000000000000000000000D2 /* DuplicatesView.swift */,
@@ -231,6 +239,7 @@
 				20000000000000000000001D /* ScanSessionStoreTests.swift */,
 				2000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift */,
 				200000000000000000000019 /* LargeFilesViewModelTests.swift */,
+				200000000000000000115003 /* OldFilesViewModelTests.swift */,
 				200000000000000000140A03 /* ManageSeparatelyViewModelTests.swift */,
 				2000000000000000000000C3 /* ToolScanViewModelTests.swift */,
 				2000000000000000000000E6 /* LeftoversToolScannerTests.swift */,
@@ -349,6 +358,8 @@
 				1000000000000000000000FC /* ModuleScanView.swift in Sources */,
 				1000000000000000000000FD /* ScanSessionStore.swift in Sources */,
 				1000000000000000000000F8 /* LargeFilesViewModel.swift in Sources */,
+				100000000000000000115001 /* OldFilesViewModel.swift in Sources */,
+				100000000000000000115002 /* OldFilesView.swift in Sources */,
 				100000000000000000140A02 /* ManageSeparatelyView.swift in Sources */,
 				100000000000000000140A01 /* ManageSeparatelyViewModel.swift in Sources */,
 				1000000000000000000000D2 /* DuplicatesView.swift in Sources */,
@@ -388,6 +399,7 @@
 				1000000000000000000000FE /* ScanSessionStoreTests.swift in Sources */,
 				1000000000000000000000B4 /* MenuBarScanCoordinatorTests.swift in Sources */,
 				1000000000000000000000FA /* LargeFilesViewModelTests.swift in Sources */,
+				100000000000000000115003 /* OldFilesViewModelTests.swift in Sources */,
 				100000000000000000140A03 /* ManageSeparatelyViewModelTests.swift in Sources */,
 				1000000000000000000000B3 /* ToolScanViewModelTests.swift in Sources */,
 				1000000000000000000000E5 /* LeftoversToolScannerTests.swift in Sources */,

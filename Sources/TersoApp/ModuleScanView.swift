@@ -39,7 +39,7 @@ extension SidebarDestination {
             ContainerCachesModule()
         case .electronCaches:
             ElectronCachesModule()
-        case .smartScan, .leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs:
+        case .smartScan, .leftovers, .duplicates, .largeFiles, .manageSeparately, .oldFiles, .auditLogs:
             nil
         }
     }

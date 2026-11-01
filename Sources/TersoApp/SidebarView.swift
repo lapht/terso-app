@@ -32,6 +32,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     case duplicates
     case largeFiles
     case manageSeparately
+    case oldFiles
     case auditLogs
 
     var id: Self { self }
@@ -64,6 +65,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             String(localized: "Large Files")
         case .manageSeparately:
             String(localized: "Manage Separately")
+        case .oldFiles:
+            String(localized: "Old Files")
         case .auditLogs:
             String(localized: "Audit Log")
         }
@@ -97,6 +100,8 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
             "doc.text.magnifyingglass"
         case .manageSeparately:
             "externaldrive.badge.questionmark"
+        case .oldFiles:
+            "clock.arrow.circlepath"
         case .auditLogs:
             "list.bullet.rectangle"
         }
@@ -160,6 +165,13 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
                     virtual machines, Docker and macOS installers. Read-only, and scans only when you start it.
                     """
             )
+        case .oldFiles:
+            String(
+                localized: """
+                    Browse old screenshots, screen recordings, installers and archives in Downloads and Desktop. \
+                    Nothing is selected, and Terso only lists them: read-only, and scans only when you start it.
+                    """
+            )
         case .auditLogs:
             String(localized: "Review local records of cleanup activity.")
         }
@@ -194,7 +206,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
                 .electronCaches
             ]
         case .tools:
-            [.leftovers, .duplicates, .largeFiles, .manageSeparately, .auditLogs]
+            [.leftovers, .duplicates, .largeFiles, .manageSeparately, .oldFiles, .auditLogs]
         }
     }
 }
