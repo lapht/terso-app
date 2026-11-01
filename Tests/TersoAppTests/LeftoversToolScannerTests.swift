@@ -150,4 +150,30 @@ struct LeftoversToolScannerTests {
 
         #expect(rules.contains { $0.appPatterns != nil })
     }
+
+    @Test func bundledRulesFileIsTheOneBundledRulesNamePointsTo() throws {
+        let name = LeftoversToolScanner.bundledRulesName
+        let bundled = try #require(
+            Bundle.main.url(forResource: name, withExtension: "json"),
+            "\(name).json is not bundled in the app"
+        )
+        let source = Self.rulesDirectory.appendingPathComponent("\(name).json")
+
+        #expect(try Data(contentsOf: bundled) == Data(contentsOf: source))
+    }
+
+    @Test func bundledRulesNameIsTheNewestRuleFile() throws {
+        let names = try FileManager.default.contentsOfDirectory(atPath: Self.rulesDirectory.path)
+            .filter { $0.hasPrefix("v") && $0.hasSuffix(".json") }
+            .map { String($0.dropLast(".json".count)) }
+        let newest = names.max { $0.compare($1, options: .numeric) == .orderedAscending }
+
+        #expect(newest == LeftoversToolScanner.bundledRulesName)
+    }
+
+    private static let rulesDirectory = URL(fileURLWithPath: #filePath)
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .appendingPathComponent("Rules")
 }
