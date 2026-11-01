@@ -151,6 +151,19 @@ public struct TCCManager: Sendable {
         module: any CleanModule,
         context: ScanContext
     ) async throws -> CleanModuleScanResult {
+        switch try await scanReport(module: module, context: context) {
+        case let .completed(report):
+            return .completed(report.items)
+        case let .requiresPermission(message):
+            return .requiresPermission(message: message)
+        }
+    }
+
+    /// Like ``scan(module:context:)``, but keeps what the module skipped when it can report it.
+    func scanReport(
+        module: any CleanModule,
+        context: ScanContext
+    ) async throws -> ModuleReportOutcome {
         let currentStatus = status
         guard !module.requiresFDA || currentStatus == .granted else {
             return .requiresPermission(
@@ -166,6 +179,14 @@ public struct TCCManager: Sendable {
             exclusions: context.exclusions,
             tccStatus: currentStatus
         )
-        return .completed(try await module.scan(context: authorizedContext))
+        if let reporting = module as? any SkippedCacheReporting {
+            return .completed(try await reporting.scanReport(context: authorizedContext))
+        }
+        return .completed(ModuleScanReport(items: try await module.scan(context: authorizedContext)))
     }
+}
+
+enum ModuleReportOutcome: Sendable {
+    case completed(ModuleScanReport)
+    case requiresPermission(message: String)
 }
