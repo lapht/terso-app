@@ -20,8 +20,9 @@ import AppKit
 import CoreKit
 import SwiftUI
 
-/// Duplicates never scans on appear: the user picks folders and starts it. Results are read-only,
-/// like Large Files: groups and copies can be inspected and revealed in Finder, nothing more.
+/// Duplicates never scans on appear: the user picks folders and starts it. Copies can be revealed
+/// in Finder or ticked (none is ticked by default, and every group keeps at least one copy) and moved
+/// to the Trash through the Safety pipeline after a recap and an explicit confirmation.
 @MainActor
 struct DuplicatesView: View {
     @ObservedObject private var viewModel: DuplicatesViewModel
@@ -44,11 +45,7 @@ struct DuplicatesView: View {
                 onScan: viewModel.startScan,
                 onCancel: viewModel.cancelScan
             ) {
-                DuplicatesResultsView(
-                    summary: viewModel.summary,
-                    homeDirectory: viewModel.homeDirectory,
-                    onScanAgain: viewModel.chooseFoldersAgain
-                )
+                DuplicatesResultsView(viewModel: viewModel)
             }
             if viewModel.phase != .scanning, viewModel.phase != .finished {
                 folderChoice
@@ -91,7 +88,8 @@ struct DuplicatesView: View {
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = true
         panel.prompt = "Add"
-        panel.message = "Choose the folders to search for identical files. Terso only reads them."
+        panel.message = "Choose the folders to search for identical files. Scanning only reads them; "
+            + "nothing is moved without your confirmation."
         if panel.runModal() == .OK {
             viewModel.addRoots(panel.urls)
         }
@@ -123,18 +121,32 @@ enum DuplicatePathFormatter {
 /// Group list plus everything the scan skipped or failed on (invariant 7: never silently scan less).
 @MainActor
 struct DuplicatesResultsView: View {
-    let summary: DuplicateScanSummary
-    let homeDirectory: URL
-    let onScanAgain: () -> Void
+    @ObservedObject var viewModel: DuplicatesViewModel
+    @StateObject private var confirmation: CleanupConfirmationViewModel
+
+    init(viewModel: DuplicatesViewModel) {
+        self.viewModel = viewModel
+        _confirmation = StateObject(
+            wrappedValue: CleanupConfirmationViewModel(onConfirm: { _ in viewModel.moveSelectedToTrash() })
+        )
+    }
+
+    private var summary: DuplicateScanSummary { viewModel.summary }
+    private var homeDirectory: URL { viewModel.homeDirectory }
 
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
             PageHeader(
                 title: "Duplicates",
                 systemImage: SidebarDestination.duplicates.symbol,
-                description: "Read-only — copies can only be revealed in Finder."
+                description: "Tick the copies to move to the Trash. Nothing is ticked by default and "
+                    + "each group keeps at least one copy."
             )
             summaryCard
+            if !summary.groups.isEmpty {
+                recap
+            }
+            outcome
             if summary.groups.isEmpty {
                 EmptyStateView(
                     systemImage: "checkmark.seal",
@@ -146,6 +158,115 @@ struct DuplicatesResultsView: View {
             }
         }
         .frame(maxWidth: DesignTokens.Layout.contentMaxWidth, maxHeight: .infinity, alignment: .topLeading)
+        .sheet(isPresented: confirmationBinding) {
+            ConfirmationSheetView(
+                itemCount: confirmation.pendingItems.count,
+                totalBytes: confirmation.pendingBytes,
+                protectedFolders: viewModel.protectedFolderNames,
+                onCancel: confirmation.cancel,
+                onConfirm: confirmation.confirm
+            )
+            .interactiveDismissDisabled()
+        }
+    }
+
+    private var recap: some View {
+        HStack(spacing: DesignTokens.Spacing.small) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxSmall) {
+                Text(SizeCalculator.formattedByteCount(viewModel.selectedBytes))
+                    .font(DesignTokens.Typography.figure)
+                    .foregroundStyle(DesignTokens.Palette.brandText)
+                Text("\(viewModel.selectedCount) copies selected")
+                    .font(DesignTokens.Typography.metadata)
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("duplicates-selected-size")
+
+            Spacer(minLength: DesignTokens.Spacing.small)
+
+            Button("Deselect All", action: viewModel.deselectAll)
+                .disabled(viewModel.selectedCount == 0)
+                .accessibilityIdentifier("duplicates-deselect-all")
+            Button("Dry Run", systemImage: "doc.text.magnifyingglass", action: viewModel.performDryRun)
+                .disabled(viewModel.selectedCount == 0)
+                .accessibilityIdentifier("duplicates-dry-run")
+            Button(
+                "Move \(viewModel.selectedCount) to Trash",
+                systemImage: "trash",
+                action: { requestConfirmation() }
+            )
+            .buttonStyle(.borderedProminent)
+            .disabled(viewModel.selectedCount == 0)
+            .accessibilityIdentifier("duplicates-move-to-trash")
+        }
+        .buttonStyle(.bordered)
+        .tersoCard(padding: DesignTokens.Spacing.small)
+    }
+
+    /// The confirmation shows the number of copies and their size; the Safety pipeline gets the
+    /// exact copies only after the user confirms.
+    private func requestConfirmation() {
+        let items = viewModel.summary.groups.flatMap { group in
+            group.copies.filter(viewModel.isSelected).map { copy in
+                CleanItem(
+                    url: copy.url,
+                    resolvedURL: copy.url,
+                    sizeBytes: copy.sizeBytes,
+                    moduleId: DuplicateTrashPlan.moduleID,
+                    ruleId: DuplicateTrashPlan.moduleID
+                )
+            }
+        }
+        confirmation.requestConfirmation(for: items)
+    }
+
+    private var confirmationBinding: Binding<Bool> {
+        Binding(
+            get: { confirmation.isPresented },
+            set: { isPresented in
+                if !isPresented {
+                    confirmation.cancel()
+                }
+            }
+        )
+    }
+
+    @ViewBuilder
+    private var outcome: some View {
+        if let report = viewModel.report {
+            switch report {
+            case let .dryRun(itemCount, bytes):
+                StatusMessage(
+                    text: "Dry run: \(itemCount) copies, \(SizeCalculator.formattedByteCount(bytes)) would be freed "
+                        + "by moving them to Trash. Nothing was changed.",
+                    systemImage: "doc.text.magnifyingglass"
+                )
+            case let .trashed(itemCount, bytes):
+                StatusMessage(
+                    text: "Moved \(itemCount) copies to Trash, about "
+                        + "\(SizeCalculator.formattedByteCount(bytes)) freed.",
+                    systemImage: "trash"
+                )
+            }
+        }
+        if !viewModel.rejections.isEmpty {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.small) {
+                StatusMessage(
+                    text: "Some copies were refused or skipped and left untouched. See the audit log.",
+                    systemImage: "exclamationmark.triangle",
+                    tone: .warning
+                )
+                ForEach(viewModel.rejections) { rejection in
+                    Text(rejection.path.isEmpty ? rejection.message : "\(rejection.path) — \(rejection.message)")
+                        .font(DesignTokens.Typography.caption)
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
+            }
+            .tersoCard()
+            .accessibilityIdentifier("duplicates-rejections")
+        }
     }
 
     private var summaryCard: some View {
@@ -162,7 +283,7 @@ struct DuplicatesResultsView: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("duplicates-total")
                 Spacer(minLength: DesignTokens.Spacing.small)
-                Button("Choose Folders Again", systemImage: "folder", action: onScanAgain)
+                Button("Choose Folders Again", systemImage: "folder", action: viewModel.chooseFoldersAgain)
                     .buttonStyle(.bordered)
             }
             if summary.isCancelled {
@@ -187,7 +308,7 @@ struct DuplicatesResultsView: View {
         List {
             Section {
                 ForEach(summary.groups) { group in
-                    DuplicateGroupRowView(group: group, homeDirectory: homeDirectory)
+                    DuplicateGroupRowView(group: group, viewModel: viewModel)
                         .listRowSeparator(.hidden)
                 }
             }
@@ -225,12 +346,20 @@ struct DuplicatesResultsView: View {
 
 private struct DuplicateGroupRowView: View {
     let group: DuplicateGroupRow
-    let homeDirectory: URL
+    @ObservedObject var viewModel: DuplicatesViewModel
 
     var body: some View {
         DisclosureGroup {
             ForEach(group.copies) { copy in
-                DuplicateCopyRowView(copy: copy, homeDirectory: homeDirectory)
+                DuplicateCopyRowView(
+                    copy: copy,
+                    homeDirectory: viewModel.homeDirectory,
+                    isSelected: Binding(
+                        get: { viewModel.isSelected(copy) },
+                        set: { viewModel.setSelected($0, copy: copy, in: group) }
+                    ),
+                    canSelect: viewModel.canSelect(copy, in: group)
+                )
             }
         } label: {
             HStack {
@@ -260,9 +389,16 @@ private struct DuplicateGroupRowView: View {
 private struct DuplicateCopyRowView: View {
     let copy: DuplicateCopy
     let homeDirectory: URL
+    let isSelected: Binding<Bool>
+    let canSelect: Bool
 
     var body: some View {
         HStack(spacing: DesignTokens.Spacing.small) {
+            Toggle("Select \(copy.url.lastPathComponent)", isOn: isSelected)
+                .labelsHidden()
+                .disabled(!canSelect)
+                .help(canSelect ? "Move this copy to the Trash" : "Each group keeps at least one copy")
+                .accessibilityLabel("Select \(copy.url.lastPathComponent)")
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxSmall) {
                 Text(copy.url.lastPathComponent)
                     .font(DesignTokens.Typography.body.weight(.medium))

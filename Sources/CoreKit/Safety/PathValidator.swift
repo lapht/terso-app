@@ -104,8 +104,16 @@ public struct PathValidator: Sendable {
     ///   - allowedRoots: The set of root URLs that are acceptable for the
     ///     calling module. Must be non-empty. Each root is also standardized
     ///     before comparison.
+    ///   - protectedAreaGrants: Folders the user picked for the duplicates flow
+    ///     (design.md §11.7). A path strictly inside one of them is no longer denied for being
+    ///     under Desktop/Documents/Downloads. Nothing else is relaxed, and the protected roots
+    ///     themselves stay denied.
     /// - Throws: ``SafetyError`` if any check fails.
-    public func validate(path: URL, allowedRoots: [URL]) throws {
+    public func validate(
+        path: URL,
+        allowedRoots: [URL],
+        protectedAreaGrants: [ProtectedAreaGrant] = []
+    ) throws {
         // 1. Normalize
         let standardized = path.standardizedFileURL
         let rawPath = standardized.path
@@ -125,7 +133,7 @@ public struct PathValidator: Sendable {
         }
 
         // 3. Protected-path check (§3).
-        try checkProtectedPaths(standardizedPath: rawPath)
+        try checkProtectedPaths(standardizedPath: rawPath, grants: protectedAreaGrants)
 
         // 4. Allowlist check (§1).
         try checkAllowlist(standardizedPath: rawPath, allowedRoots: allowedRoots)
@@ -136,26 +144,19 @@ public struct PathValidator: Sendable {
     /// Checks `standardizedPath` against all hard-denied prefixes and suffixes.
     ///
     /// Comparison is case-insensitive to handle APFS case-insensitive volumes.
-    private func checkProtectedPaths(standardizedPath: String) throws {
+    private func checkProtectedPaths(standardizedPath: String, grants: [ProtectedAreaGrant]) throws {
         let lowerPath = standardizedPath.lowercased()
 
-        // System-level prefixes
-        for (prefix, reason) in Self.systemProtectedPrefixes
-            where isContained(path: lowerPath, underPrefix: prefix.lowercased()) {
-            throw SafetyError.protectedPath(path: standardizedPath, reason: reason)
-        }
+        try checkSystemPrefixes(standardizedPath: standardizedPath)
 
-        // Personal protected roots: ~/Desktop, ~/Documents, ~/Downloads
-        let personalProtected: [(URL, String)] = [
-            (homeDirectory.appendingPathComponent("Desktop"), "user Desktop root"),
-            (homeDirectory.appendingPathComponent("Documents"), "user Documents root"),
-            (homeDirectory.appendingPathComponent("Downloads"), "user Downloads root")
-        ]
-        for (protectedURL, reason) in personalProtected {
-            let protectedPath = protectedURL.standardizedFileURL.path
-            if isContained(path: lowerPath, underPrefix: protectedPath.lowercased()) {
-                throw SafetyError.protectedPath(path: standardizedPath, reason: reason)
+        // Personal protected roots: ~/Desktop, ~/Documents, ~/Downloads. The subtree is denied,
+        // except below a folder the user picked for the duplicates flow (never the root itself).
+        for (protectedPath, reason) in personalProtectedRoots()
+            where isContained(path: lowerPath, underPrefix: protectedPath.lowercased()) {
+            if lowerPath != protectedPath.lowercased(), grant(covering: lowerPath, in: grants) != nil {
+                continue
             }
+            throw SafetyError.protectedPath(path: standardizedPath, reason: reason)
         }
 
         // Suffix-based check (e.g. .app bundles).
@@ -170,6 +171,78 @@ public struct PathValidator: Sendable {
         for (suffix, reason) in Self.protectedSuffixes
             where lastComponent.lowercased().hasSuffix(suffix.lowercased()) {
             throw SafetyError.protectedPath(path: standardizedPath, reason: reason)
+        }
+    }
+
+    private func checkSystemPrefixes(standardizedPath: String) throws {
+        let lowerPath = standardizedPath.lowercased()
+        for (prefix, reason) in Self.systemProtectedPrefixes
+            where isContained(path: lowerPath, underPrefix: prefix.lowercased()) {
+            throw SafetyError.protectedPath(path: standardizedPath, reason: reason)
+        }
+    }
+
+    private func personalProtectedRoots() -> [(path: String, reason: String)] {
+        [
+            (homeDirectory.appendingPathComponent("Desktop").standardizedFileURL.path, "user Desktop root"),
+            (homeDirectory.appendingPathComponent("Documents").standardizedFileURL.path, "user Documents root"),
+            (homeDirectory.appendingPathComponent("Downloads").standardizedFileURL.path, "user Downloads root")
+        ]
+    }
+
+    /// The grant whose folder strictly contains `lowerPath` (already lowercased), if any.
+    private func grant(covering lowerPath: String, in grants: [ProtectedAreaGrant]) -> ProtectedAreaGrant? {
+        grants.first { grant in
+            let folder = grant.folder.standardizedFileURL.path.lowercased()
+            return lowerPath != folder && isContained(path: lowerPath, underPrefix: folder)
+        }
+    }
+
+    // MARK: - Protected-area exception (design.md §11.7)
+
+    /// The grant that made `path` acceptable inside Desktop/Documents/Downloads, or `nil` when the
+    /// path is outside those areas or no grant covers it. The pipeline uses this to apply the
+    /// extra file-only checks and to mark the audit record.
+    public func protectedAreaGrant(covering path: URL, in grants: [ProtectedAreaGrant]) -> ProtectedAreaGrant? {
+        let lowerPath = path.standardizedFileURL.path.lowercased()
+        let insideProtectedArea = personalProtectedRoots().contains {
+            lowerPath != $0.path.lowercased() && isContained(path: lowerPath, underPrefix: $0.path.lowercased())
+        }
+        return insideProtectedArea ? grant(covering: lowerPath, in: grants) : nil
+    }
+
+    /// Checks a folder the user picked before it becomes a ``ProtectedAreaGrant``.
+    ///
+    /// Rejected: relative paths and `..`, system paths, the home directory and any parent of it
+    /// (blast radius too wide), symlinks, and anything that is not an existing directory.
+    func validateGrantFolder(_ folder: URL) throws {
+        if folder.path.components(separatedBy: "/").contains("..") || !folder.path.hasPrefix("/") {
+            throw SafetyError.invalidPath(path: folder.path)
+        }
+        let standardized = folder.standardizedFileURL.path
+        try checkSystemPrefixes(standardizedPath: standardized)
+
+        let lowerFolder = standardized.lowercased()
+        let lowerHome = homeDirectory.path.lowercased()
+        if lowerFolder == "/" || isContained(path: lowerHome, underPrefix: lowerFolder) {
+            throw SafetyError.protectedPath(
+                path: standardized,
+                reason: "picked folder is the home directory or one of its parents"
+            )
+        }
+        let lastComponent = standardized.components(separatedBy: "/").last ?? ""
+        for (suffix, reason) in Self.protectedSuffixes where lastComponent.lowercased().hasSuffix(suffix) {
+            throw SafetyError.protectedPath(path: standardized, reason: reason)
+        }
+
+        var info = stat()
+        guard lstat(standardized, &info) == 0, (info.st_mode & S_IFMT) == S_IFDIR else {
+            throw SafetyError.invalidPath(path: standardized)
+        }
+        // A symlinked folder (or one reached through a symlinked parent) is never followed.
+        let resolved = folder.standardizedFileURL.resolvingSymlinksInPath().path
+        guard resolved == standardized else {
+            throw SafetyError.symlinkEscape(originalPath: standardized, resolvedPath: resolved)
         }
     }
 

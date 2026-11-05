@@ -79,7 +79,10 @@ These are hard requirements; a PR that weakens any of them is rejected.
    still inside the allowlist root; never follow symlinks into unknown locations.
 3. **Protected paths.** Hard deny: SIP-protected volumes, `/System`,
    `/private/var/db`, the user's Desktop/Documents/Downloads roots, and any
-   active application bundle.
+   active application bundle. The Desktop/Documents/Downloads subtrees are
+   denied by default; the only exception is the duplicates flow, which may move
+   *regular files* (never directories, packages or the roots themselves) from
+   below a folder the user explicitly picked for that single operation (§11.7).
 4. **Trash-first.** Default destructive op is `FileManager.trashItem` (real
    Trash, recoverable). Permanent delete requires an explicit per-item opt-in
    checkbox, off by default.
@@ -145,7 +148,8 @@ require human maintainer review.
   - Update-mechanism decision: brew-only, Sparkle deferred (#46, §11.6).
   - Release (#47).
 - **v0.3:** real app uninstall by moving the `.app` to Trash via Safety (#107),
-  moving duplicates to Trash (#40, after the protected-area decision in #105),
+  moving duplicates to Trash (#40, after the protected-area decision in #105;
+  implemented, see §11.5 and §11.7),
   version-conditional exclusions in the rule DB (#106).
 - **v1.0:** config audit module, localization call, Product Hunt / Show HN
   launch, sponsorship setup.
@@ -306,8 +310,14 @@ Implemented by #33 (schema) and #34 (loader/validation); content by #101.
   are not followed; read errors are exposed, never treated as hashes.
 - View (#39): list of groups, group details, Reveal in Finder — like Large
   Files. **No selection and no deletion in v0.2.**
-- Moving duplicates to Trash is v0.3 (#40) and depends on the protected-area
-  decision for Desktop/Documents/Downloads (#105).
+- Moving duplicates to Trash (#40, v0.3) follows the protected-area decision
+  for Desktop/Documents/Downloads (#105, §11.7). Nothing is selected by default;
+  every group keeps at least one copy (the UI refuses to tick the last one and
+  `DuplicateTrashPlan` refuses the selection again); a dry-run, a recap with
+  count and size, and an explicit confirmation come before the move. Selected
+  copies are re-checked against the scan (still a regular file, same size and
+  modification date) and skipped, with a visible reason, when they changed.
+  They reach the Safety pipeline only, trash-first; no permanent delete.
 
 ### 11.5b Audit log: contents and path privacy (#103)
 
@@ -370,10 +380,8 @@ in §6. Maintainer confirmation is expected in the PR review of #46.
 
 ### 11.7 Protected-area semantics for Desktop, Documents and Downloads (#105)
 
-**Status: proposed — pending maintainer approval.** This issue changes no code
-and no test; `PathValidator` is unchanged. The decision below takes effect only
-after the maintainer approves it in the review of this PR, and the later
-implementation (#40) needs its own `[SAFETY]` issue and review.
+**Status: approved (merged in #170) and implemented by #40.** #105 changed no
+code; the implementation below is `[SAFETY]`-flagged and needs human review.
 
 **Current behavior (v0.1/v0.2).** Invariant 3 says "the user's
 Desktop/Documents/Downloads *roots*", but `PathValidator.checkProtectedPaths`
@@ -424,6 +432,26 @@ user-confirmed duplicate operation, and implement **B restricted by C** for
    package cases.
 7. The wording of invariant 3 is amended in §5 when #40 is implemented,
    in the same `[SAFETY]` PR as the code.
+
+**Implementation (#40).**
+- `ProtectedAreaGrant` (`Safety/`) is the in-memory grant. Its init rejects `..`,
+  system paths, `~` and any parent of it, symlinks and anything that is not an
+  existing directory; a protected root such as `~/Documents` is accepted.
+- `PathValidator.validate(path:allowedRoots:protectedAreaGrants:)` lifts the
+  Desktop/Documents/Downloads denial only strictly *below* a grant folder; the
+  roots, system prefixes and bundle suffixes stay denied. `SymlinkValidator`
+  applies the same grants to the resolved target.
+- `DeletionPipeline.execute(…, protectedAreaGrants:)` honors grants only for the
+  module id `files.duplicates` and holds them for that call only. For an item
+  that relies on a grant it also requires a regular file (checked with `lstat`,
+  so a symlink is refused) none of whose parent folders is a package or bundle.
+  The module allowlist (invariant 1) is still required in addition to the grant.
+- The audit record gets `protectedAreaException: true` for those items (the
+  field is absent otherwise, so existing logs stay valid); the exported report
+  prints it.
+- The UI creates grants per operation from the folders the last scan covered,
+  only for folders that hold a ticked copy, and names protected folders in the
+  confirmation sheet.
 
 **Not decided here.** Any change to `PathValidator`, any other module touching
 these folders, and the `.app`/`/Applications` denials, which stay unchanged
