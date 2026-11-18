@@ -1,0 +1,38 @@
+{
+  "version": "2026.5",
+  "schemaVersion": 2,
+  "rules": [
+    {
+      "id": "caches.example.editor",
+      "module": "caches.user",
+      "category": "Caches",
+      "name": "Example Editor caches",
+      "description": "Caches of Example Editor.",
+      "allowlistRoots": [
+        "~/Library/Caches"
+      ],
+      "paths": [],
+      "patterns": [
+        "com.example.Editor/**"
+      ],
+      "exclusions": [],
+      "isTrashSafe": true,
+      "provenance": {
+        "source": "Synthetic fixture",
+        "author": "terso-maintainer",
+        "date": "2026-11-18",
+        "rationale": "Fixture: versions 2.0 to 2.9 keep user data under Caches/com.example.Editor/Data."
+      },
+      "versionExclusions": [
+        {
+          "bundleID": "com.example.Editor",
+          "minVersion": "2.0",
+          "maxVersion": "2.9.9",
+          "paths": [
+            "com.example.Editor/Data/**"
+          ]
+        }
+      ]
+    }
+  ]
+}
