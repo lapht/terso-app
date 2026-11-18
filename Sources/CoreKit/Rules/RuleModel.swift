@@ -95,6 +95,9 @@ public struct CleanupRule: Codable, Equatable, Sendable {
     /// Schema v2 metadata describing where the rule comes from and why it is correct.
     public let provenance: Provenance?
 
+    /// Schema v2 glob exclusions that apply only while a given app version is installed.
+    public let versionExclusions: [VersionExclusion]?
+
     public init(
         id: String,
         module: String,
@@ -108,7 +111,8 @@ public struct CleanupRule: Codable, Equatable, Sendable {
         minAgeSeconds: Int64?,
         isTrashSafe: Bool,
         appPatterns: [AppPattern]? = nil,
-        provenance: Provenance? = nil
+        provenance: Provenance? = nil,
+        versionExclusions: [VersionExclusion]? = nil
     ) {
         self.id = id
         self.module = module
@@ -123,11 +127,12 @@ public struct CleanupRule: Codable, Equatable, Sendable {
         self.isTrashSafe = isTrashSafe
         self.appPatterns = appPatterns
         self.provenance = provenance
+        self.versionExclusions = versionExclusions
     }
 
     enum CodingKeys: String, CodingKey, CaseIterable {
         case id, module, category, name, description, allowlistRoots, paths, patterns, exclusions
-        case minAgeSeconds, isTrashSafe, appPatterns, provenance
+        case minAgeSeconds, isTrashSafe, appPatterns, provenance, versionExclusions
     }
 
     /// Decodes a rule and reports unknown keys, including nested ones, with this rule's id.
@@ -149,7 +154,8 @@ public struct CleanupRule: Codable, Equatable, Sendable {
                 minAgeSeconds: try container.decodeIfPresent(Int64.self, forKey: .minAgeSeconds),
                 isTrashSafe: try container.decode(Bool.self, forKey: .isTrashSafe),
                 appPatterns: try container.decodeIfPresent([AppPattern].self, forKey: .appPatterns),
-                provenance: try container.decodeIfPresent(Provenance.self, forKey: .provenance)
+                provenance: try container.decodeIfPresent(Provenance.self, forKey: .provenance),
+                versionExclusions: try container.decodeIfPresent([VersionExclusion].self, forKey: .versionExclusions)
             )
         } catch let error as UnknownFieldError {
             throw RuleValidationError.unknownField(ruleID: id, field: error.field(relativeTo: decoder.codingPath))
@@ -224,5 +230,43 @@ public struct Provenance: Codable, Equatable, Sendable {
         author = try container.decode(String.self, forKey: .author)
         date = try container.decode(String.self, forKey: .date)
         rationale = try container.decode(String.self, forKey: .rationale)
+    }
+}
+
+/// Schema v2 exclusion that applies only when the installed app's version is in a range.
+///
+/// `paths` are glob patterns relative to the rule's allowlist roots, like `exclusions`.
+/// The range is inclusive; an omitted bound is open. See docs/design.md §11.2.
+public struct VersionExclusion: Codable, Equatable, Sendable {
+    /// Reverse-DNS bundle ID of the app whose version is tested.
+    public let bundleID: String
+
+    /// Lowest affected version (inclusive), or `nil` for no lower bound.
+    public let minVersion: String?
+
+    /// Highest affected version (inclusive), or `nil` for no upper bound.
+    public let maxVersion: String?
+
+    /// Glob patterns excluded while the installed version is in range.
+    public let paths: [String]
+
+    public init(bundleID: String, minVersion: String? = nil, maxVersion: String? = nil, paths: [String]) {
+        self.bundleID = bundleID
+        self.minVersion = minVersion
+        self.maxVersion = maxVersion
+        self.paths = paths
+    }
+
+    enum CodingKeys: String, CodingKey, CaseIterable {
+        case bundleID, minVersion, maxVersion, paths
+    }
+
+    public init(from decoder: Decoder) throws {
+        try decoder.rejectUnknownKeys(CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        bundleID = try container.decode(String.self, forKey: .bundleID)
+        minVersion = try container.decodeIfPresent(String.self, forKey: .minVersion)
+        maxVersion = try container.decodeIfPresent(String.self, forKey: .maxVersion)
+        paths = try container.decode([String].self, forKey: .paths)
     }
 }

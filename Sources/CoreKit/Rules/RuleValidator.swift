@@ -31,6 +31,7 @@ public enum RuleValidationError: Error, CustomStringConvertible, Equatable, Send
     case schemaV2FieldInV1Database(ruleID: String, field: String)
     case invalidAppPattern(ruleID: String, field: String, value: String, reason: String)
     case missingProvenance(ruleID: String)
+    case invalidVersionExclusion(ruleID: String, field: String, value: String, reason: String)
     case invalidProvenance(ruleID: String, field: String, reason: String)
     /// A key outside the documented schema; `ruleID` is `nil` for top-level keys.
     case unknownField(ruleID: String?, field: String)
@@ -56,6 +57,8 @@ public enum RuleValidationError: Error, CustomStringConvertible, Equatable, Send
         case let .schemaV2FieldInV1Database(ruleID, field):
             "Rule '\(ruleID)' uses schema v2 field '\(field)' in a schemaVersion 1 database"
         case let .invalidAppPattern(ruleID, field, value, reason):
+            "Rule '\(ruleID)' has an invalid '\(field)' value '\(value)': \(reason)"
+        case let .invalidVersionExclusion(ruleID, field, value, reason):
             "Rule '\(ruleID)' has an invalid '\(field)' value '\(value)': \(reason)"
         case let .missingProvenance(ruleID):
             "Rule '\(ruleID)' defines 'appPatterns' and must define 'provenance'"
@@ -129,7 +132,8 @@ public enum RuleValidator {
             ("allowlistRoots", rule.allowlistRoots),
             ("paths", rule.paths),
             ("patterns", rule.patterns),
-            ("exclusions", rule.exclusions)
+            ("exclusions", rule.exclusions),
+            ("versionExclusions", (rule.versionExclusions ?? []).flatMap(\.paths))
         ]
         for (field, values) in fields {
             for value in values where value.split(separator: "/", omittingEmptySubsequences: true).contains("..") {
@@ -185,7 +189,7 @@ public enum RuleValidator {
             components.first?.caseInsensitiveCompare("System") == .orderedSame
     }
 
-    private static func globValidationError(in pattern: String) -> String? {
+    static func globValidationError(in pattern: String) -> String? {
         var inCharacterClass = false
         var characterClassHasMember = false
         var isEscaped = false

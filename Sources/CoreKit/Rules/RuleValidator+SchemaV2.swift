@@ -43,6 +43,9 @@ extension RuleValidator {
         if rule.provenance != nil {
             throw RuleValidationError.schemaV2FieldInV1Database(ruleID: rule.id, field: "provenance")
         }
+        if rule.versionExclusions != nil {
+            throw RuleValidationError.schemaV2FieldInV1Database(ruleID: rule.id, field: "versionExclusions")
+        }
     }
 
     static func validateSchemaV2Fields(of rule: CleanupRule) throws {
@@ -65,6 +68,7 @@ extension RuleValidator {
         if let provenance = rule.provenance {
             try validate(provenance: provenance, ruleID: rule.id)
         }
+        try validateVersionExclusions(of: rule)
     }
 
     private static func validate(appPattern: AppPattern, field: String, rule: CleanupRule) throws {
@@ -106,7 +110,7 @@ extension RuleValidator {
     }
 
     /// Validates a reverse-DNS style identifier: ASCII letters, digits, `-` and `.` only, so no globs.
-    private static func identifierValidationError(_ identifier: String, minimumComponents: Int) -> String? {
+    static func identifierValidationError(_ identifier: String, minimumComponents: Int) -> String? {
         guard !identifier.isEmpty else {
             return "must not be empty"
         }

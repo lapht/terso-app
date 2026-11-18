@@ -77,7 +77,7 @@ Things Terso never cleans are listed in [docs/design.md §12](docs/design.md#12-
 - Leftovers are reported only for apps that are no longer installed (bundle ID absent from a complete discovery), only under the `~/Library` roots listed in design.md §11.4, and acted on only through the existing Safety pipeline, trash-first.
 - Duplicates are read-only in v0.2: list, details, Reveal in Finder. No selection, no deletion (v0.3, #40).
 - Leftovers and duplicates are separate sidebar sections and are not part of Smart Scan.
-- Rule DB v2 follows the contract in design.md §11.2; version-conditional exclusions are out of scope for v0.2 (#106).
+- Rule DB v2 follows the contract in design.md §11.2; version-conditional exclusions are out of scope for v0.2 and specified in design.md §11.2 for v0.3 (#106).
 - Changes to `Safety/` or `Rules/` (including `Rules/*.json`) keep requiring the `[SAFETY]` flag and human review.
 
 ## Release procedure

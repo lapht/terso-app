@@ -254,9 +254,27 @@ Implemented by #33 (schema) and #34 (loader/validation); content by #101.
 - **Compatibility with v0.1.** A `schemaVersion: 1` database (e.g.
   `Rules/v2026.1.json`) loads with unchanged behavior. A v1 rule copied into a
   v2 database without the new fields keeps its meaning.
-- **Out of scope for v0.2:** version-conditional exclusions (excluding paths
-  only for certain versions of an installed app). Fields for them are not part
-  of the v2 contract and are rejected as unknown; tracked in #106 (v0.3).
+- **Version-conditional exclusions (#106, v0.3).** Optional `versionExclusions`
+  array on a rule, schema v2 only (`schemaVersion: 1` rejects it with
+  `schemaV2FieldInV1Database`) and requiring `provenance`. Each entry has
+  `bundleID` (reverse-DNS), `minVersion` and/or `maxVersion` (at least one),
+  and non-empty `paths`: glob patterns relative to the rule's allowlist roots,
+  validated like `exclusions` (no `..`).
+  - *Version semantics.* Versions are 1-4 dot-separated ASCII-digit numbers
+    (at most 9 digits each), compared component-wise as integers; missing
+    trailing components are 0 (`1.2` = `1.2.0`, `1.9` < `1.10`). Suffixes such
+    as `-beta` are not valid. `minVersion` <= `maxVersion`; both bounds are
+    inclusive, an omitted bound is open.
+  - *Scope.* Exclusions only ever remove candidates; they cannot add paths or
+    widen a rule. They are evaluated through
+    `RuleEvaluator.evaluate(rule:candidates:installedVersions:)`, after the
+    normal allowlist and symlink checks.
+  - *Fail-safe.* If the app is absent from `installedVersions`, its version is
+    unknown, or it does not parse, the exclusion applies (more is protected).
+  - Reading the installed version from `Info.plist` and wiring this into
+    modules is not part of this change.
+  - **No documented real-world use case exists yet** (the issue's first
+    acceptance criterion); the contract is generic and flagged for review.
 
 ### 11.3 Installed-app discovery
 - Read-only scan of `/Applications`, `~/Applications` and their subfolders,
