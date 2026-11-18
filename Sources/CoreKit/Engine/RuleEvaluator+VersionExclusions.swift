@@ -29,7 +29,7 @@ extension CleanupRule {
     public func activeVersionExclusionPaths(installedVersions: [String: String?]) -> [String] {
         (versionExclusions ?? []).flatMap { exclusion -> [String] in
             guard
-                let raw = installedVersions[exclusion.bundleID] ?? nil,
+                let raw = installedVersions[exclusion.bundleID].flatMap({ $0 }),
                 let installed = AppVersion(raw)
             else {
                 return exclusion.paths
